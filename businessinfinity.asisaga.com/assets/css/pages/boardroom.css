@@ -41,6 +41,26 @@
   border-top: 1px solid #dee2e6;
 }
 
+/* Sidebar collapsed state */
+.chatroom-sidebar-container.collapsed .chatroom-members-sidebar {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: width 0.3s, min-width 0.3s, max-width 0.3s, opacity 0.3s;
+}
+.chatroom-sidebar-container.collapsed {
+  /* Optionally shrink the sidebar toggle strip */
+}
+
+.chatroom-sidebar-container.collapsed ~ .chatroom-chat-area,
+.chatroom-sidebar-container.collapsed + .chatroom-chat-area {
+  /* If using flex, chat area will expand automatically. If not, force it: */
+  flex-basis: 100%;
+  max-width: 100%;
+}
+
 .chatroom-sidebar-toggle-strip {
   background: #6c757d;
   color: #fff;
@@ -255,19 +275,17 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  position: relative;
-  border-left: 1px solid #dee2e6;
-  border-top: 1px solid #dee2e6;
+  min-height: 0;
   min-width: 0;
 }
 
 .chatroom-chat-messages {
-  padding-top: 1rem;
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
   position: relative;
-  height: 100%;
-  min-height: 0;
+  padding-top: 1rem;
 }
 
 .chatroom-message-row {

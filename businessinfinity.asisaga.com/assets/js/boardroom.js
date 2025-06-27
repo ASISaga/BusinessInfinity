@@ -106,4 +106,22 @@ document.addEventListener('DOMContentLoaded', function () {
     renderMembers(members, lastMessages, unreadCounts, messages);
     renderMessages(messages, members);
   });
+
+  // Toggle members sidebar
+  const toggleBtn = document.getElementById('toggleMembersBtn');
+  const sidebarContainer = document.getElementById('sidebarContainer');
+  const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+  if (toggleBtn && sidebarContainer) {
+    toggleBtn.addEventListener('click', function () {
+      sidebarContainer.classList.toggle('collapsed');
+      // Optionally toggle chevron direction
+      if (sidebarToggleIcon) {
+        const isCollapsed = sidebarContainer.classList.contains('collapsed');
+        sidebarToggleIcon.src = isCollapsed
+          ? 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-right.svg'
+          : 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-left.svg';
+        sidebarToggleIcon.alt = isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar';
+      }
+    });
+  }
 });
