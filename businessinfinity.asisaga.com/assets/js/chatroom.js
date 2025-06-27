@@ -95,10 +95,10 @@ async function renderMessages(messages, members) {
 
 document.addEventListener('DOMContentLoaded', function () {
   Promise.all([
-    fetch('/data/members.json').then(res => res.json()),
-    fetch('/data/last_messages.json').then(res => res.json()),
-    fetch('/data/unread_counts.json').then(res => res.json()),
-    fetch('/data/chat.json').then(res => res.json())
+    fetch('/assets/data/members.json').then(res => res.json()),
+    fetch('/assets/data/last_messages.json').then(res => res.json()),
+    fetch('/assets/data/unread_counts.json').then(res => res.json()),
+    fetch('/assets/data/chat.json').then(res => res.json())
   ]).then(([members, lastMessages, unreadCounts, messages]) => {
     renderMembers(members, lastMessages, unreadCounts, messages);
     renderMessages(messages, members);
