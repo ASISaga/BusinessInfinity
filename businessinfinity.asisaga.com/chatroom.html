@@ -27,19 +27,26 @@
               <span class="chatroom-sidebar-strip-spacer"></span>
               <i class="fas fa-angle-double-left chatroom-sidebar-toggle-icon" id="sidebarToggleIcon"></i>
             </nav>
-            <aside id="membersSidebar" class="chatroom-members-sidebar" aria-label="Members Sidebar">
+            <aside id="membersSidebar" class="chatroom-members-sidebar d-flex flex-column" aria-label="Members Sidebar">
               <header class="chatroom-members-header">
                 <h5 class="chatroom-members-title" id="membersSidebarLabel">Members</h5>
                 <button type="button" class="chatroom-sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close"></button>
               </header>
-              <section class="chatroom-members-section" id="members">
+              <section class="chatroom-members-section flex-grow-1 d-flex flex-column" id="members">
                 <form class="chatroom-members-search-form" role="search" aria-label="Search Members">
                   <input type="search" class="chatroom-members-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
                   <span class="chatroom-members-search-addon" id="search-addon">
                     <i class="fas fa-search"></i>
                   </span>
                 </form>
-                <ul class="chatroom-members-list" role="list" id="membersListContainer">
+                <ul class="chatroom-members-list flex-grow-1" role="list" id="membersListContainer" style="overflow-y: auto; height: 0; min-height: 0; max-height: 100%;">
+                  <!-- Example member item with circular avatar -->
+                  <!--
+                  <li class="chatroom-member-item">
+                    <img src="/assets/img/avatar1.png" alt="Member Name" class="chatroom-member-avatar rounded-circle" width="40" height="40">
+                    <span class="chatroom-member-name">Member Name</span>
+                  </li>
+                  -->
                   <!-- Members will be injected here by JavaScript -->
                 </ul>
               </section>

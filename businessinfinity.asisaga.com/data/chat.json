@@ -2,8 +2,6 @@
   {
     "id": 1,
     "senderId": 6,
-    "senderName": "Ben Smith",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp",
     "direction": "received",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "timestamp": "12:00 PM | Aug 13"
@@ -11,8 +9,6 @@
   {
     "id": 2,
     "senderId": 1,
-    "senderName": "Marie Horwitz",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
     "direction": "sent",
     "text": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "timestamp": "12:00 PM | Aug 13"
@@ -20,8 +16,6 @@
   {
     "id": 3,
     "senderId": 6,
-    "senderName": "Ben Smith",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp",
     "direction": "received",
     "text": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     "timestamp": "12:00 PM | Aug 13"
@@ -29,8 +23,6 @@
   {
     "id": 4,
     "senderId": 1,
-    "senderName": "Marie Horwitz",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
     "direction": "sent",
     "text": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     "timestamp": "12:00 PM | Aug 13"
@@ -38,8 +30,6 @@
   {
     "id": 5,
     "senderId": 6,
-    "senderName": "Ben Smith",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp",
     "direction": "received",
     "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
     "timestamp": "12:00 PM | Aug 13"
@@ -47,8 +37,6 @@
   {
     "id": 6,
     "senderId": 1,
-    "senderName": "Marie Horwitz",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
     "direction": "sent",
     "text": "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
     "timestamp": "12:00 PM | Aug 13"
@@ -56,8 +44,6 @@
   {
     "id": 7,
     "senderId": 6,
-    "senderName": "Ben Smith",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp",
     "direction": "received",
     "text": "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
     "timestamp": "12:00 PM | Aug 13"
@@ -65,10 +51,36 @@
   {
     "id": 8,
     "senderId": 1,
-    "senderName": "Marie Horwitz",
-    "avatar": "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
     "direction": "sent",
     "text": "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
     "timestamp": "12:00 PM | Aug 13"
+  },
+  {
+    "id": 9,
+    "senderId": 2,
+    "direction": "sent",
+    "text": "Hi, this is Alexa!",
+    "timestamp": "5 mins ago"
+  },
+  {
+    "id": 10,
+    "senderId": 3,
+    "direction": "sent",
+    "text": "Danny here, checking in.",
+    "timestamp": "Yesterday"
+  },
+  {
+    "id": 11,
+    "senderId": 4,
+    "direction": "sent",
+    "text": "Ashley reporting!",
+    "timestamp": "Yesterday"
+  },
+  {
+    "id": 12,
+    "senderId": 5,
+    "direction": "sent",
+    "text": "Kate Moss present.",
+    "timestamp": "Yesterday"
   }
 ]

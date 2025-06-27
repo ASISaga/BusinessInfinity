@@ -1,63 +1,106 @@
 // chatroom.js: Dynamic loading and rendering of members and chat messages
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Load and render members
-  fetch('/data/members.json')
-    .then(response => response.json())
-    .then(members => renderMembers(members));
+// Utility to load a template file and cache it
+const templateCache = {};
+async function loadTemplate(path) {
+  if (templateCache[path]) return templateCache[path];
+  const res = await fetch(path);
+  const text = await res.text();
+  templateCache[path] = text;
+  return text;
+}
 
-  // Load and render chat messages
-  fetch('/data/chat.json')
-    .then(response => response.json())
-    .then(messages => renderMessages(messages));
-});
+// Simple template rendering: replaces {{var}} with values from data
+function renderTemplate(template, data) {
+  return template.replace(/{{(\w+)}}/g, (match, key) => {
+    return key in data ? data[key] : '';
+  });
+}
 
-function renderMembers(members) {
+// Support for {{#if ...}} ... {{/if}} and {{#unless ...}} ... {{/unless}}
+function renderLogicBlocks(template, data) {
+  // #if
+  template = template.replace(/{{#if (\w+)}}([\s\S]*?){{\/if}}/g, (m, key, content) => {
+    return data[key] ? content : '';
+  });
+  // #unless
+  template = template.replace(/{{#unless (\w+)}}([\s\S]*?){{\/unless}}/g, (m, key, content) => {
+    return !data[key] ? content : '';
+  });
+  return template;
+}
+
+async function renderMembers(members, lastMessages, unreadCounts, messages) {
   const membersList = document.getElementById('membersListContainer');
   if (!membersList) return;
   membersList.innerHTML = '';
-  members.forEach(member => {
+  const template = await loadTemplate('/assets/templates/chatroom-member-item.html');
+  for (const member of members) {
+    const lastMsgObj = lastMessages.find(lm => lm.memberId === member.id) || {};
+    const unreadObj = unreadCounts.find(u => u.memberId === member.id) || {};
+    let lastMessageText = '';
+    if (lastMsgObj.lastMessageId) {
+      const msg = messages.find(m => m.id === lastMsgObj.lastMessageId);
+      lastMessageText = msg ? msg.text : '';
+    }
     const badgeClass = member.status === 'online' ? 'chatroom-member-badge-success' :
       member.status === 'away' ? 'chatroom-member-badge-warning' : 'chatroom-member-badge-danger';
     const badgeLabel = member.status === 'online' ? 'Online' : member.status === 'away' ? 'Away' : 'Offline';
-    membersList.innerHTML += `
-      <li class="chatroom-member-item" role="listitem">
-        <a href="#" class="chatroom-member-link">
-          <div class="chatroom-member-row">
-            <div class="chatroom-member-avatar-wrapper">
-              <img src="${member.avatar}" alt="Avatar of ${member.name}" class="chatroom-member-avatar">
-              <span class="chatroom-member-badge ${badgeClass}" aria-label="${badgeLabel}"></span>
-            </div>
-            <div class="chatroom-member-info">
-              <p class="chatroom-member-name">${member.name}</p>
-              <p class="chatroom-member-message">${member.lastMessage}</p>
-            </div>
-          </div>
-          <div class="chatroom-member-meta">
-            <p class="chatroom-member-time">${member.lastSeen}</p>
-            ${member.unread > 0 ? `<span class="chatroom-member-unread">${member.unread}</span>` : ''}
-          </div>
-        </a>
-      </li>
-    `;
-  });
+    const unreadHtml = unreadObj.unread > 0 ? `<span class=\"chatroom-member-unread\">${unreadObj.unread}</span>` : '';
+    const html = renderTemplate(template, {
+      avatar: member.avatar,
+      name: member.name,
+      role: member.role || '',
+      lastMessageText,
+      badgeClass,
+      badgeLabel,
+      lastSeen: lastMsgObj.lastSeen || '',
+      unreadHtml
+    });
+    membersList.innerHTML += html;
+  }
 }
 
-function renderMessages(messages) {
+async function renderMessages(messages, members) {
   const chatMessages = document.getElementById('chatMessages');
   if (!chatMessages) return;
   chatMessages.innerHTML = '';
-  messages.forEach(msg => {
+  const template = await loadTemplate('/assets/templates/chatroom-message-item.html');
+  for (const msg of messages) {
     const isReceived = msg.direction === 'received';
-    chatMessages.innerHTML += `
-      <article class="chatroom-message-row ${isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end'}">
-        ${isReceived ? `<img src="${msg.avatar}" alt="Avatar of ${msg.senderName}" class="chatroom-message-avatar">` : ''}
-        <div class="chatroom-message-content">
-          <p class="chatroom-message-text ${isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent'}">${msg.text}</p>
-          <p class="chatroom-message-meta ${isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent'}">${msg.timestamp}</p>
-        </div>
-        ${!isReceived ? `<img src="${msg.avatar}" alt="Avatar of ${msg.senderName}" class="chatroom-message-avatar">` : ''}
-      </article>
-    `;
-  });
+    const sender = members.find(m => m.id === msg.senderId) || {};
+    const senderName = sender.name || 'Unknown';
+    const senderAvatar = sender.avatar || '';
+    const html = renderLogicBlocks(template, {
+      isReceived,
+      avatar: senderAvatar,
+      name: senderName,
+      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
+      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
+      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent',
+      text: msg.text,
+      timestamp: msg.timestamp
+    });
+    chatMessages.innerHTML += renderTemplate(html, {
+      avatar: senderAvatar,
+      name: senderName,
+      text: msg.text,
+      timestamp: msg.timestamp,
+      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
+      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
+      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent'
+    });
+  }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  Promise.all([
+    fetch('/data/members.json').then(res => res.json()),
+    fetch('/data/last_messages.json').then(res => res.json()),
+    fetch('/data/unread_counts.json').then(res => res.json()),
+    fetch('/data/chat.json').then(res => res.json())
+  ]).then(([members, lastMessages, unreadCounts, messages]) => {
+    renderMembers(members, lastMessages, unreadCounts, messages);
+    renderMessages(messages, members);
+  });
+});
