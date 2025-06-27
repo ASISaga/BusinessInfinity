@@ -1,19 +1,19 @@
 <li class="chatroom-member-item" role="listitem">
   <a href="#" class="chatroom-member-link">
-    <div class="chatroom-member-row">
-      <div class="chatroom-member-avatar-wrapper">
+    <div class="chatroom-member-row d-flex align-items-center justify-content-between">
+      <div class="chatroom-member-avatar-wrapper d-flex align-items-center me-3">
         <img src="{{avatar}}" alt="Avatar of {{name}}" class="chatroom-member-avatar rounded-circle" width="40" height="40">
-        <span class="chatroom-member-badge {{badgeClass}}" aria-label="{{badgeLabel}}"></span>
+        <span class="chatroom-member-badge {{badgeClass}} ms-2" aria-label="{{badgeLabel}}"></span>
       </div>
-      <div class="chatroom-member-info">
-        <p class="chatroom-member-name">{{name}}</p>
-        <p class="chatroom-member-designation">{{role}}</p>
-        <p class="chatroom-member-message">{{lastMessageText}}</p>
+      <div class="chatroom-member-info flex-grow-1">
+        <p class="chatroom-member-name mb-1">{{name}}</p>
+        <p class="chatroom-member-designation mb-1">{{role}}</p>
+        <p class="chatroom-member-message mb-0">{{lastMessageText}}</p>
       </div>
-    </div>
-    <div class="chatroom-member-meta">
-      <p class="chatroom-member-time">{{lastSeen}}</p>
-      {{unreadHtml}}
+      <div class="chatroom-member-meta text-end ms-3">
+        <p class="chatroom-member-time mb-1">{{lastSeen}}</p>
+        {{unreadHtml}}
+      </div>
     </div>
   </a>
 </li>

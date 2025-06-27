@@ -3,6 +3,9 @@
    All layout, spacing, and color previously handled by inline styles or Bootstrap utility classes is encapsulated here. 
 */
 
+/* Import component styles for chatroom member item */
+@import '../components/chatroom-member-item.css';
+
 .chatroom-boardroom-container {
   width: 100vw;
   min-height: 100vh;

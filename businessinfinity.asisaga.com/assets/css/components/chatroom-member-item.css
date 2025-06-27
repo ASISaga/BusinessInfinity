@@ -1,0 +1,95 @@
+/* chatroom-member-item.css - Styles for chatroom-member-item.html component
+   All layout, spacing, and alignment for the chatroom member item is encapsulated here.
+   Uses Bootstrap 5 utility classes as reference for flex and spacing, but encapsulated in custom classes.
+*/
+
+.chatroom-member-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.chatroom-member-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.chatroom-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatroom-member-avatar-wrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  position: relative;
+}
+
+.chatroom-member-avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #f1f1f1;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.chatroom-member-badge {
+  margin-left: 0.5rem;
+  position: absolute;
+  left: 45px;
+  top: 40px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.chatroom-member-info {
+  flex-grow: 1;
+  padding-top: 0.25rem;
+}
+
+.chatroom-member-name {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.chatroom-member-designation {
+  margin-bottom: 0.25rem;
+}
+
+.chatroom-member-message {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.chatroom-member-meta {
+  text-align: right;
+  margin-left: 1rem;
+  padding-top: 0.25rem;
+}
+
+.chatroom-member-time {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+/* Badge color variants */
+.chatroom-member-badge-success { background: #28a745; }
+.chatroom-member-badge-warning { background: #ffc107; }
+.chatroom-member-badge-danger { background: #dc3545; }
+
+.chatroom-member-unread {
+  background: #dc3545;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.25em 0.75em;
+  font-size: 0.75rem;
+  float: right;
+}
