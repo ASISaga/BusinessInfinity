@@ -39,205 +39,16 @@
                     <i class="fas fa-search"></i>
                   </span>
                 </form>
-                <nav class="chatroom-members-list-nav" aria-label="Member List" role="navigation">
-                  <ul class="chatroom-members-list" role="list">
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="Avatar of Marie Horwitz" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Marie Horwitz</p>
-                            <p class="chatroom-member-message">Hello, Are you there?</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">Just now</p>
-                          <span class="chatroom-member-unread">3</span>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp" alt="Avatar of Alexa Chung" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-warning"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Alexa Chung</p>
-                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">5 mins ago</p>
-                          <span class="chatroom-member-unread">2</span>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="Avatar of Danny McChain" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Danny McChain</p>
-                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">Yesterday</p>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="Avatar of Ashley Olsen" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-danger" aria-label="Offline"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Ashley Olsen</p>
-                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">Yesterday</p>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" alt="Avatar of Kate Moss" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-warning"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Kate Moss</p>
-                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">Yesterday</p>
-                        </div>
-                      </a>
-                    </li>
-                    <li class="chatroom-member-item" role="listitem">
-                      <a href="#!" class="chatroom-member-link">
-                        <div class="chatroom-member-row">
-                          <div class="chatroom-member-avatar-wrapper">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="Avatar of Ben Smith" class="chatroom-member-avatar">
-                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
-                          </div>
-                          <div class="chatroom-member-info">
-                            <p class="chatroom-member-name">Ben Smith</p>
-                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
-                          </div>
-                        </div>
-                        <div class="chatroom-member-meta">
-                          <p class="chatroom-member-time">Yesterday</p>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
+                <ul class="chatroom-members-list" role="list" id="membersListContainer">
+                  <!-- Members will be injected here by JavaScript -->
+                </ul>
               </section>
             </aside>
           </aside>
           <!-- Chat Area -->
           <section id="chatArea" class="chatroom-chat-area" aria-label="Chat Area">
-            <section class="chatroom-chat-messages" id="chatMessages" data-mdb-perfect-scrollbar-init aria-label="Chat Messages">
-              <article class="chatroom-message-row chatroom-message-row-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-received">Lorem ipsum
-                    dolor
-                    sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore
-                    magna aliqua.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
-                </div>
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-end">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-sent">Ut enim ad minim veniam,
-                    quis
-                    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
-                </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-received">Duis aute
-                    irure
-                    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                  </p>
-                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
-                </div>
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-end">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-sent">Excepteur sint occaecat
-                    cupidatat
-                    non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
-                </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-received">Sed ut
-                    perspiciatis
-                    unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
-                    rem
-                    aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
-                    dicta
-                    sunt explicabo.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
-                </div>
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-end">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-sent">Nemo enim ipsam
-                    voluptatem quia
-                    voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos
-                    qui
-                    ratione voluptatem sequi nesciunt.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
-                </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-received">Neque porro
-                    quisquam
-                    est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non
-                    numquam
-                    eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
-                </div>
-              </article>
-              <article class="chatroom-message-row chatroom-message-row-end">
-                <div class="chatroom-message-content">
-                  <p class="chatroom-message-text chatroom-message-text-sent">Ut enim ad minima veniam,
-                    quis
-                    nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea
-                    commodi
-                    consequatur?</p>
-                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
-                </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
-              </article>
+            <section class="chatroom-chat-messages" id="chatMessages" aria-label="Chat Messages">
+              <!-- Chat messages will be injected here by JavaScript -->
             </section>
             <footer id="messageInput" class="chatroom-message-input">
               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 3" class="chatroom-message-input-avatar">
@@ -253,6 +64,7 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/assets/js/boardroom.js"></script>
+  <script src="/assets/js/chatroom.js"></script>
 </body>
 
 </html>
