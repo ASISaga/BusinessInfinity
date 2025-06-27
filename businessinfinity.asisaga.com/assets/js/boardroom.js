@@ -1,127 +1,29 @@
-// chatroom.js: Dynamic loading and rendering of members and chat messages
+// Refactored: Boardroom chatroom logic using classes and modules
+import TemplateUtils from './chatroom/template-utils.js';
+import MembersRenderer from './chatroom/members.js';
+import MessagesRenderer from './chatroom/messages.js';
+import SidebarToggle from './chatroom/sidebar-toggle.js';
 
-// Utility to load a template file and cache it
-const templateCache = {};
-async function loadTemplate(path) {
-  if (templateCache[path]) return templateCache[path];
-  const res = await fetch(path);
-  const text = await res.text();
-  templateCache[path] = text;
-  return text;
-}
-
-// Simple template rendering: replaces {{var}} with values from data
-function renderTemplate(template, data) {
-  return template.replace(/{{(\w+)}}/g, (match, key) => {
-    return key in data ? data[key] : '';
-  });
-}
-
-// Support for {{#if ...}} ... {{/if}} and {{#unless ...}} ... {{/unless}}
-function renderLogicBlocks(template, data) {
-  // #if
-  template = template.replace(/{{#if (\w+)}}([\s\S]*?){{\/if}}/g, (m, key, content) => {
-    return data[key] ? content : '';
-  });
-  // #unless
-  template = template.replace(/{{#unless (\w+)}}([\s\S]*?){{\/unless}}/g, (m, key, content) => {
-    return !data[key] ? content : '';
-  });
-  return template;
-}
-
-async function renderMembers(members, lastMessages, unreadCounts, messages) {
-  const membersList = document.getElementById('membersListContainer');
-  if (!membersList) return;
-  membersList.innerHTML = '';
-  const template = await loadTemplate('/assets/templates/chatroom-member-item.html');
-  for (const member of members) {
-    const lastMsgObj = lastMessages.find(lm => lm.memberId === member.id) || {};
-    const unreadObj = unreadCounts.find(u => u.memberId === member.id) || {};
-    let lastMessageText = '';
-    if (lastMsgObj.lastMessageId) {
-      const msg = messages.find(m => m.id === lastMsgObj.lastMessageId);
-      lastMessageText = msg ? msg.text : '';
-    }
-    const badgeClass = member.status === 'online' ? 'chatroom-member-badge-success' :
-      member.status === 'away' ? 'chatroom-member-badge-warning' : 'chatroom-member-badge-danger';
-    const badgeLabel = member.status === 'online' ? 'Online' : member.status === 'away' ? 'Away' : 'Offline';
-    const unreadHtml = unreadObj.unread > 0 ? `<span class=\"chatroom-member-unread\">${unreadObj.unread}</span>` : '';
-    const html = renderTemplate(template, {
-      avatar: member.avatar,
-      name: member.name,
-      role: member.role || '',
-      lastMessageText,
-      badgeClass,
-      badgeLabel,
-      lastSeen: lastMsgObj.lastSeen || '',
-      unreadHtml
-    });
-    membersList.innerHTML += html;
+class BoardroomApp {
+  constructor() {
+    this.membersRenderer = new MembersRenderer('membersListContainer');
+    this.messagesRenderer = new MessagesRenderer('chatMessages');
+    this.sidebarToggle = new SidebarToggle('toggleMembersBtn', 'sidebarContainer', 'sidebarToggleIcon');
   }
-}
 
-async function renderMessages(messages, members) {
-  const chatMessages = document.getElementById('chatMessages');
-  if (!chatMessages) return;
-  chatMessages.innerHTML = '';
-  const template = await loadTemplate('/assets/templates/chatroom-message-item.html');
-  for (const msg of messages) {
-    const isReceived = msg.direction === 'received';
-    const sender = members.find(m => m.id === msg.senderId) || {};
-    const senderName = sender.name || 'Unknown';
-    const senderAvatar = sender.avatar || '';
-    const senderRole = sender.role || '';
-    const html = renderLogicBlocks(template, {
-      isReceived,
-      avatar: senderAvatar,
-      name: senderName,
-      role: senderRole,
-      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
-      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
-      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent',
-      text: msg.text,
-      timestamp: msg.timestamp
-    });
-    chatMessages.innerHTML += renderTemplate(html, {
-      avatar: senderAvatar,
-      name: senderName,
-      role: senderRole,
-      text: msg.text,
-      timestamp: msg.timestamp,
-      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
-      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
-      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent'
-    });
+  async init() {
+    const [members, lastMessages, unreadCounts, messages] = await Promise.all([
+      fetch('/assets/data/members.json').then(res => res.json()),
+      fetch('/assets/data/last_messages.json').then(res => res.json()),
+      fetch('/assets/data/unread_counts.json').then(res => res.json()),
+      fetch('/assets/data/conversation.json').then(res => res.json())
+    ]);
+    await this.membersRenderer.render(members, lastMessages, unreadCounts, messages);
+    await this.messagesRenderer.render(messages, members);
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  Promise.all([
-    fetch('/assets/data/members.json').then(res => res.json()),
-    fetch('/assets/data/last_messages.json').then(res => res.json()),
-    fetch('/assets/data/unread_counts.json').then(res => res.json()),
-    fetch('/assets/data/conversation.json').then(res => res.json())
-  ]).then(([members, lastMessages, unreadCounts, messages]) => {
-    renderMembers(members, lastMessages, unreadCounts, messages);
-    renderMessages(messages, members);
-  });
-
-  // Toggle members sidebar
-  const toggleBtn = document.getElementById('toggleMembersBtn');
-  const sidebarContainer = document.getElementById('sidebarContainer');
-  const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
-  if (toggleBtn && sidebarContainer) {
-    toggleBtn.addEventListener('click', function () {
-      sidebarContainer.classList.toggle('collapsed');
-      // Optionally toggle chevron direction
-      if (sidebarToggleIcon) {
-        const isCollapsed = sidebarContainer.classList.contains('collapsed');
-        sidebarToggleIcon.src = isCollapsed
-          ? 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-right.svg'
-          : 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-left.svg';
-        sidebarToggleIcon.alt = isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar';
-      }
-    });
-  }
+  const app = new BoardroomApp();
+  app.init();
 });
