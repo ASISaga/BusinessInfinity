@@ -5,290 +5,248 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatroom | Business Infinity</title>
-  <link rel="stylesheet" href="/assets/css/boardroom.css">
+  <link rel="stylesheet" href="/assets/css/pages/chatroom.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-  <main class="boardroom-container w-100 min-vh-100 p-0" aria-label="Chatroom" style="max-width:none;">
-    <section style="background-color: #FFFFFF;">
-      <div class="container-fluid py-5">
-        <div class="d-flex flex-row h-100" style="height: 100vh;">
+  <main class="chatroom-boardroom-container">
+    <section class="chatroom-section">
+      <div class="chatroom-container-fluid">
+        <div class="chatroom-main-row">
           <!-- Sidebar Container (toggle strip + sidebar) -->
-          <div id="sidebarContainer" class="d-flex flex-row h-100 align-self-stretch" style="height: 100dvh; min-height: 0;">
-            <div id="sidebarToggleStrip"
-              class="bg-secondary text-white d-flex flex-column align-items-center justify-content-start py-2 align-self-stretch"
-              style="flex: 0 0 48px; min-height: 0; z-index: 1051; cursor: pointer; border-top-left-radius: 8px; border-bottom-left-radius: 8px; position: relative;">
-              <button id="toggleMembersBtn" class="btn btn-link text-white p-0 mb-3 d-flex flex-column align-items-center justify-content-center"
-                style="font-size: 1.5rem; width: 40px; height: 40px; background: none; border: none;"
-                title="Toggle Members">
+          <aside id="sidebarContainer" class="chatroom-sidebar-container">
+            <nav id="sidebarToggleStrip" class="chatroom-sidebar-toggle-strip" aria-label="Sidebar Toggle">
+              <button id="toggleMembersBtn" class="chatroom-toggle-members-btn" title="Toggle Members" aria-label="Toggle Members">
                 <i class="fas fa-users"></i>
               </button>
-              <button class="btn btn-link text-white p-0 mb-3 d-flex flex-column align-items-center justify-content-center"
-                style="font-size: 1.5rem; width: 40px; height: 40px; background: none; border: none;"
-                title="Other Action">
+              <button class="chatroom-other-action-btn" title="Other Action" aria-label="Other Action">
                 <i class="fas fa-cog"></i>
               </button>
-              <span class="flex-grow-1"></span>
-              <i class="fas fa-angle-double-left mt-2" id="sidebarToggleIcon" style="font-size: 1.2rem;"></i>
-            </div>
-            <div id="membersSidebar"
-              class="bg-white border-end h-100 align-self-stretch d-flex flex-column"
-              style="width: 320px; min-width: 320px; max-width: 320px; height: 100dvh; min-height: 0; transition: width 0.3s, min-width 0.3s, max-width 0.3s, opacity 0.3s; overflow: hidden;">
-              <div class="offcanvas-header d-flex justify-content-between align-items-center">
-                <h5 class="offcanvas-title" id="membersSidebarLabel">Members</h5>
-                <button type="button" class="btn-close" id="sidebarCloseBtn" aria-label="Close"></button>
-              </div>
-              <div class="offcanvas-body p-3" id="members">
-
-                <div class="input-group rounded mb-3">
-                  <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-                    aria-describedby="search-addon" />
-                  <span class="input-group-text border-0" id="search-addon">
+              <span class="chatroom-sidebar-strip-spacer"></span>
+              <i class="fas fa-angle-double-left chatroom-sidebar-toggle-icon" id="sidebarToggleIcon"></i>
+            </nav>
+            <aside id="membersSidebar" class="chatroom-members-sidebar" aria-label="Members Sidebar">
+              <header class="chatroom-members-header">
+                <h5 class="chatroom-members-title" id="membersSidebarLabel">Members</h5>
+                <button type="button" class="chatroom-sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close"></button>
+              </header>
+              <section class="chatroom-members-section" id="members">
+                <form class="chatroom-members-search-form" role="search" aria-label="Search Members">
+                  <input type="search" class="chatroom-members-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                  <span class="chatroom-members-search-addon" id="search-addon">
                     <i class="fas fa-search"></i>
                   </span>
-                </div>
-
-                <div data-mdb-perfect-scrollbar-init style="position: relative; height: 400px">
-                  <ul class="list-unstyled mb-0">
-                    <li class="p-2 border-bottom">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-success badge-dot"></span>
+                </form>
+                <nav class="chatroom-members-list-nav" aria-label="Member List" role="navigation">
+                  <ul class="chatroom-members-list" role="list">
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="Avatar of Marie Horwitz" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Marie Horwitz</p>
-                            <p class="small text-muted">Hello, Are you there?</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Marie Horwitz</p>
+                            <p class="chatroom-member-message">Hello, Are you there?</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">Just now</p>
-                          <span class="badge bg-danger rounded-pill float-end">3</span>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">Just now</p>
+                          <span class="chatroom-member-unread">3</span>
                         </div>
                       </a>
                     </li>
-                    <li class="p-2 border-bottom">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-warning badge-dot"></span>
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp" alt="Avatar of Alexa Chung" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-warning"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Alexa Chung</p>
-                            <p class="small text-muted">Lorem ipsum dolor sit.</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Alexa Chung</p>
+                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">5 mins ago</p>
-                          <span class="badge bg-danger rounded-pill float-end">2</span>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">5 mins ago</p>
+                          <span class="chatroom-member-unread">2</span>
                         </div>
                       </a>
                     </li>
-                    <li class="p-2 border-bottom">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-success badge-dot"></span>
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="Avatar of Danny McChain" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Danny McChain</p>
-                            <p class="small text-muted">Lorem ipsum dolor sit.</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Danny McChain</p>
+                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">Yesterday</p>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">Yesterday</p>
                         </div>
                       </a>
                     </li>
-                    <li class="p-2 border-bottom">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-danger badge-dot"></span>
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="Avatar of Ashley Olsen" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-danger" aria-label="Offline"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Ashley Olsen</p>
-                            <p class="small text-muted">Lorem ipsum dolor sit.</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Ashley Olsen</p>
+                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">Yesterday</p>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">Yesterday</p>
                         </div>
                       </a>
                     </li>
-                    <li class="p-2 border-bottom">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-warning badge-dot"></span>
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" alt="Avatar of Kate Moss" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-warning"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Kate Moss</p>
-                            <p class="small text-muted">Lorem ipsum dolor sit.</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Kate Moss</p>
+                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">Yesterday</p>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">Yesterday</p>
                         </div>
                       </a>
                     </li>
-                    <li class="p-2">
-                      <a href="#!" class="d-flex justify-content-between">
-                        <div class="d-flex flex-row">
-                          <div>
-                            <img
-                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                              alt="avatar" class="d-flex align-self-center me-3" width="60">
-                            <span class="badge bg-success badge-dot"></span>
+                    <li class="chatroom-member-item" role="listitem">
+                      <a href="#!" class="chatroom-member-link">
+                        <div class="chatroom-member-row">
+                          <div class="chatroom-member-avatar-wrapper">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="Avatar of Ben Smith" class="chatroom-member-avatar">
+                            <span class="chatroom-member-badge chatroom-member-badge-success" aria-label="Online"></span>
                           </div>
-                          <div class="pt-1">
-                            <p class="fw-bold mb-0">Ben Smith</p>
-                            <p class="small text-muted">Lorem ipsum dolor sit.</p>
+                          <div class="chatroom-member-info">
+                            <p class="chatroom-member-name">Ben Smith</p>
+                            <p class="chatroom-member-message">Lorem ipsum dolor sit.</p>
                           </div>
                         </div>
-                        <div class="pt-1">
-                          <p class="small text-muted mb-1">Yesterday</p>
+                        <div class="chatroom-member-meta">
+                          <p class="chatroom-member-time">Yesterday</p>
                         </div>
                       </a>
                     </li>
                   </ul>
-                </div>
-
-              </div>
-            </div>
-          </div>
+                </nav>
+              </section>
+            </aside>
+          </aside>
           <!-- Chat Area -->
-          <div id="chatArea" class="flex-grow-1 d-flex flex-column h-100 position-relative" style="min-width:0;">
-            <div class="pt-3 pe-3 flex-grow-1 overflow-auto" id="chatMessages" data-mdb-perfect-scrollbar-init style="position: relative; height: 100%; min-height: 0;">
-              <div class="d-flex flex-row justify-content-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">Lorem ipsum
+          <section id="chatArea" class="chatroom-chat-area" aria-label="Chat Area">
+            <section class="chatroom-chat-messages" id="chatMessages" data-mdb-perfect-scrollbar-init aria-label="Chat Messages">
+              <article class="chatroom-message-row chatroom-message-row-start">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-received">Lorem ipsum
                     dolor
                     sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
                     dolore
                     magna aliqua.</p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted float-end">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
                 </div>
-              </div>
-
-              <div class="d-flex flex-row justify-content-end">
-                <div>
-                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Ut enim ad minim veniam,
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-end">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-sent">Ut enim ad minim veniam,
                     quis
                     nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                  <p class="small me-3 mb-3 rounded-3 text-muted">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
                 </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-              </div>
-
-              <div class="d-flex flex-row justify-content-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">Duis aute
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-start">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-received">Duis aute
                     irure
                     dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
                   </p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted float-end">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
                 </div>
-              </div>
-
-              <div class="d-flex flex-row justify-content-end">
-                <div>
-                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Excepteur sint occaecat
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-end">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-sent">Excepteur sint occaecat
                     cupidatat
                     non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                  <p class="small me-3 mb-3 rounded-3 text-muted">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
                 </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-              </div>
-
-              <div class="d-flex flex-row justify-content-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">Sed ut
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-start">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-received">Sed ut
                     perspiciatis
                     unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
                     rem
                     aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
                     dicta
                     sunt explicabo.</p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted float-end">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
                 </div>
-              </div>
-
-              <div class="d-flex flex-row justify-content-end">
-                <div>
-                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Nemo enim ipsam
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-end">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-sent">Nemo enim ipsam
                     voluptatem quia
                     voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos
                     qui
                     ratione voluptatem sequi nesciunt.</p>
-                  <p class="small me-3 mb-3 rounded-3 text-muted">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
                 </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-              </div>
-
-              <div class="d-flex flex-row justify-content-start">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">Neque porro
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-start">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-received">Neque porro
                     quisquam
                     est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non
                     numquam
                     eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted float-end">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-received">12:00 PM | Aug 13</p>
                 </div>
-              </div>
-
-              <div class="d-flex flex-row justify-content-end">
-                <div>
-                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Ut enim ad minima veniam,
+              </article>
+              <article class="chatroom-message-row chatroom-message-row-end">
+                <div class="chatroom-message-content">
+                  <p class="chatroom-message-text chatroom-message-text-sent">Ut enim ad minima veniam,
                     quis
                     nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea
                     commodi
                     consequatur?</p>
-                  <p class="small me-3 mb-3 rounded-3 text-muted">12:00 PM | Aug 13</p>
+                  <p class="chatroom-message-meta chatroom-message-meta-sent">12:00 PM | Aug 13</p>
                 </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1" style="width: 45px; height: 100%;">
-              </div>
-
-            </div>
-            <div id="messageInput" class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2 flex-shrink-0 position-sticky" style="background: #fff; bottom: 0; z-index: 10;">
-              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                alt="avatar 3" style="width: 40px; height: 100%;">
-              <input type="text" class="form-control form-control-lg" id="exampleFormControlInput2"
-                placeholder="Type message">
-              <a class="ms-1 text-muted" href="#!"><i class="fas fa-paperclip"></i></a>
-              <a class="ms-3 text-muted" href="#!"><i class="fas fa-smile"></i></a>
-              <a class="ms-3" href="#!"><i class="fas fa-paper-plane"></i></a>
-            </div>
-          </div>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar 1" class="chatroom-message-avatar">
+              </article>
+            </section>
+            <footer id="messageInput" class="chatroom-message-input">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 3" class="chatroom-message-input-avatar">
+              <input type="text" class="chatroom-message-input-field" id="exampleFormControlInput2" placeholder="Type message">
+              <a class="chatroom-message-input-attach" href="#!"><i class="fas fa-paperclip"></i></a>
+              <a class="chatroom-message-input-emoji" href="#!"><i class="fas fa-smile"></i></a>
+              <a class="chatroom-message-input-send" href="#!"><i class="fas fa-paper-plane"></i></a>
+            </footer>
+          </section>
         </div>
       </div>
     </section>
