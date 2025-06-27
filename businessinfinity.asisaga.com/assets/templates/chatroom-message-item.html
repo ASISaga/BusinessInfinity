@@ -1,12 +1,24 @@
 <article class="chatroom-message-row {{rowClass}}">
   {{#if isReceived}}
-    <img src="{{avatar}}" alt="Avatar of {{name}}" class="chatroom-message-avatar rounded-circle" width="40" height="40">
+    <div class="chatroom-message-avatar-block">
+      <img src="{{avatar}}" alt="Avatar of {{name}}" class="chatroom-message-avatar rounded-circle" width="40" height="40">
+      <div class="chatroom-message-avatar-meta">
+        <span class="chatroom-message-avatar-name">{{name}}</span>
+        <span class="chatroom-message-avatar-role">{{role}}</span>
+      </div>
+    </div>
   {{/if}}
   <div class="chatroom-message-content">
     <p class="chatroom-message-text {{textClass}}">{{text}}</p>
     <p class="chatroom-message-meta {{metaClass}}">{{timestamp}}</p>
   </div>
   {{#unless isReceived}}
-    <img src="{{avatar}}" alt="Avatar of {{name}}" class="chatroom-message-avatar rounded-circle" width="40" height="40">
+    <div class="chatroom-message-avatar-block">
+      <img src="{{avatar}}" alt="Avatar of {{name}}" class="chatroom-message-avatar rounded-circle" width="40" height="40">
+      <div class="chatroom-message-avatar-meta">
+        <span class="chatroom-message-avatar-name">{{name}}</span>
+        <span class="chatroom-message-avatar-role">{{role}}</span>
+      </div>
+    </div>
   {{/unless}}
 </article>

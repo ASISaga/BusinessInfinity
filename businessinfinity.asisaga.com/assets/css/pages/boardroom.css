@@ -283,8 +283,17 @@
 }
 
 .chatroom-message-avatar {
-  width: 45px;
-  height: 100%;
+  width: 40px !important;
+  height: 40px !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block;
+  overflow: hidden;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
 }
 
 .chatroom-message-text {
@@ -332,8 +341,13 @@
 }
 
 .chatroom-message-input-avatar {
-  width: 40px;
-  height: 100%;
+  width: 40px !important;
+  height: 40px !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block;
+  overflow: hidden;
 }
 
 .chatroom-message-input-field {

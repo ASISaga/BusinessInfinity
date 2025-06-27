@@ -1,93 +1,109 @@
-class BoardroomRenderer {
-  constructor() {
-    this.templateCache = {};
-  }
+// chatroom.js: Dynamic loading and rendering of members and chat messages
 
-  async getTemplate(name) {
-    if (this.templateCache[name]) return this.templateCache[name];
-    const res = await fetch(`/assets/templates/${name}.html`);
-    const text = await res.text();
-    this.templateCache[name] = text;
-    return text;
-  }
+// Utility to load a template file and cache it
+const templateCache = {};
+async function loadTemplate(path) {
+  if (templateCache[path]) return templateCache[path];
+  const res = await fetch(path);
+  const text = await res.text();
+  templateCache[path] = text;
+  return text;
+}
 
-  renderTemplate(template, data) {
-    return template.replace(/{{(\w+)}}/g, (_, key) => data[key] || '');
-  }
+// Simple template rendering: replaces {{var}} with values from data
+function renderTemplate(template, data) {
+  return template.replace(/{{(\w+)}}/g, (match, key) => {
+    return key in data ? data[key] : '';
+  });
+}
 
-  async render() {
-    // Fetch data
-    const [stakeholders, conversation] = await Promise.all([
-      fetch('/assets/data/stakeholders.json').then(r => r.json()),
-      fetch('/api/conversation').then(r => r.json())
-    ]);
-    // Fetch templates
-    const [stakeholderTpl, chatMsgTpl] = await Promise.all([
-      this.getTemplate('stakeholder'),
-      this.getTemplate('chat-message')
-    ]);
-    // Render stakeholders
-    const stakeholderHTML = stakeholders.map(s => this.renderTemplate(stakeholderTpl, s)).join('');
-    document.querySelector('.stakeholder-list').innerHTML = stakeholderHTML;
-    // Render chat messages
-    const chatHTML = conversation.map(msg => {
-      // Find emoji for role
-      const stakeholder = stakeholders.find(s => s.role === msg.role);
-      return this.renderTemplate(chatMsgTpl, {
-        ...msg,
-        emoji: stakeholder ? stakeholder.emoji : '👤'
-      });
-    }).join('');
-    document.querySelector('.chat-messages').innerHTML = chatHTML;
+// Support for {{#if ...}} ... {{/if}} and {{#unless ...}} ... {{/unless}}
+function renderLogicBlocks(template, data) {
+  // #if
+  template = template.replace(/{{#if (\w+)}}([\s\S]*?){{\/if}}/g, (m, key, content) => {
+    return data[key] ? content : '';
+  });
+  // #unless
+  template = template.replace(/{{#unless (\w+)}}([\s\S]*?){{\/unless}}/g, (m, key, content) => {
+    return !data[key] ? content : '';
+  });
+  return template;
+}
+
+async function renderMembers(members, lastMessages, unreadCounts, messages) {
+  const membersList = document.getElementById('membersListContainer');
+  if (!membersList) return;
+  membersList.innerHTML = '';
+  const template = await loadTemplate('/assets/templates/chatroom-member-item.html');
+  for (const member of members) {
+    const lastMsgObj = lastMessages.find(lm => lm.memberId === member.id) || {};
+    const unreadObj = unreadCounts.find(u => u.memberId === member.id) || {};
+    let lastMessageText = '';
+    if (lastMsgObj.lastMessageId) {
+      const msg = messages.find(m => m.id === lastMsgObj.lastMessageId);
+      lastMessageText = msg ? msg.text : '';
+    }
+    const badgeClass = member.status === 'online' ? 'chatroom-member-badge-success' :
+      member.status === 'away' ? 'chatroom-member-badge-warning' : 'chatroom-member-badge-danger';
+    const badgeLabel = member.status === 'online' ? 'Online' : member.status === 'away' ? 'Away' : 'Offline';
+    const unreadHtml = unreadObj.unread > 0 ? `<span class=\"chatroom-member-unread\">${unreadObj.unread}</span>` : '';
+    const html = renderTemplate(template, {
+      avatar: member.avatar,
+      name: member.name,
+      role: member.role || '',
+      lastMessageText,
+      badgeClass,
+      badgeLabel,
+      lastSeen: lastMsgObj.lastSeen || '',
+      unreadHtml
+    });
+    membersList.innerHTML += html;
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const renderer = new BoardroomRenderer();
-  renderer.render();
-});
-
-(function() {
-  const sidebar = document.getElementById('membersSidebar');
-  const toggleStrip = document.getElementById('sidebarToggleStrip');
-  const toggleMembersBtn = document.getElementById('toggleMembersBtn');
-  const icon = document.getElementById('sidebarToggleIcon');
-  const closeBtn = document.getElementById('sidebarCloseBtn');
-  const chatArea = document.getElementById('chatArea');
-  let collapsed = false;
-  function setCollapsed(state) {
-    collapsed = state;
-    if (collapsed) {
-      sidebar.style.width = '0';
-      sidebar.style.minWidth = '0';
-      sidebar.style.maxWidth = '0';
-      sidebar.style.opacity = '0';
-      sidebar.style.pointerEvents = 'none';
-      icon.classList.remove('fa-angle-double-left');
-      icon.classList.add('fa-angle-double-right');
-    } else {
-      sidebar.style.width = '320px';
-      sidebar.style.minWidth = '320px';
-      sidebar.style.maxWidth = '320px';
-      sidebar.style.opacity = '1';
-      sidebar.style.pointerEvents = '';
-      icon.classList.remove('fa-angle-double-right');
-      icon.classList.add('fa-angle-double-left');
-    }
-    // Optionally, force chat area to resize (not strictly needed with flexbox, but for safety)
-    chatArea.style.transition = 'flex-basis 0.3s';
+async function renderMessages(messages, members) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+  chatMessages.innerHTML = '';
+  const template = await loadTemplate('/assets/templates/chatroom-message-item.html');
+  for (const msg of messages) {
+    const isReceived = msg.direction === 'received';
+    const sender = members.find(m => m.id === msg.senderId) || {};
+    const senderName = sender.name || 'Unknown';
+    const senderAvatar = sender.avatar || '';
+    const senderRole = sender.role || '';
+    const html = renderLogicBlocks(template, {
+      isReceived,
+      avatar: senderAvatar,
+      name: senderName,
+      role: senderRole,
+      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
+      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
+      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent',
+      text: msg.text,
+      timestamp: msg.timestamp
+    });
+    chatMessages.innerHTML += renderTemplate(html, {
+      avatar: senderAvatar,
+      name: senderName,
+      role: senderRole,
+      text: msg.text,
+      timestamp: msg.timestamp,
+      rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
+      textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
+      metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent'
+    });
   }
-  toggleMembersBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    setCollapsed(!collapsed);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  Promise.all([
+    fetch('/assets/data/members.json').then(res => res.json()),
+    fetch('/assets/data/last_messages.json').then(res => res.json()),
+    fetch('/assets/data/unread_counts.json').then(res => res.json()),
+    fetch('/assets/data/conversation.json').then(res => res.json())
+  ]).then(([members, lastMessages, unreadCounts, messages]) => {
+    renderMembers(members, lastMessages, unreadCounts, messages);
+    renderMessages(messages, members);
   });
-  icon.addEventListener('click', function(e) {
-    e.stopPropagation();
-    setCollapsed(!collapsed);
-  });
-  closeBtn.addEventListener('click', function() {
-    setCollapsed(true);
-  });
-  // Start expanded
-  setCollapsed(false);
-})();
+});
