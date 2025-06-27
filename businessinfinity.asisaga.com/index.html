@@ -1,24 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Boardroom Conversations | Business Infinity</title>
-  <link rel="stylesheet" href="assets/css/boardroom.css">
+  <title>Boardroom | Business Infinity</title>
+  <link rel="stylesheet" href="/assets/css/pages/boardroom.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-  <main class="boardroom-container" aria-label="Boardroom Conversation">
-    <header>
-      <h1>Boardroom Conversations</h1>
-      <p>Simulated dialogue between key business stakeholders.</p>
-    </header>
-    <div class="vue-sections">
-      <section class="stakeholder-list" aria-label="Stakeholders"></section>
-      <section class="conversation" aria-label="Conversation">
-        <div class="chat-messages"></div>
-      </section>
-    </div>
+  <main class="chatroom-boardroom-container">
+    <section class="chatroom-section">
+      <div class="chatroom-container-fluid">
+        <div class="chatroom-main-row">
+          <!-- Sidebar Container (toggle strip + sidebar) -->
+          <aside id="sidebarContainer" class="chatroom-sidebar-container">
+            <nav id="sidebarToggleStrip" class="chatroom-sidebar-toggle-strip" aria-label="Sidebar Toggle">
+              <button id="toggleMembersBtn" class="chatroom-toggle-members-btn" title="Toggle Members" aria-label="Toggle Members">
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/people.svg" alt="Users" width="20" height="20" class="icon-white" />
+              </button>
+              <button class="chatroom-other-action-btn" title="Other Action" aria-label="Other Action">
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/gear.svg" alt="Settings" width="20" height="20" class="icon-white" />
+              </button>
+              <span class="chatroom-sidebar-strip-spacer"></span>
+              <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-left.svg" alt="Collapse Sidebar" class="chatroom-sidebar-toggle-icon icon-white" id="sidebarToggleIcon" width="18" height="18" />
+            </nav>
+            <aside id="membersSidebar" class="chatroom-members-sidebar d-flex flex-column" aria-label="Members Sidebar">
+              <section class="chatroom-members-section flex-grow-1 d-flex flex-column" id="members">
+                <form class="chatroom-members-search-form" role="search" aria-label="Search Members">
+                  <input type="search" class="chatroom-members-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                  <span class="chatroom-members-search-addon" id="search-addon">
+                    <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/search.svg" alt="Search" width="16" height="16" class="icon-white" />
+                  </span>
+                </form>
+                <ul class="chatroom-members-list flex-grow-1" role="list" id="membersListContainer" style="overflow-y: auto; height: 0; min-height: 0; max-height: 100%;">
+                  <!-- Example member item with circular avatar -->
+                  <!--
+                  <li class="chatroom-member-item">
+                    <img src="/assets/img/avatar1.png" alt="Member Name" class="chatroom-member-avatar rounded-circle" width="40" height="40">
+                    <span class="chatroom-member-name">Member Name</span>
+                  </li>
+                  -->
+                  <!-- Members will be injected here by JavaScript -->
+                </ul>
+              </section>
+            </aside>
+          </aside>
+          <!-- Chat Area -->
+          <section id="chatArea" class="chatroom-chat-area" aria-label="Chat Area">
+            <section class="chatroom-chat-messages" id="chatMessages" aria-label="Chat Messages">
+              <!-- Chat messages will be injected here by JavaScript -->
+            </section>
+            <footer id="messageInput" class="chatroom-message-input">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 3" class="chatroom-message-input-avatar">
+              <input type="text" class="chatroom-message-input-field" id="message-input-control" placeholder="Type message">
+              <a class="chatroom-message-input-attach" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/paperclip.svg" alt="Attach" width="18" height="18" class="icon-white" /></a>
+              <a class="chatroom-message-input-emoji" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/emoji-smile.svg" alt="Emoji" width="18" height="18" class="icon-white" /></a>
+              <a class="chatroom-message-input-send" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/send.svg" alt="Send" width="18" height="18" class="icon-white" /></a>
+            </footer>
+          </section>
+        </div>
+      </div>
+    </section>
   </main>
-  <script src="assets/js/boardroom.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/boardroom.js"></script>
+  <script src="/assets/js/chatroom.js"></script>
 </body>
+
 </html>
