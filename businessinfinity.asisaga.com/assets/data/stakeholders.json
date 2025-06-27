@@ -1,0 +1,7 @@
+[
+  { "role": "CEO", "emoji": "🧑‍💼" },
+  { "role": "CFO", "emoji": "💰" },
+  { "role": "CTO", "emoji": "💻" },
+  { "role": "COO", "emoji": "📦" },
+  { "role": "CMO", "emoji": "📢" }
+]

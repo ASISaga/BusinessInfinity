@@ -1,0 +1,8 @@
+[
+  { "role": "CEO", "text": "Welcome, everyone. Let’s review our quarterly goals." },
+  { "role": "CFO", "text": "Financials are strong, but we should monitor cash flow closely." },
+  { "role": "CTO", "text": "Tech team is on track with the new platform launch." },
+  { "role": "COO", "text": "Operations are running smoothly, but supply chain risks remain." },
+  { "role": "CMO", "text": "Marketing is ramping up for the product launch next month." },
+  { "role": "CEO", "text": "Excellent. Let’s align on next steps and responsibilities." }
+]
