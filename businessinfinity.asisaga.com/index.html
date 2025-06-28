@@ -14,7 +14,7 @@
   <main class="chatroom-boardroom-container">
     <section class="chatroom-section">
       <div class="chatroom-container-fluid">
-        <div class="chatroom-main-row">
+        <div class="chatroom-main-row flex-grow-1 d-flex flex-row min-vh-100">
           <!-- Sidebar Container (toggle strip + sidebar) -->
           <aside id="sidebarContainer" class="chatroom-sidebar-container">
             <nav id="sidebarToggleStrip" class="chatroom-sidebar-toggle-strip" aria-label="Sidebar Toggle">
@@ -28,8 +28,14 @@
               <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chevron-double-left.svg" alt="Collapse Sidebar" class="chatroom-sidebar-toggle-icon icon-white" id="sidebarToggleIcon" width="18" height="18" />
             </nav>
             <aside id="membersSidebar" class="chatroom-members-sidebar d-flex flex-column" aria-label="Members Sidebar">
+              <header class="chatroom-members-header d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+                <h2 class="chatroom-members-title h6 mb-0">Boardroom Members</h2>
+                <button class="btn btn-sm btn-outline-secondary" title="Invite Member" aria-label="Invite Member">
+                  <i class="fas fa-user-plus"></i>
+                </button>
+              </header>
               <section class="chatroom-members-section flex-grow-1 d-flex flex-column" id="members">
-                <form class="chatroom-members-search-form" role="search" aria-label="Search Members">
+                <form class="chatroom-members-search-form mb-2" role="search" aria-label="Search Members">
                   <input type="search" class="chatroom-members-search-input" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
                   <span class="chatroom-members-search-addon" id="search-addon">
                     <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/search.svg" alt="Search" width="16" height="16" class="icon-white" />
@@ -38,27 +44,39 @@
                 <ul class="chatroom-members-list flex-grow-1" role="list" id="membersListContainer" style="overflow-y: auto; height: 0; min-height: 0; max-height: 100%;">
                   <!-- Example member item with circular avatar -->
                   <!--
-                  <li class="chatroom-member-item">
+                  <li class="chatroom-member-item d-flex align-items-center gap-2">
                     <img src="/assets/img/avatar1.png" alt="Member Name" class="chatroom-member-avatar rounded-circle" width="40" height="40">
                     <span class="chatroom-member-name">Member Name</span>
                   </li>
                   -->
                   <!-- Members will be injected here by JavaScript -->
                 </ul>
+                <div class="text-center text-muted small mt-3" id="members-empty-state" style="display:none;">
+                  <i class="fas fa-users-slash fa-2x mb-2"></i><br>
+                  No members found.
+                </div>
               </section>
             </aside>
           </aside>
           <!-- Chat Area -->
-          <section id="chatArea" class="chatroom-chat-area" aria-label="Chat Area">
-            <section class="chatroom-chat-messages" id="chatMessages" aria-label="Chat Messages">
+          <section id="chatArea" class="chatroom-chat-area d-flex flex-column flex-grow-1 min-vh-100" aria-label="Chat Area">
+            <header class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-light">
+              <h1 class="h5 mb-0">Boardroom Chat</h1>
+              <span class="badge bg-primary">Live</span>
+            </header>
+            <section class="chatroom-chat-messages flex-grow-1 px-3 py-2" id="chatMessages" aria-label="Chat Messages" style="overflow-y: auto; min-height: 0; max-height: 100%;">
               <!-- Chat messages will be injected here by JavaScript -->
+              <div class="text-center text-muted small mt-5" id="chat-empty-state" style="display:none;">
+                <i class="fas fa-comments fa-2x mb-2"></i><br>
+                No messages yet. Start the conversation!
+              </div>
             </section>
-            <footer id="messageInput" class="chatroom-message-input">
-              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 3" class="chatroom-message-input-avatar" style="width:40px;height:40px;object-fit:cover;border-radius:50%;aspect-ratio:1/1;display:block;overflow:hidden;">
-              <input type="text" class="chatroom-message-input-field" id="message-input-control" placeholder="Type message">
-              <a class="chatroom-message-input-attach" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/paperclip.svg" alt="Attach" width="18" height="18" class="icon-white" /></a>
-              <a class="chatroom-message-input-emoji" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/emoji-smile.svg" alt="Emoji" width="18" height="18" class="icon-white" /></a>
-              <a class="chatroom-message-input-send" href="#!"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/send.svg" alt="Send" width="18" height="18" class="icon-white" /></a>
+            <footer id="messageInput" class="chatroom-message-input px-3 py-2 border-top bg-white">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 3" class="chatroom-message-input-avatar">
+              <input type="text" class="chatroom-message-input-field form-control mx-2" id="message-input-control" placeholder="Type message" aria-label="Type message">
+              <a class="chatroom-message-input-attach btn btn-link p-0 mx-1" href="#" title="Attach File" aria-label="Attach File"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/paperclip.svg" alt="Attach" width="18" height="18" class="icon-white" /></a>
+              <a class="chatroom-message-input-emoji btn btn-link p-0 mx-1" href="#" title="Insert Emoji" aria-label="Insert Emoji"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/emoji-smile.svg" alt="Emoji" width="18" height="18" class="icon-white" /></a>
+              <a class="chatroom-message-input-send btn btn-primary btn-sm ms-2 d-flex align-items-center justify-content-center" href="#" title="Send Message" aria-label="Send Message"><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/send.svg" alt="Send" width="18" height="18" class="icon-white" /></a>
             </footer>
           </section>
         </div>
