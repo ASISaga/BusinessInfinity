@@ -6,6 +6,18 @@
   margin: 0;
 }
 
+.chatroom-members-search-form-relative {
+  position: relative;
+  width: 100%;
+}
+
+.chatroom-members-search-form-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .chatroom-members-search-input {
   border-radius: 0.375rem;
   flex: 1 1 auto;
@@ -13,11 +25,25 @@
   background: #fff;
   width: 100%;
   box-sizing: border-box;
+  padding-right: 2.5rem;
 }
 
 .chatroom-members-search-addon {
   border: none;
   background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+}
+
+.chatroom-members-search-addon-absolute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .chatroom-members-list-nav {
