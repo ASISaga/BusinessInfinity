@@ -4,27 +4,26 @@
 */
 
 .chatroom-member-item {
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid #dee2e6;
+  background: #fff;
+  transition: background 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  outline: none;
 }
 
-.chatroom-member-link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
+.chatroom-member-item:focus,
+.chatroom-member-item:hover {
+  background: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.chatroom-member-row {
+.chatroom-member-avatar-block {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.chatroom-member-avatar-wrapper {
-  display: flex;
-  align-items: center;
-  margin-right: 1rem;
-  position: relative;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .chatroom-member-avatar {
@@ -37,53 +36,38 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
-.chatroom-member-badge {
-  margin-left: 0.5rem;
-  position: absolute;
-  left: 45px;
-  top: 40px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-}
-
 .chatroom-member-info {
   flex-grow: 1;
   padding-top: 0.25rem;
+  min-width: 0;
 }
 
 .chatroom-member-name {
   font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.chatroom-member-designation {
-  margin-bottom: 0.25rem;
-}
-
-.chatroom-member-message {
-  font-size: 0.875rem;
-  color: #6c757d;
   margin-bottom: 0;
+  font-size: 1rem;
 }
 
-.chatroom-member-meta {
-  text-align: right;
-  margin-left: 1rem;
-  padding-top: 0.25rem;
+.chatroom-member-role {
+  font-size: 0.75rem;
+  vertical-align: middle;
+  margin-left: 0.5em;
 }
 
-.chatroom-member-time {
-  font-size: 0.875rem;
+.chatroom-member-status {
+  font-size: 0.75rem;
+  color: #28a745;
+  margin-top: 0.15rem;
+}
+
+.chatroom-member-last-message {
+  font-size: 0.85rem;
   color: #6c757d;
-  margin-bottom: 0.25rem;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
-/* Badge color variants */
-.chatroom-member-badge-success { background: #28a745; }
-.chatroom-member-badge-warning { background: #ffc107; }
-.chatroom-member-badge-danger { background: #dc3545; }
 
 .chatroom-member-unread {
   background: #dc3545;
@@ -91,5 +75,14 @@
   border-radius: 999px;
   padding: 0.25em 0.75em;
   font-size: 0.75rem;
-  float: right;
+  align-self: flex-start;
+  margin-left: 0.5rem;
+  margin-top: 0.1rem;
+  box-shadow: 0 1px 2px rgba(220,53,69,0.08);
+}
+
+/* Accessibility: focus visible */
+.chatroom-member-item:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }

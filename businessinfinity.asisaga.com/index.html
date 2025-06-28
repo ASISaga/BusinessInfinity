@@ -42,18 +42,26 @@
                   </span>
                 </form>
                 <ul class="chatroom-members-list flex-grow-1" role="list" id="membersListContainer" style="overflow-y: auto; height: 0; min-height: 0; max-height: 100%;">
-                  <!-- Example member item with circular avatar -->
+                  <!-- Example improved member item -->
                   <!--
-                  <li class="chatroom-member-item d-flex align-items-center gap-2">
-                    <img src="/assets/img/avatar1.png" alt="Member Name" class="chatroom-member-avatar rounded-circle" width="40" height="40">
-                    <span class="chatroom-member-name">Member Name</span>
+                  <li class="chatroom-member-item d-flex align-items-center gap-3 py-2 px-2 rounded-3 position-relative">
+                    <span class="chatroom-member-avatar-block d-flex align-items-center justify-content-center me-2">
+                      <img src="/assets/img/avatar1.png" alt="Member Name" class="chatroom-member-avatar rounded-circle border border-2" width="40" height="40">
+                    </span>
+                    <div class="chatroom-member-info flex-grow-1">
+                      <span class="chatroom-member-name fw-semibold">Member Name</span>
+                      <span class="chatroom-member-role badge bg-secondary ms-2 align-middle">Admin</span>
+                      <div class="chatroom-member-status text-success small mt-1">Online</div>
+                    </div>
+                    <span class="chatroom-member-unread badge bg-danger ms-2 align-self-start" title="Unread messages">3</span>
                   </li>
                   -->
                   <!-- Members will be injected here by JavaScript -->
                 </ul>
                 <div class="text-center text-muted small mt-3" id="members-empty-state" style="display:none;">
                   <i class="fas fa-users-slash fa-2x mb-2"></i><br>
-                  No members found.
+                  <span class="fw-semibold">No members found.</span><br>
+                  <span class="small">Invite colleagues to join the boardroom!</span>
                 </div>
               </section>
             </aside>
