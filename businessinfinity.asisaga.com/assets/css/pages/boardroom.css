@@ -8,6 +8,7 @@
 @import '../components/chatroom-members-list.css';
 @import '../components/chatroom-chat-area.css';
 @import '../components/chatroom-message-input.css';
+@import '../components/chatroom-message-avatar-block.css';
 @import '../components/chatroom-utilities.css';
 
 /* Layout and scrolling fixes for chat area */

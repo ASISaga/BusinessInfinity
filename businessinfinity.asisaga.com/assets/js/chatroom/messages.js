@@ -15,14 +15,18 @@ class MessagesRenderer {
       const senderName = sender.name || 'Unknown';
       const senderAvatar = sender.avatar || '';
       const senderRole = sender.role || '';
+      // Set rowClass for alignment: flex-row-reverse for sent, blank for received
+      const rowClass = isReceived ? '' : 'flex-row-reverse';
+      const textClass = isReceived ? 'bg-white text-dark' : 'bg-primary text-white';
+      const metaClass = isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent';
       const html = TemplateUtils.renderLogicBlocks(template, {
         isReceived,
         avatar: senderAvatar,
         name: senderName,
         role: senderRole,
-        rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
-        textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
-        metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent',
+        rowClass,
+        textClass,
+        metaClass,
         text: msg.text,
         timestamp: msg.timestamp
       });
@@ -32,9 +36,9 @@ class MessagesRenderer {
         role: senderRole,
         text: msg.text,
         timestamp: msg.timestamp,
-        rowClass: isReceived ? 'chatroom-message-row-start' : 'chatroom-message-row-end',
-        textClass: isReceived ? 'chatroom-message-text-received' : 'chatroom-message-text-sent',
-        metaClass: isReceived ? 'chatroom-message-meta-received' : 'chatroom-message-meta-sent'
+        rowClass,
+        textClass,
+        metaClass
       });
     }
   }
