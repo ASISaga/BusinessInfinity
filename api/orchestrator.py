@@ -4,11 +4,10 @@ import azure.functions as func
 from api.CosmosManager import CosmosManager
 from api.BlobManager import BlobManager
 from api.AgentManager import AgentManager
-
 from api.MLClientManager import MLClientManager
-
 from api.AuthHandler import validate_jwt, UNAUTHORIZED_MSG
 from azure.functions import HttpRequest, HttpResponse
+from azure.functions import http_router
 
 STORAGE_CONN = EnvManager().get_required("AzureWebJobsStorage")
 MLURL = EnvManager().get_required("MLENDPOINT_URL")
@@ -25,14 +24,21 @@ DOMAINKNOW = blob_manager.DOMAINKNOW
 
 agent_manager = AgentManager(AGENTDIRS, DOMAINKNOW)
 
-app = func.FunctionApp()
 
-@app.function_name(name="StartConversation")
-@app.route(route="conversations", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
-def start_conv(req: func.HttpRequest) -> func.HttpResponse:
+def require_auth(req):
     claims = validate_jwt.from_request(req)
     if not claims:
         return func.HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    return claims
+
+
+router = http_router.HttpRouter()
+
+@router.route(methods=["POST"], route="conversations", auth_level=func.AuthLevel.FUNCTION)
+def start_conv(req: func.HttpRequest) -> func.HttpResponse:
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
 
     body = req.get_json()
     domain = body.get("domain")
@@ -44,12 +50,11 @@ def start_conv(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(json.dumps({"conversationId": conv_id}),
                              mimetype="application/json", status_code=201)
 
-@app.function_name(name="PostMessage")
-@app.route(route="conversations/{id}/messages", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["POST"], route="conversations/{id}/messages", auth_level=func.AuthLevel.FUNCTION)
 async def post_message(req: func.HttpRequest) -> func.HttpResponse:
-    claims = validate_jwt.from_request(req)
-    if not claims:
-        return func.HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
     convid = req.routeparams.get("id")
     body = req.get_json()
     user_input = body.get("message", "")
@@ -71,12 +76,11 @@ async def post_message(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(answer_json,
                              mimetype="application/json")
 
-@app.function_name(name="GetMessages")
-@app.route(route="conversations/{id}/messages", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["GET"], route="conversations/{id}/messages", auth_level=func.AuthLevel.FUNCTION)
 def get_messages(req: func.HttpRequest) -> func.HttpResponse:
-    claims = validate_jwt.from_request(req)
-    if not claims:
-        return func.HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
     convid = req.routeparams.get("id")
     conv_json = cosmos_manager.get_conversation(convid)
     if not conv_json:
@@ -88,8 +92,7 @@ ml_client_manager = MLClientManager()
 ml_client = ml_client_manager.get_client()
 
 # –– Mentor: Test LLM/Adapter ––
-@app.function_name(name="MentorTest")
-@app.route(route="mentor/test", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["POST"], route="mentor/test", auth_level=func.AuthLevel.FUNCTION)
 async def mentor_test(req: func.HttpRequest) -> func.HttpResponse:
     body = req.get_json()
     domain = body.get("domain")
@@ -107,8 +110,7 @@ async def mentor_test(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 # –– Mentor: Submit Q&A Pair ––
-@app.function_name(name="MentorSubmitQA")
-@app.route(route="mentor/qapair", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["POST"], route="mentor/qapair", auth_level=func.AuthLevel.FUNCTION)
 def mentorsubmitqa(req: func.HttpRequest) -> func.HttpResponse:
     body = req.get_json()
     domain = body.get("domain")
@@ -122,8 +124,7 @@ def mentorsubmitqa(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(status_code=201)
 
 # –– Mentor: List Q&A Pairs ––
-@app.function_name(name="MentorListQA")
-@app.route(route="mentor/qapairs", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["GET"], route="mentor/qapairs", auth_level=func.AuthLevel.FUNCTION)
 def mentorlistqa(req: func.HttpRequest) -> func.HttpResponse:
     domain = req.params.get("domain")
     if not domain:
@@ -133,8 +134,7 @@ def mentorlistqa(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(pairs_json, mimetype="application/json")
 
 # –– Mentor: Trigger Batch Nuance Fine-Tuning ––
-@app.function_name(name="MentorTriggerFineTune")
-@app.route(route="mentor/fine-tune", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+@router.route(methods=["POST"], route="mentor/fine-tune", auth_level=func.AuthLevel.FUNCTION)
 def mentortriggerfine_tune(req: func.HttpRequest) -> func.HttpResponse:
     body = req.get_json()
     domain = body.get("domain")
@@ -149,12 +149,11 @@ def mentortriggerfine_tune(req: func.HttpRequest) -> func.HttpResponse:
         status_code=202
     )
 
-@app.function_name(name="ListAgents")
-@app.route(route="agents", methods=["GET"])
+@router.route(methods=["GET"], route="agents")
 def list_agents(req: HttpRequest) -> HttpResponse:
-    claims = validate_jwt.from_request(req)
-    if not claims:
-        return func.HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
 
     # Get agent profiles from AgentManager
     agents_json = agent_manager.get_agent_profiles()
@@ -164,12 +163,11 @@ def list_agents(req: HttpRequest) -> HttpResponse:
         status_code=200
     )
 
-@app.function_name(name="GetAgent")
-@app.route(route="agents/{agentId}", methods=["GET"])
+@router.route(methods=["GET"], route="agents/{agentId}")
 def get_agent(req: HttpRequest) -> HttpResponse:
-    claims = validate_jwt.from_request(req)
-    if not claims:
-        return func.HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
 
     aid = req.route_params.get("agentId")
     prof_json = agent_manager.get_agent_profile(aid)
@@ -182,12 +180,11 @@ def get_agent(req: HttpRequest) -> HttpResponse:
         status_code=200
     )
 
-@app.function_name(name="ChatWithAgent")
-@app.route(route="chat/{agentId}", methods=["POST"])
+@router.route(methods=["POST"], route="chat/{agentId}")
 async def chat(req: func.HttpRequest):
-    claims = validate_jwt.from_request(req)
-    if not claims:
-        return HttpResponse(UNAUTHORIZED_MSG, status_code=401)
+    claims = require_auth(req)
+    if not isinstance(claims, dict):
+        return claims
 
     aid = req.route_params["agentId"]
     msg = req.get_json().get("message")
