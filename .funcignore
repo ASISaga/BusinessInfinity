@@ -1,0 +1,14 @@
+docs/
+server/
+
+# Ignore local virtual environment
+.venv/
+**/.venv/**
+
+# ignore the root .python_packages folder
+/.python_packages
+
+# ignore any nested .python_packages folder
+**/.python_packages/**
+
+README.MD
