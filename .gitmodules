@@ -1,0 +1,4 @@
+# Realm of Agents submodules
+[submodule "SelfLearningAgent"]
+	path = RealmOfAgents/SelfLearningAgent
+	url = https://github.com/ASISaga/SelfLearningAgent
