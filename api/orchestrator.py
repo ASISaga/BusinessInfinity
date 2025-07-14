@@ -58,7 +58,7 @@ async def post_message(req: func.HttpRequest) -> func.HttpResponse:
     convid = req.routeparams.get("id")
     body = req.get_json()
     user_input = body.get("message", "")
-    # Fetch conversation
+    # Fetch conversation 
     conv = cosmos_manager.get_conversation(convid)
     if not conv:
         return func.HttpResponse("Conversation not found", status_code=404)
