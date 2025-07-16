@@ -1,0 +1,219 @@
+{
+  "leadership": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    8,
+      "alpha":   16,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/leadership"
+      },
+      "collection": "leadership_collection"
+    },
+    "web_sources": [
+      "https://hbr.org/topic/leadership",
+      "https://leadershipfreak.com",
+      "https://www.mckinsey.com/featured-insights/leadership-and-lifestyle"
+    ]
+  },
+  "strategy": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    6,
+      "alpha":   12,
+      "dropout": 0.1
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/strategy"
+      },
+      "collection": "strategy_collection"
+    },
+    "web_sources": [
+      "https://www.bcg.com/capabilities/strategy",
+      "https://www.strategy-business.com"
+    ]
+  },
+  "finance": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    4,
+      "alpha":   8,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/finance"
+      },
+      "collection": "finance_collection"
+    },
+    "web_sources": [
+      "https://www.investopedia.com",
+      "https://www.wsj.com/finance",
+      "https://www.ft.com/markets"
+    ]
+  },
+  "operations": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    6,
+      "alpha":   12,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/operations"
+      },
+      "collection": "operations_collection"
+    },
+    "web_sources": [
+      "https://www.supplychainquarterly.com",
+      "https://www.pmi.org/learning/library",
+      "https://hbr.org/topic/operations"
+    ]
+  },
+  "technology": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    8,
+      "alpha":   16,
+      "dropout": 0.02
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/technology"
+      },
+      "collection": "technology_collection"
+    },
+    "web_sources": [
+      "https://techcrunch.com",
+      "https://thenextweb.com",
+      "https://www.wired.com/category/technology"
+    ]
+  },
+  "information-technology": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    4,
+      "alpha":   8,
+      "dropout": 0.1
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/it"
+      },
+      "collection": "it_collection"
+    },
+    "web_sources": [
+      "https://www.cio.com",
+      "https://www.networkworld.com",
+      "https://www.techrepublic.com"
+    ]
+  },
+  "marketing": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    8,
+      "alpha":   16,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/marketing"
+      },
+      "collection": "marketing_collection"
+    },
+    "web_sources": [
+      "https://blog.hubspot.com/marketing",
+      "https://moz.com/blog",
+      "https://www.contentmarketinginstitute.com"
+    ]
+  },
+  "human-resources": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    4,
+      "alpha":   8,
+      "dropout": 0.1
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/hr"
+      },
+      "collection": "hr_collection"
+    },
+    "web_sources": [
+      "https://www.shrm.org",
+      "https://hbr.org/topic/human-resource-management"
+    ]
+  },
+  "cybersecurity": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    6,
+      "alpha":   12,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/security"
+      },
+      "collection": "security_collection"
+    },
+    "web_sources": [
+      "https://www.schneier.com",
+      "https://www.csoonline.com",
+      "https://www.darkreading.com"
+    ]
+  },
+  "data": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    8,
+      "alpha":   16,
+      "dropout": 0.02
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/data"
+      },
+      "collection": "data_collection"
+    },
+    "web_sources": [
+      "https://towardsdatascience.com",
+      "https://www.kdnuggets.com",
+      "https://dataconomy.com"
+    ]
+  },
+  "analytics": {
+    "adapter_model": "meta/llama-3b",
+    "lora": {
+      "rank":    6,
+      "alpha":   12,
+      "dropout": 0.05
+    },
+    "chroma_config": {
+      "client_kwargs": {
+        "chroma_db_impl": "duckdb+parquet",
+        "persist_directory": "./.chromadb/analytics"
+      },
+      "collection": "analytics_collection"
+    },
+    "web_sources": [
+      "https://www.tableau.com/learn/articles/analytics",
+      "https://www.sas.com/en_us/insights/analytics.html"
+    ]
+  }
+}

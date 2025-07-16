@@ -1,0 +1,20 @@
+{
+  "sales": {
+    "host": "chroma-sales.example.com",
+    "port": 443,
+    "collection": "sales_knowledge",
+    "top_k": 5
+  },
+  "tech": {
+    "host": "chroma-tech.example.com",
+    "port": 443,
+    "collection": "tech_knowledge",
+    "top_k": 5
+  },
+  "hr": {
+    "host": "chroma-hr.example.com",
+    "port": 443,
+    "collection": "hr_knowledge",
+    "top_k": 5
+  }
+}

@@ -2,7 +2,7 @@
 import azure.functions as func
 import logging
 from http_router import HttpRouter, route
-from extract_name import extract_name
+from api.extract_name import extract_name
 from api.AuthHandler import AuthHandler
 
 class HttpMainHandler:

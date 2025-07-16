@@ -1,0 +1,9 @@
+{
+  "vllmserverurl": "http://vllm-server:8000",
+  "experience_db": {
+    "type": "chroma",
+    "host": "chroma.example.com",
+    "port": 443,
+    "collection": "leadership_experiences"
+  }
+}

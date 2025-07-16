@@ -1,0 +1,14 @@
+ {
+     "sales": {
+       "webpages": [
+         "https://example.com/sales-strategy.html",
+         "https://example.com/negotiation-blog.html"
+       ]
+     },
+     "hr": {
+       "webpages": [
+         "https://example.com/employee-engagement.html",
+         "https://example.com/performance-review.html"
+       ]
+     }
+   }
