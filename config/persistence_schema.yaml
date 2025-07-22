@@ -1,0 +1,20 @@
+collections:
+  goals:
+    type: list
+    item_schema:
+      name: str
+      description: str
+      target: int
+      cadence: str # e.g. "monthly", "daily"
+  triggers:
+    type: list
+    item_schema:
+      name: str
+      schedule: str # cron or natural language
+      action: str
+  metrics:
+    type: dict
+    value_schema:
+      timestamp: datetime
+      name: str
+      value: float
