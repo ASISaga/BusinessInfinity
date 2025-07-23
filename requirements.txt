@@ -1,25 +1,31 @@
 # Azure Functions
 azure-functions
-# Azure Cosmos DB
-azure-cosmos
+
+# Azure Data Tables
+azure-data-tables
+
 # Azure Storage Blob
 azure-storage-blob
+
 # chromadb
 chromadb
+
 # semantic-kernel
 semantic-kernel
+
 # requests
 requests
+
 # azure-ai-ml
 azure-ai-ml
+
 # azure-identity
 azure-identity
+
 # Do not include azure-functions-worker in this file
 # The Python Worker is managed by the Azure Functions platform
 # Manually managing azure-functions-worker may cause unexpected issues
 
 msal
 pyjwt
-requests
-azure-functions
 http-router
