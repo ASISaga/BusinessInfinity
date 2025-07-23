@@ -8,6 +8,15 @@ from api.MLClientManager import MLClientManager
 from api.AuthHandler import validate_jwt, UNAUTHORIZED_MSG
 
 class Orchestrator:
+    def handle_servicebus_message(self, message_body):
+        """
+        Handle messages received from Azure Service Bus queue trigger.
+        You can add custom business logic here, e.g. process, store, or forward the message.
+        """
+        import logging
+        logging.info(f"Processing Service Bus message: {message_body}")
+        # Example: Add your business logic here
+        return True
     def linkedin_auth_redirect(self, req):
         # Redirect user to LinkedIn OAuth
         client_id = "YOUR_LINKEDIN_CLIENT_ID"

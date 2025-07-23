@@ -29,3 +29,7 @@ azure-identity
 msal
 pyjwt
 http-router
+
+transformers
+peft
+datasets

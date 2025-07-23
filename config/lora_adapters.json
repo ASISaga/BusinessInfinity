@@ -1,0 +1,18 @@
+[
+    {
+        "adapter_name": "lora_qv",
+        "task_type": "causal_lm",
+        "inference_mode": false,
+        "r": 16,
+        "lora_alpha": 32,
+        "target_modules": ["q_proj", "v_proj"]
+    },
+    {
+        "adapter_name": "lora_ko",
+        "task_type": "causal_lm",
+        "inference_mode": false,
+        "r": 8,
+        "lora_alpha": 16,
+        "target_modules": ["k_proj", "o_proj"]
+    }
+]
