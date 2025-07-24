@@ -1,3 +1,26 @@
+    def publish_adapter(self, adapter_name, output_dir=None, base_model_desc="Llama-3.1-8B"):
+        """
+        Publish a single trained LoRA adapter as a model in Azure ML workspace.
+        Args:
+            adapter_name (str): Name of the adapter to publish
+            output_dir (str, optional): Directory containing trained adapter files. If None, uses default from config or last training.
+            base_model_desc (str): Description of the base model
+        """
+        from azure.ai.ml.entities import Model
+        # Try to infer output_dir from last training if not provided
+        if output_dir is None and hasattr(self, 'last_output_dir'):
+            output_dir = self.last_output_dir
+        elif output_dir is None:
+            raise ValueError("output_dir must be provided or set during training.")
+        adapter_path = f"{output_dir}/{adapter_name}"
+        model = Model(
+            path=adapter_path,
+            name=f"lora-{adapter_name}-adapter",
+            type="custom_model",
+            description=f"LoRA {adapter_name} adapter for {base_model_desc}",
+        )
+        self.ml_client.models.create_or_update(model)
+        print(f"Published model: lora-{adapter_name}-adapter")
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import AmlCompute, Environment, BuildContext
@@ -6,7 +29,31 @@ from LoRAPipeline import LoRAPipeline
 from LoRATrainer import LoRATrainer
 from peft import TaskType
 
+
 class MLManager:
+    def publish_adapter(self, adapter_name, output_dir=None, base_model_desc="Llama-3.1-8B"):
+        """
+        Publish a single trained LoRA adapter as a model in Azure ML workspace.
+        Args:
+            adapter_name (str): Name of the adapter to publish
+            output_dir (str, optional): Directory containing trained adapter files. If None, uses default from config or last training.
+            base_model_desc (str): Description of the base model
+        """
+        from azure.ai.ml.entities import Model
+        # Try to infer output_dir from last training if not provided
+        if output_dir is None and hasattr(self, 'last_output_dir'):
+            output_dir = self.last_output_dir
+        elif output_dir is None:
+            raise ValueError("output_dir must be provided or set during training.")
+        adapter_path = f"{output_dir}/{adapter_name}"
+        model = Model(
+            path=adapter_path,
+            name=f"lora-{adapter_name}-adapter",
+            type="custom_model",
+            description=f"LoRA {adapter_name} adapter for {base_model_desc}",
+        )
+        self.ml_client.models.create_or_update(model)
+        print(f"Published model: lora-{adapter_name}-adapter")
     """
     MLManager handles Azure ML workspace authentication, compute/environment provisioning,
     LoRA pipeline execution, adapter training, registration, and lifecycle management.
@@ -61,6 +108,8 @@ class MLManager:
             adapters=adapters
         )
         trainer.train()
+        # Save output_dir for later use in publish_adapter
+        self.last_output_dir = output_dir
         # Register trained adapters as models in Azure ML
         self.register_adapters(adapters, output_dir)
         return adapters

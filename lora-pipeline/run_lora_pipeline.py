@@ -30,7 +30,7 @@ if __name__ == "__main__":
         training_params = json.load(f)
     with open("./config/lora_adapters.json", "r") as f:
         adapters = json.load(f)
-        
+
     adapters = ml_manager.train_adapters(training_params, adapters)
     print("All done! Your LoRA adapters are trained and registered.")
 
@@ -38,6 +38,12 @@ if __name__ == "__main__":
     for adapter_cfg in adapters:
         adapter_name = adapter_cfg["adapter_name"]
         ml_manager.start_adapter(adapter_name)
+
+    # Publish each adapter individually
+    for adapter_cfg in adapters:
+        adapter_name = adapter_cfg["adapter_name"]
+        print(f"Publishing adapter: {adapter_name}")
+        ml_manager.publish_adapter(adapter_name)
 
     # ... do inference or other tasks ...
 
