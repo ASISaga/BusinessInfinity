@@ -13,59 +13,79 @@ from azure.ai.ml.entities import (
     Output,
     BuildContext,
 )
+import json
 
 class LoRAPipeline:
-    """
-    LoRAPipeline automates the Azure ML workflow for LoRA adapter training and registration.
-    """
-    def __init__(self):
+    def __init__(self, subscription_id, resource_group, workspace_name):
         """
-        Authenticate and connect to Azure ML workspace using environment variables and DefaultAzureCredential.
+        Initialize the LoRAPipeline object.
+        Args:
+            subscription_id (str): Azure subscription ID
+            resource_group (str): Azure resource group name
+            workspace_name (str): Azure ML workspace name
         """
-        subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
-        resource_group  = os.environ["AZURE_RESOURCE_GROUP"]
-        workspace_name  = os.environ["AZURE_WORKSPACE"]
+        self.subscription_id = subscription_id
+        self.resource_group = resource_group
+        self.workspace_name = workspace_name
+        self.ml_client = self._get_ml_client()
 
-        self.ml_client = MLClient(
-            DefaultAzureCredential(),
-            subscription_id,
-            resource_group,
-            workspace_name,
+    def _get_ml_client(self):
+        """
+        Create and return an MLClient object.
+        """
+        credential = DefaultAzureCredential()
+        ml_client = MLClient(
+            credential=credential,
+            subscription_id=self.subscription_id,
+            resource_group_name=self.resource_group,
+            workspace_name=self.workspace_name,
         )
+        return ml_client
 
-    def provision_compute(self, compute_name="lora-cluster"):
+    def provision_compute(self, compute_name="cpu-cluster", vm_size="Standard_DS2_v2", max_nodes=4):
         """
-        Provision (or get) a spot-priced GPU cluster for training.
-        Checks if the cluster exists; if not, creates a new one with spot pricing (low_priority).
+        Provision an Azure ML compute cluster.
+        Args:
+            compute_name (str): Name of the compute cluster
+            vm_size (str): Virtual machine size
+            max_nodes (int): Maximum number of nodes in the cluster
         Returns:
-            str: Name of the compute cluster
+            str: The name of the provisioned compute cluster
         """
-        if compute_name not in [c.name for c in self.ml_client.compute.list()]:
+        try:
             compute = AmlCompute(
                 name=compute_name,
-                size="STANDARD_NC6",
-                min_instances=0,
-                max_instances=4,
-                idle_time_before_scale_down=300,
-                tier="low_priority",  # spot pricing
+                size=vm_size,
+                max_nodes=max_nodes,
+                min_nodes=0,
+                idle_time_before_scale_down=120,
             )
-            self.ml_client.compute.begin_create_or_update(compute).result()
-        else:
-            compute = self.ml_client.compute.get(compute_name)
-        return compute_name
+            self.ml_client.compute.begin_create_or_update(compute)
+            print(f"Provisioning compute cluster: {compute_name}")
+            # Wait for the compute to be provisioned
+            import time
+            time.sleep(60)  # Adjust this based on your needs
+            return compute_name
+        except Exception as e:
+            print(f"Error provisioning compute: {e}")
+            raise
 
-    def setup_environment(self, env_name="lora-env"):
+    def setup_environment(self, env_name="lora-env", conda_file="environment.yml"):
         """
-        Create (or get) the Conda environment for training.
-        Checks if the environment exists; if not, creates it from environment.yml.
+        Set up the Azure ML environment for training.
+        Args:
+            env_name (str): Name of the environment
+            conda_file (str): Path to the conda environment file
         Returns:
-            str: Name of the environment
+            str: The name of the created or updated environment
         """
         if env_name not in [e.name for e in self.ml_client.environments.list()]:
+            # Create a new environment
             env = Environment(
                 name=env_name,
-                description="LoRA training env",
-                conda_file="environment.yml",   # see snippet below
+                description="Environment for LoRA adapter training",
+                docker_image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
+                conda_file=conda_file,
                 build=BuildContext(path=".")     # assumes environment.yml is in cwd
             )
             self.ml_client.environments.create_or_update(env)
@@ -126,6 +146,49 @@ class LoRAPipeline:
             )
             self.ml_client.models.create_or_update(model)
             print(f"Registered model: lora-{adapter}-adapter")
+
+    # === Azure ML scoring logic for adapter selection ===
+    model = None
+    adapters = {}
+    current_adapter = None
+
+    @staticmethod
+    def init():
+        """
+        Azure ML calls this once when the endpoint is started.
+        Loads all available LoRA adapters and base model.
+        """
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        base_model_name = "meta-llama/Llama-3.1-8B-Instruct"
+        LoRAPipeline.model = AutoModelForCausalLM.from_pretrained(base_model_name)
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        # Load all adapters (replace with your actual adapter loading logic)
+        LoRAPipeline.adapters["qv"] = "qv_adapter_path"
+        LoRAPipeline.adapters["ko"] = "ko_adapter_path"
+        LoRAPipeline.current_adapter = None
+        print("Model and adapters loaded.")
+
+    @staticmethod
+    def run(raw_data):
+        """
+        Azure ML calls this for every request.
+        Expects JSON with 'adapter_name' and 'input_data'.
+        """
+        try:
+            data = raw_data if isinstance(raw_data, dict) else json.loads(raw_data)
+            adapter_name = data.get("adapter_name")
+            input_data = data.get("input_data")
+            if adapter_name not in LoRAPipeline.adapters:
+                return {"error": f"Adapter '{adapter_name}' not found."}
+            if LoRAPipeline.current_adapter != adapter_name:
+                # Example: LoRAPipeline.model.load_adapter(LoRAPipeline.adapters[adapter_name])
+                LoRAPipeline.current_adapter = adapter_name
+            # Example: run inference (replace with your actual logic)
+            # output = LoRAPipeline.model.generate(input_data)
+            output = f"[Simulated output for adapter '{adapter_name}' and input '{input_data}']"
+            return {"result": output}
+        except Exception as e:
+            return {"error": str(e)}
 
     def run(self):
         """

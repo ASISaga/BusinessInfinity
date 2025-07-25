@@ -1,29 +1,8 @@
-    def publish_adapter(self, adapter_name, output_dir=None, base_model_desc="Llama-3.1-8B"):
-        """
-        Publish a single trained LoRA adapter as a model in Azure ML workspace.
-        Args:
-            adapter_name (str): Name of the adapter to publish
-            output_dir (str, optional): Directory containing trained adapter files. If None, uses default from config or last training.
-            base_model_desc (str): Description of the base model
-        """
-        from azure.ai.ml.entities import Model
-        # Try to infer output_dir from last training if not provided
-        if output_dir is None and hasattr(self, 'last_output_dir'):
-            output_dir = self.last_output_dir
-        elif output_dir is None:
-            raise ValueError("output_dir must be provided or set during training.")
-        adapter_path = f"{output_dir}/{adapter_name}"
-        model = Model(
-            path=adapter_path,
-            name=f"lora-{adapter_name}-adapter",
-            type="custom_model",
-            description=f"LoRA {adapter_name} adapter for {base_model_desc}",
-        )
-        self.ml_client.models.create_or_update(model)
-        print(f"Published model: lora-{adapter_name}-adapter")
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import AmlCompute, Environment, BuildContext
+from azure.ai.ml.entities import ManagedOnlineEndpoint
+from azure.core.exceptions import ResourceNotFoundError
 
 from LoRAPipeline import LoRAPipeline
 from LoRATrainer import LoRATrainer
@@ -31,6 +10,55 @@ from peft import TaskType
 
 
 class MLManager:
+    def create_online_endpoint(self, endpoint_name, auth_mode="key"):
+        """
+        Create an Azure ML online endpoint if it does not exist.
+        Args:
+            endpoint_name (str): Name of the endpoint
+            auth_mode (str): Authentication mode ('key' or 'aml_token')
+        """
+        try:
+            endpoint = self.ml_client.online_endpoints.get(endpoint_name)
+            print(f"Endpoint '{endpoint_name}' already exists.")
+        except ResourceNotFoundError:
+            endpoint = ManagedOnlineEndpoint(
+                name=endpoint_name,
+                auth_mode=auth_mode,
+            )
+            endpoint = self.ml_client.online_endpoints.begin_create_or_update(endpoint).result()
+            print(f"Created endpoint: {endpoint_name}")
+        return endpoint
+
+    def deploy_adapter_to_endpoint(self, adapter_name, endpoint_name, environment_name, instance_type="Standard_DS3_v2"):
+        """
+        Deploy a registered adapter model to an Azure ML online endpoint.
+        Args:
+            adapter_name (str): Name of the adapter/model (without 'lora-' prefix)
+            endpoint_name (str): Name of the endpoint
+            environment_name (str): Name of the Azure ML environment to use
+            instance_type (str): VM size for deployment
+        """
+        from azure.ai.ml.entities import ManagedOnlineDeployment
+        model_name = f"lora-{adapter_name}-adapter"
+        deployment_name = f"{adapter_name}-deploy"
+        model = self.ml_client.models.get(model_name, label="latest")
+        environment = self.ml_client.environments.get(environment_name, label="latest")
+        deployment = ManagedOnlineDeployment(
+            name=deployment_name,
+            endpoint_name=endpoint_name,
+            model=model,
+            environment=environment,
+            instance_type=instance_type,
+            instance_count=1,
+        )
+        self.ml_client.online_deployments.begin_create_or_update(deployment).result()
+        # Set as default deployment
+        self.ml_client.online_endpoints.begin_update(
+            endpoint_name=endpoint_name,
+            default_deployment_name=deployment_name
+        ).result()
+        print(f"Deployed model '{model_name}' to endpoint '{endpoint_name}' as deployment '{deployment_name}'")
+    
     def publish_adapter(self, adapter_name, output_dir=None, base_model_desc="Llama-3.1-8B"):
         """
         Publish a single trained LoRA adapter as a model in Azure ML workspace.
