@@ -1,0 +1,49 @@
+flowchart LR
+    subgraph Suite[Multi‑Agent "C‑suite"]
+        A1[CEO Agent\n(Vision, Strategy)]
+        A2[Ops Agent\n(ERP, Supply Chain)]
+        A3[Sales Agent\n(CRM, Customer Insights)]
+        A4[Marketing Agent\n(LinkedIn MCP, Reddit MCP)]
+        A5[Product Agent\n(Web/MCP Builds)]
+        A6[Finance Agent\n(Analytics, Budgeting)]
+        A7[Manufacturing Agent\n(MES, QC Systems)]
+    end
+
+    %% Tools per Agent
+    T1[ERP System]
+    T2[CRM Platform]
+    T3[LinkedIn MCP]
+    T4[Reddit MCP]
+    T5[Web Build MCP]
+    T6[Analytics Dashboard]
+    T7[MES Platform]
+
+    %% Flows to Tools
+    A2 --> T1
+    A3 --> T2
+    A4 --> T3
+    A4 --> T4
+    A5 --> T5
+    A6 --> T6
+    A7 --> T7
+
+    %% Inter-Agent Intelligence Mesh
+    A1 <--> A2
+    A1 <--> A3
+    A1 <--> A4
+    A1 <--> A5
+    A1 <--> A6
+    A1 <--> A7
+
+    A2 <--> A3
+    A3 <--> A4
+    A4 <--> A5
+    A5 <--> A2
+    A6 <--> A7
+
+    %% External Inputs & Outputs
+    EXT[External Data Streams\n(Market, Social, Ops)]
+    OUT[Strategic Actions\n(Deploy, Update, Optimize)]
+
+    EXT --> Suite
+    Suite --> OUT
