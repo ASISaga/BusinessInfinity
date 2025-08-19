@@ -1,0 +1,47 @@
+sequenceDiagram
+    %% Swimlanes
+    participant EXT as External Data<br/>(Market, Social, Ops)
+    participant CEO as CEO Agent<br/>(Vision, Strategy)
+    participant OPS as Ops Agent<br/>(ERP, Supply Chain)
+    participant SALES as Sales Agent<br/>(CRM Insights)
+    participant MKT as Marketing Agent<br/>(LinkedIn/Reddit MCP)
+    participant PROD as Product Agent<br/>(Web/MCP Builds)
+    participant FIN as Finance Agent<br/>(Analytics, Budgeting)
+    participant MFG as Manufacturing Agent<br/>(MES, QC)
+    participant WORLD as Strategic Actions<br/>(Deploy, Update, Optimize)
+
+    %% Data Ingestion
+    EXT->>CEO: Feed market signals & macro trends
+    EXT->>OPS: Supply & logistics data
+    EXT->>SALES: Customer behavior shifts
+    EXT->>MKT: Channel performance stats
+    EXT->>PROD: Tech feasibility inputs
+    EXT->>FIN: Financial metrics
+    EXT->>MFG: Manufacturing throughput data
+
+    %% Strategic Loop
+    CEO->>OPS: Set operational priorities
+    CEO->>SALES: Sales targets & narratives
+    CEO->>MKT: Campaign themes
+    CEO->>PROD: Product roadmap directives
+    CEO->>FIN: Budget allocations
+    CEO->>MFG: Production focus areas
+
+    %% Tactical Cross-talk
+    OPS->>MFG: Adjust production schedules
+    SALES->>MKT: Align on customer messaging
+    MKT->>PROD: Feedback for product tweaks
+    FIN->>CEO: Budget performance reports
+    PROD->>OPS: Resource requirement updates
+
+    %% Execution Output
+    OPS->>WORLD: Supply chain adjustments
+    SALES->>WORLD: Sales initiatives
+    MKT->>WORLD: Live campaigns
+    PROD->>WORLD: Product releases
+    FIN->>WORLD: Financial rebalancing
+    MFG->>WORLD: Manufacturing changes
+
+    %% Continuous Feedback
+    WORLD->>EXT: Real-world impact data
+    EXT-->>CEO: New intel for next decision loop
