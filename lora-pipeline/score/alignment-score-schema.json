@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AlignmentScoreResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["alignment_score", "vision", "decision", "model_info", "timestamp_utc"],
+  "properties": {
+    "alignment_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Numeric score between 0 and 1 indicating how well the decision aligns with the vision."
+    },
+    "vision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The company vision text provided as input."
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The decision option text provided as input."
+    },
+    "model_info": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_name", "version", "fine_tune_date"],
+      "properties": {
+        "model_name": {
+          "type": "string",
+          "description": "Name of the deployed model, e.g., 'llama-3.1-8b-instruct-finetuned'."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version tag or commit hash of the deployed model."
+        },
+        "fine_tune_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when the model was last fine-tuned."
+        }
+      }
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the score was generated."
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Optional natural language explanation of why the score was assigned."
+    }
+  }
+}
