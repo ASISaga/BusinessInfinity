@@ -1,125 +1,110 @@
 class BoardroomDashboard extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.manifest = null;
-    this.selectedRole = this.getAttribute('role') || 'ALL';
-  }
-
   async connectedCallback() {
     const manifestUrl = this.getAttribute('manifest-url');
-    if (!manifestUrl) return this._renderError('No manifest-url attribute provided.');
-    try {
-      const res = await fetch(manifestUrl);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      this.manifest = await res.json();
-      this._render();
-    } catch (e) {
-      this._renderError(`Failed to load manifest: ${e.message}`);
+    const roleFilter = this.getAttribute('role');
+
+    const res = await fetch(manifestUrl);
+    const manifest = await res.json();
+
+    // Filter panels by role if provided
+    let panels = manifest.panels;
+    if (roleFilter) {
+      panels = panels.filter(p => p.role.toLowerCase() === roleFilter.toLowerCase());
     }
-  }
 
-  _render() {
-    const styleLink = `<link rel="stylesheet" href="styles.css">`;
-    const roles = this._availableRoles();
-    const roleSelect = `
-      <div class="header">
-        <strong>Role:</strong>
-        <select class="select" id="roleSelect">
-          <option value="ALL"${this.selectedRole==='ALL'?' selected':''}>ALL</option>
-          ${roles.map(r => `<option value="${r}"${this.selectedRole===r?' selected':''}>${r}</option>`).join('')}
-        </select>
-        <span style="margin-left:auto"><strong>${this.manifest.title}</strong></span>
-      </div>
-    `;
-
-    const panels = this._filteredPanels().map(p => this._panelHtml(p)).join('');
-
-    this.shadowRoot.innerHTML = `
-      ${styleLink}
-      ${roleSelect}
-      <div class="dashboard">${panels}</div>
-    `;
-
-    this.shadowRoot.getElementById('roleSelect').addEventListener('change', (e) => {
-      this.selectedRole = e.target.value;
-      this._render();
+    // Group by role
+    const roles = {};
+    panels.forEach(panel => {
+      if (!roles[panel.role]) roles[panel.role] = {};
+      roles[panel.role][panel.scope || 'default'] = panel;
     });
 
-    this._bindActions();
+    this.render(roles);
   }
 
-  _availableRoles() {
-    const set = new Set(this.manifest.panels.map(p => p.role));
-    return Array.from(set);
-  }
+  render(roles) {
+    const container = document.createElement('div');
+    container.className = 'dashboard';
 
-  _filteredPanels() {
-    const all = this.manifest.panels;
-    if (this.selectedRole === 'ALL') return all;
-    return all.filter(p => p.role === this.selectedRole);
-  }
+    Object.keys(roles).forEach(role => {
+      const roleContainer = document.createElement('div');
 
-  _panelHtml(panel) {
-    const res = this.manifest.uiResources.find(r => r.uri === panel.uri);
-    const payload = res ? res.payload : '<em>No content</em>';
-    const actions = (panel.actions || []).map(a => {
-      const data = encodeURIComponent(JSON.stringify({ panelUri: panel.uri, actionId: a.id }));
-      return `<button data-bind="${data}">${a.label}</button>`;
-    }).join('');
-    return `
-      <div class="panel">
-        <h3>${panel.title} <span style="color:#64748b;font-weight:400">(${panel.role})</span></h3>
-        <div class="payload">${payload}</div>
-        <div class="actions">${actions}</div>
-      </div>
-    `;
-  }
+      // Header with scope toggle
+      const header = document.createElement('div');
+      header.className = 'role-header';
 
-  _bindActions() {
-    this.shadowRoot.querySelectorAll('button[data-bind]').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const payload = JSON.parse(decodeURIComponent(e.currentTarget.getAttribute('data-bind')));
-        const binding = this.manifest.actionBindings.find(b => b.actionId === payload.actionId);
-        if (!binding) return alert('No binding for action.');
-        const params = await this._collectParams(binding.paramsSchema);
-        try {
-          const res = await fetch('/api/mcp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jsonrpc: '2.0', id: Math.random().toString(36).slice(2,8), method: binding.mcpMethod, params })
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error.message);
-          alert(`${binding.mcpMethod} OK:\n${JSON.stringify(data.result, null, 2)}`);
-        } catch (err) {
-          alert(`Error: ${err.message}`);
-        }
+      const title = document.createElement('h2');
+      title.textContent = role;
+      header.appendChild(title);
+
+      const toggle = document.createElement('div');
+      toggle.className = 'scope-toggle';
+
+      const scopes = Object.keys(roles[role]);
+      scopes.forEach(scope => {
+        const btn = document.createElement('button');
+        btn.textContent = scope.charAt(0).toUpperCase() + scope.slice(1);
+        btn.addEventListener('click', () => {
+          toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.renderPanel(roleContainer, roles[role][scope]);
+        });
+        toggle.appendChild(btn);
       });
+
+      header.appendChild(toggle);
+      roleContainer.appendChild(header);
+
+      // Default to first scope
+      const defaultScope = scopes[0];
+      this.renderPanel(roleContainer, roles[role][defaultScope]);
+      toggle.querySelector('button').classList.add('active');
+
+      container.appendChild(roleContainer);
     });
+
+    this.innerHTML = '';
+    this.appendChild(container);
   }
 
-  async _collectParams(schema) {
-    const props = (schema && schema.properties) ? schema.properties : {};
-    const required = (schema && schema.required) ? schema.required : [];
-    const values = {};
-    for (const key of Object.keys(props)) {
-      const type = props[key].type || 'string';
-      let val = window.prompt(`Enter ${key}${required.includes(key) ? ' *' : ''}:`);
-      if (val === null) throw new Error('Cancelled');
-      if (type === 'number' || type === 'integer') {
-        const num = Number(val);
-        if (Number.isNaN(num)) throw new Error(`Invalid number for ${key}`);
-        values[key] = num;
-      } else {
-        values[key] = val;
-      }
+  renderPanel(container, panel) {
+    // Remove old panel
+    container.querySelectorAll('.panel').forEach(p => p.remove());
+
+    const panelEl = document.createElement('div');
+    panelEl.className = 'panel';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = panel.title;
+    panelEl.appendChild(h3);
+
+    const actionsEl = document.createElement('div');
+    actionsEl.className = 'actions';
+
+    panel.actions.forEach(action => {
+      const btn = document.createElement('button');
+      btn.textContent = action.label;
+      btn.addEventListener('click', () => this.triggerAction(action.id));
+      actionsEl.appendChild(btn);
+    });
+
+    panelEl.appendChild(actionsEl);
+    container.appendChild(panelEl);
+  }
+
+  async triggerAction(actionId) {
+    try {
+      const res = await fetch(`/mcp/${actionId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+      alert(`Action ${actionId} completed: ${JSON.stringify(data)}`);
+    } catch (err) {
+      console.error(err);
+      alert(`Error executing ${actionId}`);
     }
-    return values;
-    }
-  
-  _renderError(msg) {
-    this.shadowRoot.innerHTML = `<link rel="stylesheet" href="styles.css"><div class="header"><span style="color:#dc2626">${msg}</span></div>`;
   }
 }
 
