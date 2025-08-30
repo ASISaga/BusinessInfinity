@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Our custom element -->
-  <boardroom-dashboard manifest-url="/boardroom/manifest"></boardroom-dashboard>
+  <!-- Choose a role: CEO, CFO, CTO, COO, Investor, Governance. Omit role to show all. -->
+  <boardroom-dashboard manifest-url="/api/boardroom/manifest" role="CFO"></boardroom-dashboard>
 
-  <script src="dashboard.js" type="module"></script>
+  <script type="module" src="dashboard.js"></script>
 </body>
 </html>
