@@ -6,30 +6,27 @@ class BoardroomDashboard extends HTMLElement {
     const res = await fetch(manifestUrl);
     const manifest = await res.json();
 
-    // Filter panels by role if provided
     let panels = manifest.panels;
     if (roleFilter) {
       panels = panels.filter(p => p.role.toLowerCase() === roleFilter.toLowerCase());
     }
 
-    // Group by role
     const roles = {};
     panels.forEach(panel => {
       if (!roles[panel.role]) roles[panel.role] = {};
       roles[panel.role][panel.scope || 'default'] = panel;
     });
 
-    this.render(roles);
+    this.render(roles, manifest.actionBindings);
   }
 
-  render(roles) {
+  render(roles, bindings) {
     const container = document.createElement('div');
     container.className = 'dashboard';
 
     Object.keys(roles).forEach(role => {
       const roleContainer = document.createElement('div');
 
-      // Header with scope toggle
       const header = document.createElement('div');
       header.className = 'role-header';
 
@@ -47,7 +44,7 @@ class BoardroomDashboard extends HTMLElement {
         btn.addEventListener('click', () => {
           toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          this.renderPanel(roleContainer, roles[role][scope]);
+          this.renderPanel(roleContainer, roles[role][scope], bindings);
         });
         toggle.appendChild(btn);
       });
@@ -55,9 +52,8 @@ class BoardroomDashboard extends HTMLElement {
       header.appendChild(toggle);
       roleContainer.appendChild(header);
 
-      // Default to first scope
       const defaultScope = scopes[0];
-      this.renderPanel(roleContainer, roles[role][defaultScope]);
+      this.renderPanel(roleContainer, roles[role][defaultScope], bindings);
       toggle.querySelector('button').classList.add('active');
 
       container.appendChild(roleContainer);
@@ -67,8 +63,7 @@ class BoardroomDashboard extends HTMLElement {
     this.appendChild(container);
   }
 
-  renderPanel(container, panel) {
-    // Remove old panel
+  renderPanel(container, panel, bindings) {
     container.querySelectorAll('.panel').forEach(p => p.remove());
 
     const panelEl = document.createElement('div');
@@ -84,7 +79,7 @@ class BoardroomDashboard extends HTMLElement {
     panel.actions.forEach(action => {
       const btn = document.createElement('button');
       btn.textContent = action.label;
-      btn.addEventListener('click', () => this.triggerAction(action.id));
+      btn.addEventListener('click', () => this.triggerAction(action.id, bindings));
       actionsEl.appendChild(btn);
     });
 
@@ -92,19 +87,20 @@ class BoardroomDashboard extends HTMLElement {
     container.appendChild(panelEl);
   }
 
-  async triggerAction(actionId) {
-    try {
-      const res = await fetch(`/mcp/${actionId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
-      const data = await res.json();
-      alert(`Action ${actionId} completed: ${JSON.stringify(data)}`);
-    } catch (err) {
-      console.error(err);
-      alert(`Error executing ${actionId}`);
+  async triggerAction(actionId, bindings) {
+    const binding = bindings.find(b => b.actionId === actionId);
+    if (!binding) {
+      alert(`No binding found for ${actionId}`);
+      return;
     }
+    const params = {}; // Could prompt user for paramsSchema here
+    const res = await fetch('/api/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method: binding.mcpMethod, params })
+    });
+    const data = await res.json();
+    alert(`${actionId} result: ${JSON.stringify(data.result || data.error)}`);
   }
 }
 
