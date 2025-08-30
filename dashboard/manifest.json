@@ -5,13 +5,40 @@
   "refreshInterval": "30s",
   "panels": [
     {
-      "uri": "ui://boardroom/founder",
-      "role": "Founder",
-      "title": "Founder KPIs",
+      "uri": "ui://boardroom/ceo",
+      "role": "CEO",
+      "title": "CEO Overview",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "approve-plan", "label": "Approve Plan", "type": "approve" },
-        { "id": "comment-plan", "label": "Comment", "type": "comment" }
+        { "id": "approve-plan", "label": "Approve Plan", "type": "approve" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/cfo",
+      "role": "CFO",
+      "title": "CFO Finance KPIs",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "cfo-approve-budget", "label": "Approve Budget", "type": "approve" },
+        { "id": "cfo-liquidity", "label": "Get Liquidity (7d)", "type": "drilldown" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/cto",
+      "role": "CTO",
+      "title": "CTO Incident Summary",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "cto-incidents", "label": "Refresh Incidents", "type": "drilldown" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/coo",
+      "role": "COO",
+      "title": "COO Ops Throughput",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "coo-ack-alert", "label": "Acknowledge Alert", "type": "approve" }
       ]
     },
     {
@@ -19,7 +46,6 @@
       "role": "Investor",
       "title": "Portfolio Health",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
-      "refreshInterval": "60s",
       "actions": [
         { "id": "drill-risk", "label": "View Risk Breakdown", "type": "drilldown", "targetUri": "ui://boardroom/investor-risk" }
       ]
@@ -37,73 +63,81 @@
       "mcpMethod": "founder.approvePlan",
       "paramsSchema": {
         "type": "object",
-        "properties": {
-          "planId": { "type": "string" },
-          "approvedBy": { "type": "string" }
-        },
+        "properties": { "planId": { "type": "string" }, "approvedBy": { "type": "string" } },
         "required": ["planId", "approvedBy"]
       },
       "responseSchema": {
         "type": "object",
-        "properties": {
-          "status": { "type": "string", "enum": ["approved", "error"] },
-          "timestamp": { "type": "string", "format": "date-time" }
-        },
+        "properties": { "status": { "type": "string", "enum": ["approved", "error"] }, "timestamp": { "type": "string", "format": "date-time" } },
         "required": ["status", "timestamp"]
       }
     },
     {
-      "actionId": "comment-plan",
-      "mcpMethod": "founder.addComment",
+      "actionId": "cfo-approve-budget",
+      "mcpMethod": "cfo.approveBudget",
       "paramsSchema": {
         "type": "object",
-        "properties": {
-          "planId": { "type": "string" },
-          "comment": { "type": "string" },
-          "author": { "type": "string" }
-        },
-        "required": ["planId", "comment", "author"]
+        "properties": { "budgetId": { "type": "string" }, "amount": { "type": "number" }, "approvedBy": { "type": "string" } },
+        "required": ["budgetId", "amount", "approvedBy"]
       },
       "responseSchema": {
         "type": "object",
-        "properties": {
-          "commentId": { "type": "string" },
-          "timestamp": { "type": "string", "format": "date-time" }
-        },
-        "required": ["commentId", "timestamp"]
+        "properties": { "status": { "type": "string", "enum": ["approved", "error"] }, "timestamp": { "type": "string", "format": "date-time" } },
+        "required": ["status", "timestamp"]
+      }
+    },
+    {
+      "actionId": "cfo-liquidity",
+      "mcpMethod": "cfo.getLiquidity",
+      "paramsSchema": {
+        "type": "object",
+        "properties": { "windowDays": { "type": "integer" } },
+        "required": ["windowDays"]
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": { "days": { "type": "integer" }, "cash": { "type": "number" }, "runwayMonths": { "type": "number" } },
+        "required": ["days", "cash", "runwayMonths"]
+      }
+    },
+    {
+      "actionId": "cto-incidents",
+      "mcpMethod": "cto.getIncidentSummary",
+      "paramsSchema": { "type": "object", "properties": {}, "required": [] },
+      "responseSchema": {
+        "type": "object",
+        "properties": { "open": { "type": "integer" }, "sev1": { "type": "integer" }, "sev2": { "type": "integer" } },
+        "required": ["open", "sev1", "sev2"]
+      }
+    },
+    {
+      "actionId": "coo-ack-alert",
+      "mcpMethod": "coo.acknowledgeAlert",
+      "paramsSchema": {
+        "type": "object",
+        "properties": { "alertId": { "type": "string" }, "acknowledgedBy": { "type": "string" } },
+        "required": ["alertId", "acknowledgedBy"]
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": { "acknowledged": { "type": "boolean" }, "timestamp": { "type": "string", "format": "date-time" } },
+        "required": ["acknowledged", "timestamp"]
       }
     },
     {
       "actionId": "drill-risk",
       "mcpMethod": "investor.getRiskBreakdown",
-      "paramsSchema": {
-        "type": "object",
-        "properties": { "portfolioId": { "type": "string" } },
-        "required": ["portfolioId"]
-      },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "uiResourceUri": { "type": "string" } },
-        "required": ["uiResourceUri"]
-      }
+      "paramsSchema": { "type": "object", "properties": { "portfolioId": { "type": "string" } }, "required": ["portfolioId"] },
+      "responseSchema": { "type": "object", "properties": { "uiResourceUri": { "type": "string" } }, "required": ["uiResourceUri"] }
     }
   ],
   "uiResources": [
-    {
-      "uri": "ui://boardroom/founder",
-      "payload": "<div class='founder-kpis'><h2>Founder KPIs</h2><ul><li>Runway: 14 months</li><li>MRR Growth: +12%</li><li>Churn: 3.1%</li></ul></div>"
-    },
-    {
-      "uri": "ui://boardroom/investor",
-      "payload": "<div class='portfolio-health'><h2>Portfolio Health</h2><p>Overall Risk: Low</p><p>Top Performer: AlphaTech (+27% YoY)</p></div>"
-    },
-    {
-      "uri": "ui://boardroom/investor-risk",
-      "payload": "<div class='risk-breakdown'><h2>Risk Breakdown</h2><ul><li>Market Risk: 35%</li><li>Operational Risk: 25%</li><li>Liquidity Risk: 15%</li><li>Other: 25%</li></ul></div>"
-    },
-    {
-      "uri": "ui://boardroom/governance",
-      "payload": "<html><body><h2>Decision Tree State</h2><p>3 active proposals, 1 pending mentor review.</p></body></html>"
-    }
+    { "uri": "ui://boardroom/ceo", "payload": "<div><h2>CEO Overview</h2><ul><li>Runway: 14 months</li><li>MRR Growth: +12%</li><li>Churn: 3.1%</li></ul></div>" },
+    { "uri": "ui://boardroom/cfo", "payload": "<div><h2>CFO Finance KPIs</h2><ul><li>Cash: $2.4M</li><li>Burn: $160k/mo</li><li>Runway: 15 months</li></ul></div>" },
+    { "uri": "ui://boardroom/cto", "payload": "<div><h2>CTO Incidents</h2><p>Open: 3 (Sev1: 1, Sev2: 2)</p></div>" },
+    { "uri": "ui://boardroom/coo", "payload": "<div><h2>COO Ops Throughput</h2><p>Orders/day: 1,240 | SLA: 99.1%</p></div>" },
+    { "uri": "ui://boardroom/investor", "payload": "<div><h2>Portfolio Health</h2><p>Overall Risk: Low</p><p>Top Performer: AlphaTech (+27% YoY)</p></div>" },
+    { "uri": "ui://boardroom/investor-risk", "payload": "<div><h2>Risk Breakdown</h2><ul><li>Market: 35%</li><li>Operational: 25%</li><li>Liquidity: 15%</li><li>Other: 25%</li></ul></div>" },
+    { "uri": "ui://boardroom/governance", "payload": "<div><h2>Decision Tree State</h2><p>3 active proposals, 1 pending mentor review.</p></div>" }
   ]
 }
