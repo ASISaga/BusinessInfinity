@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  font-family: system-ui, sans-serif;
+}
+
+.dashboard {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.panel {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.actions {
+  margin-top: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #0078d4;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #005a9e;
+}
