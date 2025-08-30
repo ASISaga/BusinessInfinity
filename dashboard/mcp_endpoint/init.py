@@ -11,7 +11,6 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400
         )
-
     response = await handle_mcp(body)
     return func.HttpResponse(
         json.dumps(response),
