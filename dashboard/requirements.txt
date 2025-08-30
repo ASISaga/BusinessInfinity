@@ -1,0 +1,4 @@
+azure-functions
+semantic-kernel
+openai
+python-dotenv
