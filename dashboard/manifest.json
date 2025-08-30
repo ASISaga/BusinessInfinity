@@ -1,0 +1,109 @@
+{
+  "$schema": "https://business-infinity.dev/schemas/boardroom-manifest-v1.json",
+  "boardroomId": "bi-core-001",
+  "title": "Business Infinity Core Boardroom",
+  "refreshInterval": "30s",
+  "panels": [
+    {
+      "uri": "ui://boardroom/founder",
+      "role": "Founder",
+      "title": "Founder KPIs",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "approve-plan", "label": "Approve Plan", "type": "approve" },
+        { "id": "comment-plan", "label": "Comment", "type": "comment" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/investor",
+      "role": "Investor",
+      "title": "Portfolio Health",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "refreshInterval": "60s",
+      "actions": [
+        { "id": "drill-risk", "label": "View Risk Breakdown", "type": "drilldown", "targetUri": "ui://boardroom/investor-risk" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/governance",
+      "role": "Governance",
+      "title": "Decision Tree State",
+      "mimeType": "text/html"
+    }
+  ],
+  "actionBindings": [
+    {
+      "actionId": "approve-plan",
+      "mcpMethod": "founder.approvePlan",
+      "paramsSchema": {
+        "type": "object",
+        "properties": {
+          "planId": { "type": "string" },
+          "approvedBy": { "type": "string" }
+        },
+        "required": ["planId", "approvedBy"]
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["approved", "error"] },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["status", "timestamp"]
+      }
+    },
+    {
+      "actionId": "comment-plan",
+      "mcpMethod": "founder.addComment",
+      "paramsSchema": {
+        "type": "object",
+        "properties": {
+          "planId": { "type": "string" },
+          "comment": { "type": "string" },
+          "author": { "type": "string" }
+        },
+        "required": ["planId", "comment", "author"]
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "commentId": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["commentId", "timestamp"]
+      }
+    },
+    {
+      "actionId": "drill-risk",
+      "mcpMethod": "investor.getRiskBreakdown",
+      "paramsSchema": {
+        "type": "object",
+        "properties": { "portfolioId": { "type": "string" } },
+        "required": ["portfolioId"]
+      },
+      "responseSchema": {
+        "type": "object",
+        "properties": { "uiResourceUri": { "type": "string" } },
+        "required": ["uiResourceUri"]
+      }
+    }
+  ],
+  "uiResources": [
+    {
+      "uri": "ui://boardroom/founder",
+      "payload": "<div class='founder-kpis'><h2>Founder KPIs</h2><ul><li>Runway: 14 months</li><li>MRR Growth: +12%</li><li>Churn: 3.1%</li></ul></div>"
+    },
+    {
+      "uri": "ui://boardroom/investor",
+      "payload": "<div class='portfolio-health'><h2>Portfolio Health</h2><p>Overall Risk: Low</p><p>Top Performer: AlphaTech (+27% YoY)</p></div>"
+    },
+    {
+      "uri": "ui://boardroom/investor-risk",
+      "payload": "<div class='risk-breakdown'><h2>Risk Breakdown</h2><ul><li>Market Risk: 35%</li><li>Operational Risk: 25%</li><li>Liquidity Risk: 15%</li><li>Other: 25%</li></ul></div>"
+    },
+    {
+      "uri": "ui://boardroom/governance",
+      "payload": "<html><body><h2>Decision Tree State</h2><p>3 active proposals, 1 pending mentor review.</p></body></html>"
+    }
+  ]
+}
