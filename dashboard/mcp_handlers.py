@@ -1,19 +1,13 @@
-import json
+# mcp_handlers.py (append/extend)
+import json, os
 from datetime import datetime
-from state import founder_state, investor_state
+from state import founder_state, investor_state, finance_state, tech_state, ops_state
 from prompts import APPROVAL_PROMPT
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
-import os
 
 kernel = Kernel()
-kernel.add_service(
-    OpenAIChatCompletion(
-        service_id="openai",
-        api_key=os.getenv("OPENAI_API_KEY"),
-        model_id="gpt-4o-mini"
-    )
-)
+kernel.add_service(OpenAIChatCompletion(service_id="openai", api_key=os.getenv("OPENAI_API_KEY"), model_id=os.getenv("OPENAI_MODEL", "gpt-4o-mini")))
 
 async def run_prompt(prompt: str, input_text: str) -> str:
     func = kernel.create_semantic_function(prompt)
@@ -26,41 +20,53 @@ async def handle_mcp(body: dict):
     id_ = body.get("id")
 
     try:
+        # CEO/Founder
         if method == "founder.approvePlan":
-            plan_id = params["planId"]
-            approved_by = params["approvedBy"]
-            plan = founder_state["plans"].get(plan_id)
-            if not plan:
-                raise ValueError("Plan not found")
-
+            plan = founder_state["plans"].get(params["planId"])
+            if not plan: raise ValueError("Plan not found")
             eval_json = await run_prompt(APPROVAL_PROMPT, plan["title"])
             decision = json.loads(eval_json).get("decision", "approve")
             if decision == "approve":
                 plan["status"] = "approved"
-                result = {"status": "approved", "timestamp": datetime.utcnow().isoformat()}
-            else:
-                result = {"status": "error", "timestamp": datetime.utcnow().isoformat(), "decision": decision}
-            return {"jsonrpc": "2.0", "id": id_, "result": result}
+                return {"jsonrpc":"2.0","id":id_,"result":{"status":"approved","timestamp":datetime.utcnow().isoformat()}}
+            return {"jsonrpc":"2.0","id":id_,"result":{"status":"error","timestamp":datetime.utcnow().isoformat(),"decision":decision}}
 
-        elif method == "founder.addComment":
-            comment_id = f"c-{datetime.utcnow().timestamp()}"
-            founder_state["comments"].append({
-                "commentId": comment_id,
-                "planId": params["planId"],
-                "comment": params["comment"],
-                "author": params["author"],
-                "timestamp": datetime.utcnow().isoformat()
-            })
-            return {"jsonrpc": "2.0", "id": id_, "result": {"commentId": comment_id, "timestamp": datetime.utcnow().isoformat()}}
+        # CFO
+        if method == "cfo.approveBudget":
+            b = finance_state["budgets"].get(params["budgetId"])
+            if not b: raise ValueError("Budget not found")
+            b["status"] = "approved"
+            b["amount"] = params["amount"]
+            return {"jsonrpc":"2.0","id":id_,"result":{"status":"approved","timestamp":datetime.utcnow().isoformat()}}
 
-        elif method == "investor.getRiskBreakdown":
-            portfolio_id = params["portfolioId"]
-            if portfolio_id not in investor_state["risk"]:
-                raise ValueError("Portfolio not found")
-            return {"jsonrpc": "2.0", "id": id_, "result": {"uiResourceUri": "ui://boardroom/investor-risk"}}
+        if method == "cfo.getLiquidity":
+            days = int(params.get("windowDays", 7))
+            cash = finance_state["liquidity"]["cash"]
+            burn = finance_state["liquidity"]["monthly_burn"]
+            runway_months = max(0, round(cash / max(1, burn), 2))
+            return {"jsonrpc":"2.0","id":id_,"result":{"days":days,"cash":cash,"runwayMonths":runway_months}}
 
-        else:
-            return {"jsonrpc": "2.0", "id": id_, "error": {"code": -32601, "message": "Method not found"}}
+        # CTO
+        if method == "cto.getIncidentSummary":
+            open_count = sum(1 for i in tech_state["incidents"] if i["status"]=="open")
+            sev1 = sum(1 for i in tech_state["incidents"] if i["status"]=="open" and i["sev"]==1)
+            sev2 = sum(1 for i in tech_state["incidents"] if i["status"]=="open" and i["sev"]==2)
+            return {"jsonrpc":"2.0","id":id_,"result":{"open":open_count,"sev1":sev1,"sev2":sev2}}
+
+        # COO
+        if method == "coo.acknowledgeAlert":
+            alert = next((a for a in ops_state["alerts"] if a["id"]==params["alertId"]), None)
+            if not alert: raise ValueError("Alert not found")
+            alert["status"] = "acknowledged"
+            return {"jsonrpc":"2.0","id":id_,"result":{"acknowledged":True,"timestamp":datetime.utcnow().isoformat()}}
+
+        # Investor (existing)
+        if method == "investor.getRiskBreakdown":
+            pid = params["portfolioId"]
+            if pid not in investor_state["risk"]: raise ValueError("Portfolio not found")
+            return {"jsonrpc":"2.0","id":id_,"result":{"uiResourceUri":"ui://boardroom/investor-risk"}}
+
+        return {"jsonrpc":"2.0","id":id_,"error":{"code":-32601,"message":f"Method not found: {method}"}}
 
     except Exception as e:
-        return {"jsonrpc": "2.0", "id": id_, "error": {"code": -32000, "message": str(e)}}
+        return {"jsonrpc":"2.0","id":id_,"error":{"code":-32000,"message":str(e)}}
