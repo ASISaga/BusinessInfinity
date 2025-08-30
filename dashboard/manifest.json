@@ -1,143 +1,171 @@
 {
-  "$schema": "https://business-infinity.dev/schemas/boardroom-manifest-v1.json",
-  "boardroomId": "bi-core-001",
-  "title": "Business Infinity Core Boardroom",
-  "refreshInterval": "30s",
   "panels": [
     {
-      "uri": "ui://boardroom/ceo",
+      "uri": "ui://boardroom/ceo-local",
       "role": "CEO",
-      "title": "CEO Overview",
+      "scope": "local",
+      "title": "CEO – Local Overview",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "approve-plan", "label": "Approve Plan", "type": "approve" }
+        { "id": "ceo-approve-plan", "label": "Approve Local Plan", "type": "approve" },
+        { "id": "ceo-review-metrics", "label": "Review Local Metrics", "type": "view" }
       ]
     },
     {
-      "uri": "ui://boardroom/cfo",
+      "uri": "ui://boardroom/ceo-network",
+      "role": "CEO",
+      "scope": "network",
+      "title": "CEO – Network Overview",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "ceo-propose-network-initiative", "label": "Propose Network Initiative", "type": "approve" },
+        { "id": "ceo-review-network-metrics", "label": "Review Network Metrics", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/cfo-local",
       "role": "CFO",
-      "title": "CFO Finance KPIs",
+      "scope": "local",
+      "title": "CFO – Local Finance",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "cfo-approve-budget", "label": "Approve Budget", "type": "approve" },
-        { "id": "cfo-liquidity", "label": "Get Liquidity (7d)", "type": "drilldown" }
+        { "id": "cfo-approve-budget", "label": "Approve Local Budget", "type": "approve" },
+        { "id": "cfo-review-financials", "label": "Review Local Financials", "type": "view" }
       ]
     },
     {
-      "uri": "ui://boardroom/cto",
+      "uri": "ui://boardroom/cfo-network",
+      "role": "CFO",
+      "scope": "network",
+      "title": "CFO – Network Finance",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "cfo-propose-network-budget", "label": "Propose Network Budget", "type": "approve" },
+        { "id": "cfo-review-network-financials", "label": "Review Network Financials", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/cto-local",
       "role": "CTO",
-      "title": "CTO Incident Summary",
+      "scope": "local",
+      "title": "CTO – Local Technology",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "cto-incidents", "label": "Refresh Incidents", "type": "drilldown" }
+        { "id": "cto-approve-tech-plan", "label": "Approve Local Tech Plan", "type": "approve" },
+        { "id": "cto-review-systems", "label": "Review Local Systems", "type": "view" }
       ]
     },
     {
-      "uri": "ui://boardroom/coo",
+      "uri": "ui://boardroom/cto-network",
+      "role": "CTO",
+      "scope": "network",
+      "title": "CTO – Network Technology",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "cto-propose-network-tech", "label": "Propose Network Tech Initiative", "type": "approve" },
+        { "id": "cto-review-network-systems", "label": "Review Network Systems", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/coo-local",
       "role": "COO",
-      "title": "COO Ops Throughput",
+      "scope": "local",
+      "title": "COO – Local Operations",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "coo-ack-alert", "label": "Acknowledge Alert", "type": "approve" }
+        { "id": "coo-approve-ops-plan", "label": "Approve Local Ops Plan", "type": "approve" },
+        { "id": "coo-review-ops", "label": "Review Local Operations", "type": "view" }
       ]
     },
     {
-      "uri": "ui://boardroom/investor",
+      "uri": "ui://boardroom/coo-network",
+      "role": "COO",
+      "scope": "network",
+      "title": "COO – Network Operations",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "coo-propose-network-ops", "label": "Propose Network Ops Initiative", "type": "approve" },
+        { "id": "coo-review-network-ops", "label": "Review Network Operations", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/investor-local",
       "role": "Investor",
-      "title": "Portfolio Health",
+      "scope": "local",
+      "title": "Investor – Local Portfolio",
       "mimeType": "application/vnd.mcp-ui.remote-dom",
       "actions": [
-        { "id": "drill-risk", "label": "View Risk Breakdown", "type": "drilldown", "targetUri": "ui://boardroom/investor-risk" }
+        { "id": "investor-approve-funding", "label": "Approve Local Funding", "type": "approve" },
+        { "id": "investor-review-portfolio", "label": "Review Local Portfolio", "type": "view" }
       ]
     },
     {
-      "uri": "ui://boardroom/governance",
+      "uri": "ui://boardroom/investor-network",
+      "role": "Investor",
+      "scope": "network",
+      "title": "Investor – Network Portfolio",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "investor-propose-network-funding", "label": "Propose Network Funding", "type": "approve" },
+        { "id": "investor-review-network-portfolio", "label": "Review Network Portfolio", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/governance-local",
       "role": "Governance",
-      "title": "Decision Tree State",
-      "mimeType": "text/html"
+      "scope": "local",
+      "title": "Governance – Local Compliance",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "gov-approve-policy", "label": "Approve Local Policy", "type": "approve" },
+        { "id": "gov-review-compliance", "label": "Review Local Compliance", "type": "view" }
+      ]
+    },
+    {
+      "uri": "ui://boardroom/governance-network",
+      "role": "Governance",
+      "scope": "network",
+      "title": "Governance – Network Compliance",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "gov-propose-network-policy", "label": "Propose Network Policy", "type": "approve" },
+        { "id": "gov-review-network-compliance", "label": "Review Network Compliance", "type": "view" }
+      ]
+    },
+
+    {
+      "uri": "ui://boardroom/network",
+      "role": "Network",
+      "scope": "global",
+      "title": "Network – Ecosystem Overview",
+      "mimeType": "application/vnd.mcp-ui.remote-dom",
+      "actions": [
+        { "id": "network-initiate-collaboration", "label": "Initiate Collaboration", "type": "approve" },
+        { "id": "network-review-ecosystem", "label": "Review Ecosystem Health", "type": "view" }
+      ]
     }
   ],
+
   "actionBindings": [
-    {
-      "actionId": "approve-plan",
-      "mcpMethod": "founder.approvePlan",
-      "paramsSchema": {
-        "type": "object",
-        "properties": { "planId": { "type": "string" }, "approvedBy": { "type": "string" } },
-        "required": ["planId", "approvedBy"]
-      },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "status": { "type": "string", "enum": ["approved", "error"] }, "timestamp": { "type": "string", "format": "date-time" } },
-        "required": ["status", "timestamp"]
-      }
-    },
-    {
-      "actionId": "cfo-approve-budget",
-      "mcpMethod": "cfo.approveBudget",
-      "paramsSchema": {
-        "type": "object",
-        "properties": { "budgetId": { "type": "string" }, "amount": { "type": "number" }, "approvedBy": { "type": "string" } },
-        "required": ["budgetId", "amount", "approvedBy"]
-      },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "status": { "type": "string", "enum": ["approved", "error"] }, "timestamp": { "type": "string", "format": "date-time" } },
-        "required": ["status", "timestamp"]
-      }
-    },
-    {
-      "actionId": "cfo-liquidity",
-      "mcpMethod": "cfo.getLiquidity",
-      "paramsSchema": {
-        "type": "object",
-        "properties": { "windowDays": { "type": "integer" } },
-        "required": ["windowDays"]
-      },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "days": { "type": "integer" }, "cash": { "type": "number" }, "runwayMonths": { "type": "number" } },
-        "required": ["days", "cash", "runwayMonths"]
-      }
-    },
-    {
-      "actionId": "cto-incidents",
-      "mcpMethod": "cto.getIncidentSummary",
-      "paramsSchema": { "type": "object", "properties": {}, "required": [] },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "open": { "type": "integer" }, "sev1": { "type": "integer" }, "sev2": { "type": "integer" } },
-        "required": ["open", "sev1", "sev2"]
-      }
-    },
-    {
-      "actionId": "coo-ack-alert",
-      "mcpMethod": "coo.acknowledgeAlert",
-      "paramsSchema": {
-        "type": "object",
-        "properties": { "alertId": { "type": "string" }, "acknowledgedBy": { "type": "string" } },
-        "required": ["alertId", "acknowledgedBy"]
-      },
-      "responseSchema": {
-        "type": "object",
-        "properties": { "acknowledged": { "type": "boolean" }, "timestamp": { "type": "string", "format": "date-time" } },
-        "required": ["acknowledged", "timestamp"]
-      }
-    },
-    {
-      "actionId": "drill-risk",
-      "mcpMethod": "investor.getRiskBreakdown",
-      "paramsSchema": { "type": "object", "properties": { "portfolioId": { "type": "string" } }, "required": ["portfolioId"] },
-      "responseSchema": { "type": "object", "properties": { "uiResourceUri": { "type": "string" } }, "required": ["uiResourceUri"] }
-    }
-  ],
-  "uiResources": [
-    { "uri": "ui://boardroom/ceo", "payload": "<div><h2>CEO Overview</h2><ul><li>Runway: 14 months</li><li>MRR Growth: +12%</li><li>Churn: 3.1%</li></ul></div>" },
-    { "uri": "ui://boardroom/cfo", "payload": "<div><h2>CFO Finance KPIs</h2><ul><li>Cash: $2.4M</li><li>Burn: $160k/mo</li><li>Runway: 15 months</li></ul></div>" },
-    { "uri": "ui://boardroom/cto", "payload": "<div><h2>CTO Incidents</h2><p>Open: 3 (Sev1: 1, Sev2: 2)</p></div>" },
-    { "uri": "ui://boardroom/coo", "payload": "<div><h2>COO Ops Throughput</h2><p>Orders/day: 1,240 | SLA: 99.1%</p></div>" },
-    { "uri": "ui://boardroom/investor", "payload": "<div><h2>Portfolio Health</h2><p>Overall Risk: Low</p><p>Top Performer: AlphaTech (+27% YoY)</p></div>" },
-    { "uri": "ui://boardroom/investor-risk", "payload": "<div><h2>Risk Breakdown</h2><ul><li>Market: 35%</li><li>Operational: 25%</li><li>Liquidity: 15%</li><li>Other: 25%</li></ul></div>" },
-    { "uri": "ui://boardroom/governance", "payload": "<div><h2>Decision Tree State</h2><p>3 active proposals, 1 pending mentor review.</p></div>" }
-  ]
-}
+    { "actionId": "ceo-approve-plan", "mcpMethod": "ceo.approvePlan" },
+    { "actionId": "ceo-review-metrics", "mcpMethod": "ceo.reviewMetrics" },
+    { "actionId": "ceo-propose-network-initiative", "mcpMethod": "ceo.proposeNetworkInitiative" },
+    { "actionId": "ceo-review-network-metrics", "mcpMethod": "ceo.reviewNetworkMetrics" },
+
+    { "actionId": "cfo-approve-budget", "mcpMethod": "cfo.approveBudget" },
+    { "actionId": "cfo-review-financials", "mcpMethod": "cfo.reviewFinancials" },
+    { "actionId": "cfo-propose-network-budget", "mcpMethod": "cfo.proposeNetworkBudget" },
+    { "actionId": "cfo-review-network-financials", "mcpMethod": "cfo.reviewNetworkFinancials" },
+
+    { "actionId": "cto-approve-tech-plan", "mcpMethod": "cto.approveTechPlan" },
+    { "actionId": "cto-review-systems", "mcpMethod": "cto.reviewSystems" },
+    { "actionId": "cto-propose-network-tech", "mcpMethod": "cto.proposeNetworkTech" },
+    { "actionId": "cto-review-network-systems", "mcpMethod": "cto.reviewNetworkSystems" },
+
+    { "actionId": "coo-approve-ops-plan", "mcpMethod": "coo.approveOpsPlan" },
+    { "actionId": "coo-review-ops", "m
