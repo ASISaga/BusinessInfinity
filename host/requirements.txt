@@ -1,0 +1,8 @@
+azure-functions
+azure-functions-asgi
+fastapi
+uvicorn==0.30.6
+pydantic>=2.7
+azure-data-tables
+azure-storage-queue
+httpx
