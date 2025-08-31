@@ -1,0 +1,39 @@
+flowchart TD
+    %% === UI-Driven Agent Call Path ===
+    subgraph UIPath[UI‑Driven Agent Call (Production Inference)]
+        FE[Frontend (Boardroom UI)]
+        HOST[Host App<br/>(Azure Functions - Consumption)]
+        MCPUI[MCP‑UI Module<br/>(Manifest Loader)]
+        GOV[Governance / Validation]
+        SK[Semantic Kernel<br/>Multi‑Agents]
+        AMLMGR[AML Manager]
+        AML[Azure ML<br/>(LoRA Adapters)]
+        QUEUE[Azure Storage Queue]
+        TABLE[Azure Table Storage]
+    end
+
+    %% === Direct AML Control Path ===
+    subgraph AMLPath[Direct AML Control (Demo / Training)]
+        FE2[Frontend (Boardroom UI)]
+        HOST2[Host App]
+        GOV2[Governance / Validation]
+        AMLMGR2[AML Manager]
+        AML2[Azure ML]
+        REG[AML Model Registry]
+        SK2[Semantic Kernel<br/>Multi‑Agents]
+    end
+
+    %% UI Path connections
+    FE -->|Load dashboard| HOST --> MCPUI --> FE
+    FE -->|Trigger action| HOST --> GOV --> SK
+    SK --> AMLMGR --> AML --> AMLMGR --> SK
+    SK --> QUEUE --> HOST --> GOV --> TABLE
+    FE -->|Poll messages| HOST --> TABLE --> FE
+
+    %% AML Path connections
+    FE2 -->|Train/Infer request| HOST2 --> GOV2 --> AMLMGR2 --> AML2
+    AML2 -->|Register LoRA| REG --> SK2
+    AML2 --> AMLMGR2 --> HOST2 --> FE2
+
+    %% Cross-link: Registry updates SK in UI path
+    REG -.-> SK
