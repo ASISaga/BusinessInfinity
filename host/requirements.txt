@@ -6,3 +6,5 @@ pydantic>=2.7
 azure-data-tables
 azure-storage-queue
 httpx
+azure-storage-queue
+semantic-kernel
