@@ -1,0 +1,72 @@
+flowchart TD
+    %% Frontend
+    subgraph FE[Frontend: Boardroom]
+        FE_Chat[Chat UI<br/>(polls host for messages)]
+        FE_Dash[Dashboard<br/>(renders MCP‑UI schema)]
+        FE_Demo[Demo/Training UI<br/>(calls host AML APIs)]
+    end
+
+    %% Host App
+    subgraph HOST[Azure Functions Host App<br/>(Consumption Plan)]
+        MCPUI[MCP‑UI Module<br/>• Reads manifest.mcpUi<br/>• Generates UI schema<br/>• Maps UI actions → SK agents]
+        GOV[Governance / Validation<br/>• Role/scope/tool checks<br/>• Policy engine]
+        AMLMGR[AML Manager<br/>• Start/stop AML endpoints<br/>• Route inference to LoRA<br/>• Trigger LoRA training<br/>• Monitor jobs]
+        PERSIST[Persistence<br/>Azure Table Storage]
+        API[HTTP APIs<br/>/messages, /dashboard, /aml/infer, /aml/train]
+        QTRIG[Async Queue Trigger<br/>(Azure Storage Queue)]
+    end
+
+    %% Queue
+    subgraph QUEUE[Azure Storage Queue]
+        QMSG[Low‑cost async message bus<br/>Triggers host functions]
+    end
+
+    %% SK Agents
+    subgraph SK[Semantic Kernel Multi‑Agents]
+        CMO[CMO Agent → Marketing LoRA]
+        CFO[CFO Agent → Finance LoRA]
+        CTO[CTO Agent → Tech LoRA]
+    end
+
+    %% AML
+    subgraph AML[Azure Machine Learning]
+        LORAs[LoRA Adapters per domain<br/>(registered models)]
+        ENDPTS[Online Endpoints<br/>(consumption, scale‑to‑zero)]
+        TRAIN[Training Pipelines<br/>(triggered by host)]
+        REG[Model Registry]
+    end
+
+    %% Frontend to Host
+    FE_Chat -->|polls /messages| API
+    FE_Dash -->|fetches /dashboard| MCPUI
+    FE_Demo -->|calls /aml APIs| AMLMGR
+
+    %% Host internals
+    MCPUI --> GOV
+    GOV -->|valid action| SK
+    GOV -->|persist system msgs| PERSIST
+    QTRIG --> GOV
+    API --> PERSIST
+
+    %% SK Agents to Host
+    SK -->|emit messages| QMSG
+    QMSG --> QTRIG
+
+    %% SK Agents to AML
+    CMO -->|inference| ENDPTS
+    CFO -->|inference| ENDPTS
+    CTO -->|inference| ENDPTS
+
+    %% AML Manager to AML
+    AMLMGR -->|start/stop endpoints| ENDPTS
+    AMLMGR -->|route inference| ENDPTS
+    AMLMGR -->|trigger training| TRAIN
+    TRAIN --> REG
+    REG --> LORAs
+    LORAs --> ENDPTS
+
+    %% AML results back to SK
+    ENDPTS --> SK
+
+    %% Persistence to Frontend
+    PERSIST -->|queried by polling| FE_Chat
