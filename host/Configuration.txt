@@ -1,0 +1,15 @@
+
+Configuration
+
+Set these environment variables in each Functions app (host and agents):
+
+- Shared
+  - AZURETABLESCONNECTION_STRING
+  - AZUREQUEUESCONNECTION_STRING
+  - TABLE_NAME=BoardroomMessages
+  - QUEUEAGENTREQUESTS=agent-requests
+  - QUEUEAGENTEVENTS=agent-events
+- AML endpoints per agent
+  - AMLCMOSCORINGURI, AMLCMO_KEY
+  - AMLCFOSCORINGURI, AMLCFO_KEY
+  - AMLCTOSCORINGURI, AMLCTO_KEY
