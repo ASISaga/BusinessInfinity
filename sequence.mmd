@@ -1,0 +1,44 @@
+sequenceDiagram
+    autonumber
+    participant FE as Frontend (Boardroom)
+    participant HOST as Host App (Azure Functions - Consumption)
+    participant MCPUI as MCP‑UI Module
+    participant GOV as Governance/Validation
+    participant SK as Semantic Kernel Multi‑Agents
+    participant AML as Azure ML (LoRA Adapters)
+    participant QUEUE as Azure Storage Queue
+    participant TABLE as Azure Table Storage
+
+    %% === Production Inference Flow ===
+    Note over FE,AML: **Production Agent Inference**
+    FE->>HOST: Request dashboard schema (/dashboard)
+    HOST->>MCPUI: Load manifest.mcpUi for role/scope
+    MCPUI-->>FE: Return UI schema JSON
+
+    FE->>HOST: User triggers action (via MCP‑UI)
+    HOST->>GOV: Validate role/scope/tool
+    GOV-->>HOST: Approved
+    HOST->>SK: Invoke correct domain agent
+
+    SK->>AML: Call bound LoRA endpoint (inference)
+    AML-->>SK: Return inference result
+    SK->>QUEUE: Emit message/event
+
+    QUEUE->>HOST: Trigger Function (async)
+    HOST->>GOV: Validate incoming message
+    GOV->>TABLE: Persist message
+    FE->>HOST: Poll /messages
+    HOST->>TABLE: Query messages
+    TABLE-->>HOST: Return ordered messages
+    HOST-->>FE: Deliver chat updates
+
+    %% === Demo / Training Flow ===
+    Note over FE,AML: **Demo / Training LoRA**
+    FE->>HOST: Request AML training (/aml/train) or inference (/aml/infer)
+    HOST->>GOV: Validate request
+    GOV-->>HOST: Approved
+    HOST->>AML: Start endpoint or trigger training pipeline
+    AML-->>HOST: Job status / inference result
+    HOST-->>FE: Return status/result
+    AML->>REG: Register/update LoRA adapter
+    REG-->>SK: Bind updated LoRA to relevant agent
