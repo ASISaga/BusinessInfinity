@@ -1,0 +1,38 @@
+flowchart TB
+    %% === Layers ===
+    subgraph UI[UI Layer]
+        FE[Frontend (Boardroom UI)]
+        MCPUI[MCP‑UI Module<br/>(Manifest Loader)]
+    end
+
+    subgraph HOST[Host / Orchestration Layer]
+        HOSTAPP[Azure Functions - Consumption]
+        GOV[Governance / Validation]
+        QUEUE[Azure Storage Queue]
+        TABLE[Azure Table Storage]
+    end
+
+    subgraph AGENTS[Agent Layer]
+        SK[Semantic Kernel Multi‑Agents]
+    end
+
+    subgraph ML[ML Layer]
+        AMLMGR[AML Manager]
+        AML[Azure ML (LoRA Adapters)]
+        REG[AML Model Registry]
+    end
+
+    %% === UI Path ===
+    FE -->|Load manifest| MCPUI --> HOSTAPP
+    FE -->|Trigger action| HOSTAPP --> GOV --> SK
+    SK --> AMLMGR --> AML
+    AML --> AMLMGR --> SK
+    SK --> QUEUE --> HOSTAPP --> TABLE --> FE
+
+    %% === Direct AML Control Path ===
+    FE -->|Train/Infer request| HOSTAPP --> GOV --> AMLMGR --> AML
+    AML --> REG --> SK
+
+    %% === Cross-layer bindings ===
+    MCPUI -. manifest schema .-> SK
+    REG -. updated LoRA binding .-> SK
