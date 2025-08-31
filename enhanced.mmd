@@ -1,0 +1,51 @@
+flowchart TB
+    %% === LAYERS ===
+    subgraph UI[UI Layer]
+        FE[Frontend (Boardroom UI)]
+        MCPUI[MCP‑UI Module<br/>(Manifest Loader)]
+    end
+
+    subgraph HOST[Host / Orchestration Layer]
+        HOSTAPP[Azure Functions - Consumption]
+        GOV[Governance / Validation]
+        QUEUE[Azure Storage Queue]
+        TABLE[Azure Table Storage]
+    end
+
+    subgraph AGENTS[Agent Layer]
+        SK[Semantic Kernel Multi‑Agents]
+    end
+
+    subgraph ML[ML Layer]
+        AMLMGR[AML Manager]
+        AML[Azure ML (LoRA Adapters)]
+        REG[AML Model Registry]
+    end
+
+    %% === UI-Driven Agent Call Path (Production Inference) ===
+    FE --(1) Load manifest--> MCPUI --(2) Return schema--> HOSTAPP
+    FE --(3) Trigger action--> HOSTAPP --(4) Validate--> GOV --(5) Approved--> SK
+    SK --(6) Request inference--> AMLMGR --(7) Call endpoint--> AML
+    AML --(8) Return result--> AMLMGR --(9) Deliver to agent--> SK
+    SK --(10) Emit message--> QUEUE --(11) Trigger host--> HOSTAPP --(12) Validate--> GOV --(13) Persist--> TABLE --(14) Return messages--> FE
+
+    %% === Direct AML Control Path (Demo / Training) ===
+    FE --(15) Train/Infer request--> HOSTAPP --(16) Validate--> GOV --(17) Approved--> AMLMGR --(18) Run job--> AML
+    AML --(19) Register LoRA--> REG --(20) Bind to agent--> SK
+
+    %% === Cross-layer bindings ===
+    MCPUI -. manifest schema .-> SK
+    REG -. updated LoRA binding .-> SK
+
+    %% === Styling ===
+    classDef seq fill=#f0f9ff,stroke=#007acc,stroke-width=1px;
+    FE:::seq
+    MCPUI:::seq
+    HOSTAPP:::seq
+    GOV:::seq
+    SK:::seq
+    AMLMGR:::seq
+    AML:::seq
+    QUEUE:::seq
+    TABLE:::seq
+    REG:::seq
