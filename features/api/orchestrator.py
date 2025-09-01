@@ -185,12 +185,12 @@ class Orchestrator:
         return {"answer_json": answer_json, "status_code": 200}
 
     def login(self, req):
-        from core.api.AuthHandler import AuthHandler
+        from ..authentication.auth_handler import AuthHandler
         auth_handler = AuthHandler()
         return auth_handler.login(req)
 
     def refresh(self, req):
-        from core.api.AuthHandler import AuthHandler
+        from ..authentication.auth_handler import AuthHandler
         auth_handler = AuthHandler()
         return auth_handler.refresh(req)
 
