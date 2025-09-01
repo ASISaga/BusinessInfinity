@@ -1,4 +1,22 @@
-# Core functionality package
+"""
+BusinessInfinity Core Package
+
+This is the core package for the BusinessInfinity application, providing:
+- Agent management and orchestration
+- Machine learning integrations  
+- Storage and environment management
+- Application framework components
+- API and server functionality
+
+Key modules:
+- agents: Agent management and orchestration
+- app: Application-level logic and models
+- api: API components and handlers (some deprecated)
+- framework: Framework-level infrastructure
+- ml: Machine learning components
+- storage: Data storage management
+- environment: Environment and configuration management
+"""
 
 # Import all managers and classes for backward compatibility
 from .agents import AmlChatService, UnifiedAgentManager, agent_manager
