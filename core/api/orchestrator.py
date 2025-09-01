@@ -4,7 +4,7 @@ from core.agents import agent_manager
 from core.storage import storage_manager
 from core.ml import ml_manager
 
-from api.AuthHandler import validate_jwt, UNAUTHORIZED_MSG
+from core.api.AuthHandler import validate_jwt, UNAUTHORIZED_MSG
 
 class Orchestrator:
     def handle_servicebus_message(self, message_body):
@@ -185,12 +185,12 @@ class Orchestrator:
         return {"answer_json": answer_json, "status_code": 200}
 
     def login(self, req):
-        from api.AuthHandler import AuthHandler
+        from core.api.AuthHandler import AuthHandler
         auth_handler = AuthHandler()
         return auth_handler.login(req)
 
     def refresh(self, req):
-        from api.AuthHandler import AuthHandler
+        from core.api.AuthHandler import AuthHandler
         auth_handler = AuthHandler()
         return auth_handler.refresh(req)
 

@@ -56,7 +56,7 @@ class UnifiedAgentManager:
         
         # Initialize environment manager if available
         try:
-            from api.EnvManager import EnvManager
+            from core.api.EnvManager import EnvManager
             env = EnvManager()
             self.agent_profile_blob = env.get_required("AGENTPROFILESBLOB")
             self.agent_directives_blob = env.get_required("AGENTDIRECTIVESBLOB")

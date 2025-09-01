@@ -1,6 +1,6 @@
 import asyncio, json, os
 import websockets
-from protocol import MCPRequest, MCPResponse
+from .protocol import MCPRequest, MCPResponse
 
 STATE = {
     "blend_overrides": {},

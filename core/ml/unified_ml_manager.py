@@ -29,7 +29,7 @@ class UnifiedMLManager:
     def __init__(self):
         # Initialize environment variables
         try:
-            from api.EnvManager import EnvManager
+            from core.api.EnvManager import EnvManager
             env = EnvManager()
             self.subscription_id = env.get_required("AZURESUBSCRIPTION_ID")
             self.resource_group_name = env.get_required("AZURERESOURCEGROUP")

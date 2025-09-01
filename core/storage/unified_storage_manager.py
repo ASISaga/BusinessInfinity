@@ -28,7 +28,7 @@ class UnifiedStorageManager:
     def __init__(self):
         # Initialize environment variables
         try:
-            from api.EnvManager import EnvManager
+            from core.api.EnvManager import EnvManager
             env = EnvManager()
             self.storage_conn = env.get_required("AzureWebJobsStorage")
             self.table_conn = env.get_required("AZURE_TABLES_CONNECTION_STRING", self.storage_conn)
