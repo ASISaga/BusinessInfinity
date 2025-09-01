@@ -3,11 +3,11 @@ import logging
 import azure.functions as func
 from pathlib import Path
 
-# Import consolidated core modules
-from core.agents import agent_manager
-from core.ml import ml_manager
-from core.storage import storage_manager
-from core.environment import env_manager
+# Import consolidated feature modules
+from features.agents import agent_manager
+from features.ml_pipeline import ml_manager
+from features.storage import storage_manager
+from features.environment import env_manager
 
 # Create the main function app instance  
 app = func.FunctionApp()
