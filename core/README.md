@@ -5,7 +5,7 @@ This directory contains the consolidated core functionality for BusinessInfinity
 ## Module Structure
 
 ### `agents.py` - Unified Agent Management
-- **Consolidates**: `api/AgentManager.py`, `app/agents.py`, `app/aml_chat.py`
+- **Consolidates**: `core/api/AgentManager.py`, `core/app/agents.py`, `core/app/aml_chat.py`
 - **Features**: 
   - Semantic Kernel agent orchestration
   - Azure ML endpoint integration
@@ -13,7 +13,7 @@ This directory contains the consolidated core functionality for BusinessInfinity
   - ChromaDB knowledge integration
 
 ### `ml.py` - Azure ML Management  
-- **Consolidates**: `app/aml.py`, `api/MLClientManager.py`
+- **Consolidates**: `core/app/aml.py`, `core/api/MLClientManager.py`
 - **Features**:
   - AML endpoint inference
   - ML client management
@@ -21,7 +21,7 @@ This directory contains the consolidated core functionality for BusinessInfinity
   - Training job management
 
 ### `storage.py` - Unified Storage Management
-- **Consolidates**: `app/storage.py`, `api/ConversationManager.py`, `api/TrainingDataManager.py`
+- **Consolidates**: `core/app/storage.py`, `core/api/ConversationManager.py`, `core/api/TrainingDataManager.py`
 - **Features**:
   - Azure Tables operations
   - Azure Blob Storage operations
@@ -30,7 +30,7 @@ This directory contains the consolidated core functionality for BusinessInfinity
   - Training data management
 
 ### `environment.py` - Enhanced Environment Management
-- **Enhances**: `api/EnvManager.py`
+- **Enhances**: `core/api/EnvManager.py`
 - **Features**:
   - Centralized environment variable access
   - Enhanced type conversion
