@@ -4,36 +4,22 @@ Consolidates functionality from api/AgentManager.py and app/agents.py
 """
 import os
 import json
-import httpx
 from typing import Dict, Any, List, Optional
-from semantic_kernel import Kernel
-from semantic_kernel.contents import ChatHistory, ChatMessageContent, AuthorRole, StreamingChatMessageContent
-from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
-from semantic_kernel.prompt_template import PromptTemplateConfig
-from chromadb import Client as ChromaClient
 
+try:
+    from semantic_kernel import Kernel
+    from semantic_kernel.contents import ChatHistory
+    SEMANTIC_KERNEL_AVAILABLE = True
+except ImportError:
+    SEMANTIC_KERNEL_AVAILABLE = False
 
-class AmlChatService(ChatCompletionClientBase):
-    """Azure ML chat completion service for Semantic Kernel"""
-    
-    def __init__(self, scoring_uri: str, key: str):
-        self.scoring_uri = scoring_uri
-        self.key = key
+try:
+    from chromadb import Client as ChromaClient
+    CHROMADB_AVAILABLE = True
+except ImportError:
+    CHROMADB_AVAILABLE = False
 
-    async def get_chat_message_contents(self, messages: ChatHistory, **kwargs) -> List[ChatMessageContent]:
-        prompt = "\n".join([f"{m.role.name}: {m.content}" for m in messages.messages])
-        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.key}"}
-        async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(self.scoring_uri, headers=headers, json={"input": prompt})
-            resp.raise_for_status()
-            data = resp.json()
-        text = data.get("result") or data.get("output") or str(data)
-        return [ChatMessageContent(role=AuthorRole.ASSISTANT, content=text)]
-
-    async def get_streaming_chat_message_contents(self, messages: ChatHistory, **kwargs):
-        # Simple non-streaming fallback
-        for item in await self.get_chat_message_contents(messages, **kwargs):
-            yield StreamingChatMessageContent(item.role, item.content)
+from .aml_chat_service import AmlChatService
 
 
 class UnifiedAgentManager:
@@ -107,6 +93,9 @@ class UnifiedAgentManager:
     def _create_aml_agent(self, agent_id: str, config: Dict[str, str]):
         """Create an AML-based agent function"""
         async def aml_agent_func(user_input: str, context: dict = None) -> str:
+            if not SEMANTIC_KERNEL_AVAILABLE:
+                return f"Error: semantic_kernel not available for agent {agent_id}"
+                
             k = Kernel()
             k.add_service(AmlChatService(config["scoring_uri"], config["key"]))
             hist = ChatHistory()
@@ -119,6 +108,11 @@ class UnifiedAgentManager:
 
     def _create_semantic_agent(self, domain: str, agent_dirs, domain_know):
         """Create a Semantic Kernel agent with ChromaDB integration"""
+        if not CHROMADB_AVAILABLE:
+            async def error_agent_func(user_input: str, context: dict = None) -> str:
+                return f"Error: ChromaDB not available for semantic agent {domain}"
+            return error_agent_func
+            
         dirs = agent_dirs[domain]
         sys_block = "\n".join([f"Purpose: {dirs['purpose']}", *dirs["context"]])
         cfg = domain_know[domain]["chromaconfig"]
@@ -130,7 +124,8 @@ class UnifiedAgentManager:
             snippets = "\n".join(f"- {s}" for s in docs["documents"][0])
             
             # Use a simple prompt-based approach since semantic function creation varies
-            kernel = Kernel()
+            if SEMANTIC_KERNEL_AVAILABLE:
+                kernel = Kernel()
             prompt = f"""{sys_block}
 
 Context Snippets:
@@ -208,7 +203,3 @@ Response:"""
             return await agent_func(user_input, {})
         except Exception as e:
             return f"Error running agent {agent_id}: {str(e)}"
-
-
-# Global instance - can be imported directly
-agent_manager = UnifiedAgentManager()

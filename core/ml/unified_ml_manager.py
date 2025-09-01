@@ -6,25 +6,15 @@ import os
 import json
 import httpx
 from typing import Dict, Any
-from azure.ai.ml import MLClient
-from azure.identity import DefaultAzureCredential
 
+try:
+    from azure.ai.ml import MLClient
+    from azure.identity import DefaultAzureCredential
+    AZURE_ML_AVAILABLE = True
+except ImportError:
+    AZURE_ML_AVAILABLE = False
 
-# Agent endpoint mappings
-AML_ENDPOINTS = {
-    "cmo": {
-        "scoring_uri": os.getenv("AML_CMO_SCORING_URI", ""),
-        "key": os.getenv("AML_CMO_KEY", "")
-    },
-    "cfo": {
-        "scoring_uri": os.getenv("AML_CFO_SCORING_URI", ""),
-        "key": os.getenv("AML_CFO_KEY", "")
-    },
-    "cto": {
-        "scoring_uri": os.getenv("AML_CTO_SCORING_URI", ""),
-        "key": os.getenv("AML_CTO_KEY", "")
-    }
-}
+from .endpoints import AML_ENDPOINTS
 
 
 class UnifiedMLManager:
@@ -59,8 +49,11 @@ class UnifiedMLManager:
         """Backwards compatibility property"""
         return AML_ENDPOINTS
 
-    def get_client(self) -> MLClient:
+    def get_client(self):
         """Get Azure ML client (singleton pattern)"""
+        if not AZURE_ML_AVAILABLE:
+            raise ImportError("Azure ML libraries are required for ML operations")
+            
         if self._client is None:
             self._client = MLClient(
                 DefaultAzureCredential(),
@@ -174,7 +167,3 @@ class UnifiedMLManager:
             "configured_agents": configured_agents,
             "workspace": f"{self.subscription_id}/{self.resource_group_name}/{self.workspace_name}"
         }
-
-
-# Global instance
-ml_manager = UnifiedMLManager()
