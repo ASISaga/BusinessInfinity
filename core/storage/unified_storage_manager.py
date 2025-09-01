@@ -7,9 +7,14 @@ import json
 import time
 import datetime
 from typing import Dict, Any, List, Optional
-from azure.data.tables import TableClient, TableServiceClient, TableEntity
-from azure.storage.queue import QueueClient
-from azure.storage.blob import BlobClient
+
+try:
+    from azure.data.tables import TableClient, TableServiceClient, TableEntity
+    from azure.storage.queue import QueueClient
+    from azure.storage.blob import BlobClient
+    AZURE_AVAILABLE = True
+except ImportError:
+    AZURE_AVAILABLE = False
 
 
 class UnifiedStorageManager:
@@ -75,16 +80,22 @@ class UnifiedStorageManager:
 
     # === Azure Tables Operations ===
 
-    def get_table_client(self) -> TableClient:
+    def get_table_client(self):
         """Get Azure Tables client (singleton pattern)"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
+            
         if self._table_client is None:
             self._table_client = TableClient.from_connection_string(
                 self.table_conn, table_name=self.table_name
             )
         return self._table_client
 
-    def get_cosmos_table_client(self) -> Optional[TableClient]:
+    def get_cosmos_table_client(self):
         """Get Cosmos DB table client (singleton pattern)"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
+            
         if not self.cosmos_endpoint or not self.cosmos_key:
             return None
         
@@ -127,6 +138,9 @@ class UnifiedStorageManager:
 
     def create_conversation(self, conv_id: str, domain: str):
         """Create a new conversation"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
+            
         table = self.get_cosmos_table_client() or self.get_table_client()
 
         entity = TableEntity()
@@ -168,24 +182,32 @@ class UnifiedStorageManager:
 
     # === Queue Operations ===
 
-    def get_queue_client(self, name: str) -> QueueClient:
+    def get_queue_client(self, name: str):
         """Get queue client for specific queue"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
         return QueueClient.from_connection_string(self.queue_conn, name)
 
     def enqueue_request(self, msg: Dict[str, Any]) -> None:
         """Enqueue agent request message"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
         q = self.get_queue_client(self.req_queue)
         q.send_message(json.dumps(msg))
 
     def enqueue_event(self, msg: Dict[str, Any]) -> None:
         """Enqueue agent event message"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
         q = self.get_queue_client(self.evt_queue)
         q.send_message(json.dumps(msg))
 
     # === Blob Storage Operations ===
 
-    def get_blob_client(self, container: str, key: str) -> BlobClient:
+    def get_blob_client(self, container: str, key: str):
         """Get blob client for specific container and key"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
         if container == "mentorqa":
             blobname = f"{key}mentor_qa.jsonl"
         else:
@@ -198,6 +220,8 @@ class UnifiedStorageManager:
 
     def load_json_from_blob(self, container: str, blob: str) -> Dict[str, Any]:
         """Load and parse JSON content from blob"""
+        if not AZURE_AVAILABLE:
+            raise ImportError("Azure libraries are required for storage operations")
         bc = BlobClient.from_connection_string(
             self.storage_conn,
             container_name=container,
@@ -259,7 +283,3 @@ class UnifiedStorageManager:
             "cosmos_configured": bool(self.cosmos_endpoint and self.cosmos_key),
             "agent_data_loaded": bool(self.agent_dirs and self.agent_profiles)
         }
-
-
-# Global instance
-storage_manager = UnifiedStorageManager()

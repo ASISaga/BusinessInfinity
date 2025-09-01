@@ -193,12 +193,3 @@ class UnifiedEnvManager:
     def get_env_vars_by_prefix(prefix: str) -> dict:
         """Get environment variables with a specific prefix"""
         return {k: v for k, v in os.environ.items() if k.startswith(prefix)}
-
-
-# Convenience instance and backwards compatibility
-env_manager = UnifiedEnvManager()
-
-# Backwards compatibility class
-class EnvManager(UnifiedEnvManager):
-    """Backwards compatibility wrapper"""
-    pass
