@@ -1,8 +1,8 @@
 # mcp_handlers.py (append/extend)
 import json, os
 from datetime import datetime
-from core.dashboard.state import founder_state, investor_state, finance_state, tech_state, ops_state
-from core.dashboard.prompts import APPROVAL_PROMPT
+from .state import founder_state, investor_state, finance_state, tech_state, ops_state
+from .prompts import APPROVAL_PROMPT
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 

@@ -3,7 +3,7 @@ import logging
 import azure.functions as func
 from azure.functions import HttpRequest, HttpResponse
 
-from core.api.Orchestrator import Orchestrator
+from .orchestrator import Orchestrator
 
 app = func.FunctionApp()
 
