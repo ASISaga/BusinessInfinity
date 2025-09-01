@@ -1,13 +1,19 @@
 # mcp_handlers.py (append/extend)
 import json, os
 from datetime import datetime
-from state import founder_state, investor_state, finance_state, tech_state, ops_state
-from prompts import APPROVAL_PROMPT
+from dashboard.state import founder_state, investor_state, finance_state, tech_state, ops_state
+from dashboard.prompts import APPROVAL_PROMPT
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 
 kernel = Kernel()
-kernel.add_service(OpenAIChatCompletion(service_id="openai", api_key=os.getenv("OPENAI_API_KEY"), model_id=os.getenv("OPENAI_MODEL", "gpt-4o-mini")))
+try:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        kernel.add_service(OpenAIChatCompletion(service_id="openai", api_key=api_key, ai_model_id=os.getenv("OPENAI_MODEL", "gpt-4o-mini")))
+except Exception as e:
+    # OpenAI service not available, will handle in the function
+    pass
 
 async def run_prompt(prompt: str, input_text: str) -> str:
     func = kernel.create_semantic_function(prompt)
