@@ -1,10 +1,9 @@
 import os, json, uuid, datetime, requests
-from .EnvManager import EnvManager
+from core.environment import env_manager
+from core.agents import agent_manager
+from core.storage import storage_manager
+from core.ml import ml_manager
 
-from api.ConversationManager import ConversationManager
-from api.TrainingDataManager import TrainingDataManager
-from api.AgentManager import AgentManager
-from api.MLClientManager import MLClientManager
 from api.AuthHandler import validate_jwt, UNAUTHORIZED_MSG
 
 class Orchestrator:
@@ -57,19 +56,20 @@ class Orchestrator:
         # For demo, just return profile and email
         return {"profile": profile, "email": email, "mimetype": "application/json"}
     def __init__(self):
-        self.env = EnvManager()
-        self.STORAGE_CONN = self.env.get_required("AzureWebJobsStorage")
-        self.MLURL = self.env.get_required("MLENDPOINT_URL")
-        self.MLKEY = self.env.get_required("MLENDPOINT_KEY")
+        self.env = env_manager
+        self.STORAGE_CONN = env_manager.get_required("AzureWebJobsStorage")
+        self.MLURL = env_manager.get_required("MLENDPOINT_URL")
+        self.MLKEY = env_manager.get_required("MLENDPOINT_KEY")
 
-        self.conversation_manager = ConversationManager()
-        self.training_data_manager = TrainingDataManager()
-        self.AGENTDIRS = self.training_data_manager.AGENTDIRS
-        self.AGENTPROFILES = self.training_data_manager.AGENTPROFILES
-        self.DOMAINKNOW = self.training_data_manager.DOMAINKNOW
-        self.agent_manager = AgentManager(self.AGENTDIRS, self.DOMAINKNOW)
-        self.ml_client_manager = MLClientManager()
-        self.ml_client = self.ml_client_manager.get_client()
+        # Use consolidated managers
+        self.storage_manager = storage_manager
+        self.agent_manager = agent_manager
+        self.ml_manager = ml_manager
+        
+        # Get agent data from storage manager
+        self.AGENTDIRS = self.storage_manager.get_agent_dirs()
+        self.AGENTPROFILES = self.storage_manager.get_agent_profiles()
+        self.DOMAINKNOW = self.storage_manager.get_domain_knowledge()
 
     def start_conversation(self, req):
         claims = self.require_auth(req)
@@ -82,7 +82,7 @@ class Orchestrator:
             return {"error": "Invalid domain", "status_code": 400}
 
         conv_id = str(uuid.uuid4())
-        self.conversation_manager.create_conversation(conv_id, domain)
+        self.storage_manager.create_conversation(conv_id, domain)
         return {"conversationId": conv_id, "status_code": 201}
 
     async def post_message(self, req):
@@ -92,16 +92,23 @@ class Orchestrator:
         convid = req.routeparams.get("id")
         body = req.get_json()
         user_input = body.get("message", "")
-        conv = self.conversation_manager.get_conversation(convid)
+        conv = self.storage_manager.get_conversation(convid)
         if not conv:
             return {"error": "Conversation not found", "status_code": 404}
 
-        domain = conv["domain"]
+        # Parse conversation JSON
+        conv_data = json.loads(conv) if isinstance(conv, str) else conv
+        domain = conv_data["domain"]
         user_msg = {"sender": "user", "text": user_input,
                     "time": datetime.datetime.utcnow().isoformat()}
-        conv["messages"].append(user_msg)
+        messages = conv_data.get("messages", [])
+        if isinstance(messages, str):
+            messages = json.loads(messages)
+        messages.append(user_msg)
+        conv_data["messages"] = messages
+        
         answer_json = await self.agent_manager.ask_agent(domain, user_input)
-        self.conversation_manager.upsert_conversation(conv, domain, answer_json)
+        self.storage_manager.upsert_conversation(conv_data, domain, answer_json)
         return {"answer_json": answer_json, "status_code": 200}
 
     def get_messages(self, req):
@@ -109,7 +116,7 @@ class Orchestrator:
         if not isinstance(claims, dict):
             return {"error": "unauthorized", "status_code": 401}
         convid = req.routeparams.get("id")
-        conv_json = self.conversation_manager.get_conversation(convid)
+        conv_json = self.storage_manager.get_conversation(convid)
         if not conv_json:
             return {"error": "Not found", "status_code": 404}
         return {"conv_json": conv_json, "status_code": 200}
@@ -131,14 +138,14 @@ class Orchestrator:
         a = body.get("answer")
         if not domain or not q or not a:
             return {"error": "domain, question, answer required", "status_code": 400}
-        self.training_data_manager.upload_mentor_qa_pair(domain, q, a)
+        self.storage_manager.upload_mentor_qa_pair(domain, q, a)
         return {"status_code": 201}
 
     def mentorlistqa(self, req):
         domain = req.params.get("domain")
         if not domain:
             return {"error": "domain query param required", "status_code": 400}
-        pairs_json = self.training_data_manager.get_mentor_qa_pairs(domain)
+        pairs_json = self.storage_manager.get_mentor_qa_pairs(domain)
         return {"pairs_json": pairs_json, "status_code": 200}
 
     def mentortriggerfine_tune(self, req):
@@ -146,7 +153,7 @@ class Orchestrator:
         domain = body.get("domain")
         if not domain:
             return {"error": "domain required", "status_code": 400}
-        result_json = self.ml_client_manager.invoke_pipeline(domain)
+        result_json = self.ml_manager.invoke_pipeline(domain)
         return {"result_json": result_json, "status_code": 202}
 
     def list_agents(self, req):

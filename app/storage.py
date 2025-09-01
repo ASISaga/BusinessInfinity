@@ -1,46 +1,21 @@
-import os, json, time
-from typing import Dict, Any, List, Optional
-from azure.data.tables import TableClient
-from azure.storage.queue import QueueClient
+"""
+DEPRECATED: This module has been consolidated into core/storage.py  
+Use: from core.storage import storage_manager instead
+"""
+import warnings
+from core.storage import storage_manager
 
-TABLE_CONN = os.getenv("AZURE_TABLES_CONNECTION_STRING")
-QUEUE_CONN = os.getenv("AZURE_QUEUES_CONNECTION_STRING")
-TABLE_NAME = os.getenv("TABLE_NAME", "BoardroomMessages")
-REQ_QUEUE = os.getenv("QUEUE_AGENT_REQUESTS", "agent-requests")
-EVT_QUEUE = os.getenv("QUEUE_AGENT_EVENTS", "agent-events")
+warnings.warn(
+    "app.storage is deprecated. Use core.storage.storage_manager instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
-def table() -> TableClient:
-    return TableClient.from_connection_string(TABLE_CONN, table_name=TABLE_NAME)
-
-def queue(name: str) -> QueueClient:
-    return QueueClient.from_connection_string(QUEUE_CONN, name)
-
-def to_row(boardroom_id: str, conversation_id: str, env: Dict[str, Any]) -> Dict[str, Any]:
-    # PartitionKey: boardroomId|conversationId; RowKey: sortable timestamp
-    pk = f"{boardroom_id}|{conversation_id}"
-    rk = f"{int(time.time()*1000):013d}-{env['messageId']}"
-    return {
-        "PartitionKey": pk,
-        "RowKey": rk,
-        "Envelope": json.dumps(env)
-    }
-
-def from_row(row: Dict[str, Any]) -> Dict[str, Any]:
-    return json.loads(row["Envelope"])
-
-def enqueue_request(msg: Dict[str, Any]) -> None:
-    q = queue(REQ_QUEUE)
-    q.send_message(json.dumps(msg))
-
-def enqueue_event(msg: Dict[str, Any]) -> None:
-    q = queue(EVT_QUEUE)
-    q.send_message(json.dumps(msg))
-
-def query_messages(boardroom_id: str, conversation_id: str, since: Optional[str]) -> List[Dict[str, Any]]:
-    with table() as t:
-        pk = f"{boardroom_id}|{conversation_id}"
-        if since:
-            flt = f"PartitionKey eq '{pk}' and RowKey gt '{since}'"
-        else:
-            flt = f"PartitionKey eq '{pk}'"
-        return [from_row(e) for e in t.query_entities(flt, results_per_page=100)]
+# Backwards compatibility aliases
+table = storage_manager.get_table_client
+queue = storage_manager.get_queue_client
+to_row = storage_manager.to_row
+from_row = storage_manager.from_row
+enqueue_request = storage_manager.enqueue_request
+enqueue_event = storage_manager.enqueue_event
+query_messages = storage_manager.query_messages
