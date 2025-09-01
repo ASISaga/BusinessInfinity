@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "isDefaultHostConfig": true,
+  "functionAppScriptFile": "function_app.py",
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
