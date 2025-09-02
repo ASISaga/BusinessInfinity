@@ -12,6 +12,12 @@ from environment import env_manager
 from dashboard.mcp_handlers import handle_mcp
 from utils.governance import validate_request, GovernanceError
 
+# === Assimilated from utils/app.py ===
+from utils.manifest import get_ui_schema
+from utils.storage import enqueue_request, query_messages
+from utils.aml import aml_infer as utils_aml_infer, aml_train as utils_aml_train
+from utils.models import UiAction, Envelope
+
 # Create the main function app instance  
 app = func.FunctionApp()
 
@@ -44,6 +50,137 @@ async def health(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200
     )
+
+# === Assimilated FastAPI endpoints from utils/app.py ===
+
+# /dashboard
+@app.route(route="dashboard", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+async def get_dashboard(req: func.HttpRequest) -> func.HttpResponse:
+    role = req.params.get("role")
+    scope = req.params.get("scope", "local")
+    schema = get_ui_schema(role, scope)
+    return func.HttpResponse(
+        json.dumps({"uiSchema": schema}),
+        mimetype="application/json",
+        status_code=200
+    )
+
+# /messages
+@app.route(route="messages", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+async def get_messages(req: func.HttpRequest) -> func.HttpResponse:
+    boardroomId = req.params.get("boardroomId")
+    conversationId = req.params.get("conversationId")
+    since = req.params.get("since")
+    rows = query_messages(boardroomId, conversationId, since)
+    return func.HttpResponse(
+        json.dumps({"messages": rows}),
+        mimetype="application/json",
+        status_code=200
+    )
+
+# /action
+@app.route(route="action", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
+async def post_action(req: func.HttpRequest) -> func.HttpResponse:
+    import uuid
+    try:
+        body = req.get_json()
+        action = UiAction(**body)
+        corr = action.correlationId or str(uuid.uuid4())
+        env = Envelope(
+            correlationId=corr,
+            traceId=corr,
+            boardroomId=action.boardroomId,
+            conversationId=action.conversationId,
+            senderAgentId=action.agentId,
+            role=action.agentId.upper(),
+            scope=action.scope,
+            messageType="chat",
+            payload={
+                "action": action.action,
+                "args": action.args
+            }
+        ).model_dump()
+        try:
+            validate_request("inference", {"role": env["role"], "scope": env["scope"], "payload": env["payload"]})
+        except GovernanceError as ge:
+            return func.HttpResponse(
+                json.dumps({"error": str(ge)}),
+                mimetype="application/json",
+                status_code=403
+            )
+        enqueue_request(env)
+        return func.HttpResponse(
+            json.dumps({"status": "queued", "correlationId": corr}),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        logging.error(f"Error in /action: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to queue action"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+# /aml/infer
+@app.route(route="aml/infer", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
+async def aml_infer_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        body = req.get_json()
+        agentId = body.get("agentId")
+        prompt = body.get("prompt")
+        try:
+            validate_request("inference", {"role": "Governance", "payload": {"agentId": agentId}})
+        except GovernanceError as ge:
+            return func.HttpResponse(
+                json.dumps({"error": str(ge)}),
+                mimetype="application/json",
+                status_code=403
+            )
+        res = await utils_aml_infer(agentId, prompt)
+        return func.HttpResponse(
+            json.dumps(res),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        logging.error(f"Error in /aml/infer: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "AML inference failed"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+# /aml/train
+@app.route(route="aml/train", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
+async def aml_train_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        body = req.get_json()
+        jobName = body.get("jobName")
+        modelName = body.get("modelName")
+        datasetUri = body.get("datasetUri")
+        demo = body.get("demo", True)
+        try:
+            validate_request("training", {"role": "Governance", "demo": demo, "payload": {"modelName": modelName}})
+        except GovernanceError as ge:
+            return func.HttpResponse(
+                json.dumps({"error": str(ge)}),
+                mimetype="application/json",
+                status_code=403
+            )
+        res = await utils_aml_train(jobName, {"modelName": modelName, "datasetUri": datasetUri})
+        return func.HttpResponse(
+            json.dumps(res),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        logging.error(f"Error in /aml/train: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "AML training failed"}),
+            mimetype="application/json",
+            status_code=500
+        )
 
 # MCP endpoint function (replaces dashboard/mcp_endpoint) 
 @app.route(route="mcp", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
