@@ -1,39 +1,40 @@
 flowchart TD
+
     %% Frontend
     subgraph FE[Frontend: Boardroom]
-        FE_Chat[Chat UI<br/>(polls host for messages)]
-        FE_Dash[Dashboard<br/>(renders MCP‑UI schema)]
-        FE_Demo[Demo/Training UI<br/>(calls host AML APIs)]
+    FE_Chat["Chat UI (polls host for messages)"]
+    FE_Dash["Dashboard (renders MCP-UI schema)"]
+    FE_Demo["Demo/Training UI (calls host AML APIs)"]
     end
 
     %% Host App
-    subgraph HOST[Azure Functions Host App<br/>(Consumption Plan)]
-        MCPUI[MCP‑UI Module<br/>• Reads manifest.mcpUi<br/>• Generates UI schema<br/>• Maps UI actions → SK agents]
-        GOV[Governance / Validation<br/>• Role/scope/tool checks<br/>• Policy engine]
-        AMLMGR[AML Manager<br/>• Start/stop AML endpoints<br/>• Route inference to LoRA<br/>• Trigger LoRA training<br/>• Monitor jobs]
-        PERSIST[Persistence<br/>Azure Table Storage]
-        API[HTTP APIs<br/>/messages, /dashboard, /aml/infer, /aml/train]
-        QTRIG[Async Queue Trigger<br/>(Azure Storage Queue)]
+    subgraph HOST["Azure Functions Host App (Consumption Plan)"]
+        MCPUI["MCP-UI Module: Reads manifest.mcpUi, Generates UI schema, Maps UI actions → SK agents"]
+        GOV["Governance / Validation: Role/scope/tool checks, Policy engine"]
+        AMLMGR["AML Manager: Start/stop AML endpoints, Route inference to LoRA, Trigger LoRA training, Monitor jobs"]
+        PERSIST["Persistence: Azure Table Storage"]
+        API["HTTP APIs: /messages, /dashboard, /aml/infer, /aml/train"]
+        QTRIG["Async Queue Trigger (Azure Storage Queue)"]
     end
 
     %% Queue
-    subgraph QUEUE[Azure Storage Queue]
-        QMSG[Low‑cost async message bus<br/>Triggers host functions]
+    subgraph QUEUE["Azure Storage Queue"]
+        QMSG["Low-cost async message bus (Triggers host functions)"]
     end
 
     %% SK Agents
-    subgraph SK[Semantic Kernel Multi‑Agents]
+    subgraph SK[Semantic Kernel Multi-Agents]
         CMO[CMO Agent → Marketing LoRA]
         CFO[CFO Agent → Finance LoRA]
         CTO[CTO Agent → Tech LoRA]
     end
 
     %% AML
-    subgraph AML[Azure Machine Learning]
-        LORAs[LoRA Adapters per domain<br/>(registered models)]
-        ENDPTS[Online Endpoints<br/>(consumption, scale‑to‑zero)]
-        TRAIN[Training Pipelines<br/>(triggered by host)]
-        REG[Model Registry]
+    subgraph AML["Azure Machine Learning"]
+        LORAs["LoRA Adapters per domain (registered models)"]
+        ENDPTS["Online Endpoints (consumption, scale-to-zero)"]
+        TRAIN["Training Pipelines (triggered by host)"]
+        REG["Model Registry"]
     end
 
     %% Frontend to Host

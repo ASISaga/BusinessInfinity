@@ -4,10 +4,13 @@ import azure.functions as func
 from pathlib import Path
 
 # Import consolidated feature modules
-from features.agents import agent_manager
-from features.ml_pipeline import ml_manager
-from features.storage import storage_manager
-from features.environment import env_manager
+from agents import agent_manager
+from ml_pipeline import ml_manager
+from storage import storage_manager
+from environment import env_manager
+
+from dashboard.mcp_handlers import handle_mcp
+from utils.governance import validate_request, GovernanceError
 
 # Create the main function app instance  
 app = func.FunctionApp()
@@ -57,7 +60,7 @@ async def mcp_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     
     # Import handle_mcp locally to avoid import issues
     try:
-        from dashboard.mcp_handlers import handle_mcp
+       
         response = await handle_mcp(body)
     except ImportError as e:
         logging.error(f"Failed to import MCP handler: {e}")
@@ -94,8 +97,6 @@ async def agent_events_trigger(msg: func.QueueMessage):
     data = json.loads(msg.get_body().decode("utf-8"))
     
     try:
-        from app.governance import validate_request, GovernanceError
-        
         validate_request("message", {"role": data.get("role"), "payload": data})
         row = storage_manager.to_row(data["boardroomId"], data["conversationId"], data)
         with storage_manager.get_table_client() as t:

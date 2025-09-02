@@ -1,25 +1,25 @@
 flowchart TB
     %% === LAYERS ===
     subgraph UI[UI Layer]
-        FE[Frontend (Boardroom UI)]
-        MCPUI[MCP‑UI Module<br/>(Manifest Loader)]
+    FE["Frontend (Boardroom UI)"]
+    MCPUI["MCP-UI Module (Manifest Loader)"]
     end
 
     subgraph HOST[Host / Orchestration Layer]
-        HOSTAPP[Azure Functions - Consumption]
-        GOV[Governance / Validation]
-        QUEUE[Azure Storage Queue]
-        TABLE[Azure Table Storage]
+    HOSTAPP["Azure Functions - Consumption"]
+    GOV["Governance / Validation"]
+    QUEUE["Azure Storage Queue"]
+    TABLE["Azure Table Storage"]
     end
 
     subgraph AGENTS[Agent Layer]
-        SK[Semantic Kernel Multi‑Agents]
+    SK["Semantic Kernel Multi-Agents"]
     end
 
     subgraph ML[ML Layer]
-        AMLMGR[AML Manager]
-        AML[Azure ML (LoRA Adapters)]
-        REG[AML Model Registry]
+    AMLMGR["AML Manager"]
+    AML["Azure ML (LoRA Adapters)"]
+    REG["AML Model Registry"]
     end
 
     %% === UI-Driven Agent Call Path (Production Inference) ===
@@ -38,14 +38,18 @@ flowchart TB
     REG -. updated LoRA binding .-> SK
 
     %% === Sequence cues (annotated) ===
-    classDef seq fill=#f0f9ff,stroke=#007acc,stroke-width=1px;
-    FE:::seq
-    MCPUI:::seq
-    HOSTAPP:::seq
-    GOV:::seq
-    SK:::seq
-    AMLMGR:::seq
-    AML:::seq
-    QUEUE:::seq
-    TABLE:::seq
-    REG:::seq
+    SK
+
+%% === End of flowchart ===
+
+classDef seq fill:#f0f9ff,stroke:#0077cc,stroke-width:1px
+FE:::seq
+MCPUI:::seq
+HOSTAPP:::seq
+GOV:::seq
+SK:::seq
+AMLMMGR:::seq
+AML:::seq
+QUEUE:::seq
+TABLE:::seq
+REG:::seq
