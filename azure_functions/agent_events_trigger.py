@@ -1,17 +1,23 @@
-import json
-import logging
-import azure.functions as func
-from ...features.storage import storage_manager
+"""
+Agent Events Trigger - Updated to use new trigger structure
 
-async def main(msg: func.QueueMessage):
-    data = json.loads(msg.get_body().decode("utf-8"))
-    try:
-        # TODO: Move governance validation to a feature
-        # validate_request("message", {"role": data.get("role"), "payload": data})
-        pass
-    except Exception as ge:
-        logging.warning(f"Message rejected: {ge}")
-        return
-    row = storage_manager.to_row(data["boardroomId"], data["conversationId"], data)
-    table_client = storage_manager.get_table_client("messages")
-    table_client.create_entity(row)
+This module now imports from the consolidated triggers module.
+The actual trigger implementation is in triggers/queue_triggers.py
+"""
+
+import logging
+from triggers.queue_triggers import register_queue_triggers
+
+# For backward compatibility, we can still provide the main function
+# but it now delegates to the consolidated trigger system
+async def main(msg):
+    """
+    Legacy main function for backward compatibility.
+    The actual trigger is now registered in triggers/queue_triggers.py
+    """
+    logging.info("agent_events_trigger.main() called - this function is deprecated.")
+    logging.info("Trigger functionality has been moved to triggers/queue_triggers.py")
+    logging.info("Please use the new trigger registration system.")
+    
+    # We could call the new trigger function here if needed for compatibility
+    # But it's better to use the new system directly

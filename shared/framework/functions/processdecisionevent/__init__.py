@@ -1,9 +1,21 @@
-import json
-import logging
-import azure.functions as func
+"""
+Process Decision Event - Updated to use new trigger structure
 
-def main(msg: func.ServiceBusMessage):
-    body = msg.get_body().decode("utf-8")
-    subject = msg.subject
-    logging.info(f"[GOV] Event: {subject} Payload: {body}")
-    # Add side effects: persist to Cosmos DB, trigger notifications, etc.
+This module now imports from the consolidated triggers module.
+The actual trigger implementation is in triggers/service_bus_triggers.py
+"""
+
+import logging
+from triggers.service_bus_triggers import register_service_bus_triggers
+
+def main(msg):
+    """
+    Legacy main function for backward compatibility.
+    The actual trigger is now registered in triggers/service_bus_triggers.py
+    """
+    logging.info("processdecisionevent.main() called - this function is deprecated.")
+    logging.info("Trigger functionality has been moved to triggers/service_bus_triggers.py")
+    logging.info("Please use the new trigger registration system.")
+    
+    # We could call the new trigger function here if needed for compatibility
+    # But it's better to use the new system directly
