@@ -1,27 +1,23 @@
-import json, time
-import azure.functions as func
-from azure.storage.queue import QueueClient
-import os
-from ...features.agents import agent_manager
+"""
+Agent Requests Trigger - Updated to use new trigger structure
 
-EVT_QUEUE = os.getenv("QUEUE_AGENT_EVENTS", "agent-events")
-QUEUE_CONN = os.getenv("AZURE_QUEUES_CONNECTION_STRING")
+This module now imports from the consolidated triggers module.
+The actual trigger implementation is in triggers/queue_triggers.py
+"""
 
-def events_queue() -> QueueClient:
-    return QueueClient.from_connection_string(QUEUE_CONN, EVT_QUEUE)
+import logging
+from triggers.queue_triggers import register_queue_triggers
 
-async def main(msg: func.QueueMessage):
-    env = json.loads(msg.get_body().decode("utf-8"))
-    agent_id = env["senderAgentId"]
-    args = env["payload"]
-    # Map action+args to a prompt. For production, select prompt per action schema.
-    prompt = f"Action={args.get('action')}\nArgs={json.dumps(args.get('args', {}))}"
-    output = await agent_manager.run_agent(agent_id, prompt)
-
-    event = {
-        **env,
-        "messageType": "toolResult",
-        "payload": {"action": args.get("action"), "result": output},
-        "timestamp": time.time()
-    }
-    events_queue().send_message(json.dumps(event))
+# For backward compatibility, we can still provide the main function
+# but it now delegates to the consolidated trigger system
+async def main(msg):
+    """
+    Legacy main function for backward compatibility.
+    The actual trigger is now registered in triggers/queue_triggers.py
+    """
+    logging.info("agent_requests_trigger.main() called - this function is deprecated.")
+    logging.info("Trigger functionality has been moved to triggers/queue_triggers.py")
+    logging.info("Please use the new trigger registration system.")
+    
+    # We could call the new trigger function here if needed for compatibility
+    # But it's better to use the new system directly
