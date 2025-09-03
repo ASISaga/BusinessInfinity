@@ -8,12 +8,14 @@
     "/agents": {
       "get": {
         "summary": "List agents",
+        "operationId": "getAgents",
         "responses": { "200": { "description": "Agent list" } }
       }
     },
     "/agents/{agentId}": {
       "get": {
         "summary": "Get agent profile",
+        "operationId": "getAgentProfile",
         "parameters": [{ "name": "agentId", "in": "path", "required": true, "schema": { "type": "string" } }],
         "responses": { "200": { "description": "Agent profile" } }
       }
@@ -21,6 +23,7 @@
     "/agents/{agent_id}/chat": {
       "post": {
         "summary": "Chat with agent",
+        "operationId": "chatWithAgent",
         "parameters": [{ "name": "agent_id", "in": "path", "required": true, "schema": { "type": "string" } }],
         "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
         "responses": { "200": { "description": "Chat response" } }
@@ -29,6 +32,7 @@
     "/conversations": {
       "post": {
         "summary": "Start conversation",
+        "operationId": "startConversation",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" } } } } } },
         "responses": { "201": { "description": "Conversation started" } }
       }
@@ -36,11 +40,13 @@
     "/conversations/{id}/messages": {
       "get": {
         "summary": "Get messages for conversation",
+        "operationId": "getConversationMessages",
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
         "responses": { "200": { "description": "Messages list" } }
       },
       "post": {
         "summary": "Post message to conversation",
+        "operationId": "postConversationMessage",
         "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
         "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
         "responses": { "200": { "description": "Message posted" } }
@@ -49,6 +55,7 @@
     "/mentor/test": {
       "post": {
         "summary": "Test mentor question",
+        "operationId": "testMentorQuestion",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" }, "question": { "type": "string" } } } } } },
         "responses": { "200": { "description": "Mentor answer" } }
       }
@@ -56,6 +63,7 @@
     "/mentor/qapairs": {
       "get": {
         "summary": "List mentor Q&A pairs",
+        "operationId": "getMentorQaPairs",
         "parameters": [{ "name": "domain", "in": "query", "required": false, "schema": { "type": "string" } }],
         "responses": { "200": { "description": "Q&A pairs list" } }
       }
@@ -63,6 +71,7 @@
     "/mentor/qapair": {
       "post": {
         "summary": "Submit mentor Q&A pair",
+        "operationId": "submitMentorQaPair",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "Q&A pair submitted" } }
       }
@@ -70,6 +79,7 @@
     "/mentor/fine-tune": {
       "post": {
         "summary": "Trigger mentor fine-tuning",
+        "operationId": "triggerMentorFineTune",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" } } } } } },
         "responses": { "200": { "description": "Fine-tune triggered" } }
       }
@@ -77,18 +87,21 @@
     "/auth/linkedin": {
       "get": {
         "summary": "LinkedIn OAuth redirect",
+        "operationId": "authLinkedin",
         "responses": { "302": { "description": "Redirect to LinkedIn" } }
       }
     },
     "/auth/linkedin/callback": {
       "get": {
         "summary": "LinkedIn OAuth callback",
+        "operationId": "authLinkedinCallback",
         "responses": { "200": { "description": "LinkedIn profile and email" } }
       }
     },
     "/auth/login": {
       "post": {
         "summary": "Login",
+        "operationId": "authLogin",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "Login result" } }
       }
@@ -96,6 +109,7 @@
     "/auth/refresh": {
       "post": {
         "summary": "Refresh token",
+        "operationId": "authRefresh",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "Token refreshed" } }
       }
@@ -103,6 +117,7 @@
     "/ml/infer": {
       "post": {
         "summary": "ML inference",
+        "operationId": "mlInfer",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "Inference result" } }
       }
@@ -110,6 +125,7 @@
     "/aml/infer": {
       "post": {
         "summary": "AML inference",
+        "operationId": "amlInfer",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "AML inference result" } }
       }
@@ -117,6 +133,7 @@
     "/aml/train": {
       "post": {
         "summary": "AML training",
+        "operationId": "amlTrain",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "AML training result" } }
       }
@@ -124,18 +141,21 @@
     "/dashboard": {
       "get": {
         "summary": "Get dashboard",
+        "operationId": "getDashboard",
         "responses": { "200": { "description": "Dashboard data" } }
       }
     },
     "/messages": {
       "get": {
         "summary": "Get messages",
+        "operationId": "getMessages",
         "responses": { "200": { "description": "Messages list" } }
       }
     },
     "/action": {
       "post": {
         "summary": "Post UI action",
+        "operationId": "postAction",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "Action queued" } }
       }
@@ -143,12 +163,14 @@
     "/manifest": {
       "get": {
         "summary": "Get manifest",
+        "operationId": "getManifest",
         "responses": { "200": { "description": "Manifest data" } }
       }
     },
     "/mcp": {
       "post": {
         "summary": "MCP endpoint",
+        "operationId": "postMcp",
         "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
         "responses": { "200": { "description": "MCP result" } }
       }
@@ -156,12 +178,14 @@
     "/status": {
       "get": {
         "summary": "Get system status",
+        "operationId": "getStatus",
         "responses": { "200": { "description": "System status" } }
       }
     },
     "/health": {
       "get": {
         "summary": "Health check",
+        "operationId": "getHealth",
         "responses": { "200": { "description": "Health status" } }
       }
     }
