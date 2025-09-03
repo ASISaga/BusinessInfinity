@@ -36,8 +36,16 @@ def register_service_bus_triggers(app: func.FunctionApp):
             logging.error(f"[GOV] Error processing decision event: {e}")
 
 
-    # Example service bus queue trigger (from api/router.py)
-    # This can be uncommented and configured if needed
+    # Router Service Bus queue trigger merged from api/router.py
+    from api.orchestrator import Orchestrator
+    orchestrator = Orchestrator()
+
+    @app.function_name(name="servicebus_queue_trigger")
+    @app.service_bus_queue_trigger(arg_name="msg", queue_name="myqueue", connection="AzureServiceBusConnection")
+    def servicebus_queue_trigger(msg: func.ServiceBusMessage):
+        message_body = msg.get_body().decode('utf-8')
+        logging.info(f"Received Service Bus message: {message_body}")
+        orchestrator.handle_servicebus_message(message_body)
     # @app.service_bus_queue_trigger(arg_name="msg", queue_name="myqueue", 
     #                               connection="AzureServiceBusConnection")
     # def servicebus_queue_trigger(msg: func.ServiceBusMessage):

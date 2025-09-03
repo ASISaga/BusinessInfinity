@@ -1,0 +1,169 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Business Infinity API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/agents": {
+      "get": {
+        "summary": "List agents",
+        "responses": { "200": { "description": "Agent list" } }
+      }
+    },
+    "/agents/{agentId}": {
+      "get": {
+        "summary": "Get agent profile",
+        "parameters": [{ "name": "agentId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Agent profile" } }
+      }
+    },
+    "/agents/{agent_id}/chat": {
+      "post": {
+        "summary": "Chat with agent",
+        "parameters": [{ "name": "agent_id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Chat response" } }
+      }
+    },
+    "/conversations": {
+      "post": {
+        "summary": "Start conversation",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" } } } } } },
+        "responses": { "201": { "description": "Conversation started" } }
+      }
+    },
+    "/conversations/{id}/messages": {
+      "get": {
+        "summary": "Get messages for conversation",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Messages list" } }
+      },
+      "post": {
+        "summary": "Post message to conversation",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Message posted" } }
+      }
+    },
+    "/mentor/test": {
+      "post": {
+        "summary": "Test mentor question",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" }, "question": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Mentor answer" } }
+      }
+    },
+    "/mentor/qapairs": {
+      "get": {
+        "summary": "List mentor Q&A pairs",
+        "parameters": [{ "name": "domain", "in": "query", "required": false, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Q&A pairs list" } }
+      }
+    },
+    "/mentor/qapair": {
+      "post": {
+        "summary": "Submit mentor Q&A pair",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Q&A pair submitted" } }
+      }
+    },
+    "/mentor/fine-tune": {
+      "post": {
+        "summary": "Trigger mentor fine-tuning",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "domain": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Fine-tune triggered" } }
+      }
+    },
+    "/auth/linkedin": {
+      "get": {
+        "summary": "LinkedIn OAuth redirect",
+        "responses": { "302": { "description": "Redirect to LinkedIn" } }
+      }
+    },
+    "/auth/linkedin/callback": {
+      "get": {
+        "summary": "LinkedIn OAuth callback",
+        "responses": { "200": { "description": "LinkedIn profile and email" } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Login result" } }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Refresh token",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Token refreshed" } }
+      }
+    },
+    "/ml/infer": {
+      "post": {
+        "summary": "ML inference",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Inference result" } }
+      }
+    },
+    "/aml/infer": {
+      "post": {
+        "summary": "AML inference",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "AML inference result" } }
+      }
+    },
+    "/aml/train": {
+      "post": {
+        "summary": "AML training",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "AML training result" } }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "summary": "Get dashboard",
+        "responses": { "200": { "description": "Dashboard data" } }
+      }
+    },
+    "/messages": {
+      "get": {
+        "summary": "Get messages",
+        "responses": { "200": { "description": "Messages list" } }
+      }
+    },
+    "/action": {
+      "post": {
+        "summary": "Post UI action",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Action queued" } }
+      }
+    },
+    "/manifest": {
+      "get": {
+        "summary": "Get manifest",
+        "responses": { "200": { "description": "Manifest data" } }
+      }
+    },
+    "/mcp": {
+      "post": {
+        "summary": "MCP endpoint",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "MCP result" } }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "Get system status",
+        "responses": { "200": { "description": "System status" } }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": { "200": { "description": "Health status" } }
+      }
+    }
+  }
+}
