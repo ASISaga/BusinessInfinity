@@ -1,160 +1,123 @@
 # AI C‑Suite & Federated Collaboration Framework
 
 ## 1. Introduction
-
 This repository contains the complete, modular specification set for designing, deploying, and governing **AI‑driven executive councils** (C‑suite agents) within a single company and across a federated supply/value chain.
 
-It is designed for **progressive adoption** — starting with advisory AI roles and evolving toward conditional and strategic autonomy — while maintaining **trust, transparency, and governance** at every stage.
-
-The framework is **domain‑agnostic**: it can be applied to manufacturing, retail, finance, technology, logistics, or any other sector where leadership decisions benefit from AI‑augmented reasoning and cross‑enterprise collaboration.
+It includes:
+- **Static architecture** — roles, archetypes, artifacts, governance.
+- **Dynamic behaviour** — event flows, decision loops, learning cycles.
+- **Scenario playbook** — real‑world examples of the system in action.
+- **Traceability matrix** — mapping scenarios to artifacts, UI modules, and governance.
 
 ---
 
 ## 2. Repository Structure
 
-The repository is organised into **six major sections**:
-
 ### **A. Core Architecture**
-Defines the **four building blocks** every AI C‑suite member uses.
-
-| File | Description |
-|------|-------------|
-| `1-Domain-Tuned-LLM.md` | Blueprint for fine‑tuned, domain‑legend LLMs with embedded lexicon and heuristics. |
-| `2-Organizational-Data-MCP.md` | Integration hub into enterprise systems with dual‑horizon memory (short‑term operational, long‑term strategic). |
-| `3-Community-Engagement-MCP.md` | Channel execution layer for publishing, engagement, and analytics. |
-| `4-Persistent-AI-Agent.md` | Orchestration logic that binds the LLM and MCP servers into a persistent, role‑specific agent. |
-
----
+- `1-Domain-Tuned-LLM.md`
+- `2-Organizational-Data-MCP.md`
+- `3-Community-Engagement-MCP.md`
+- `4-Persistent-AI-Agent.md`
 
 ### **B. Role‑Specific Blueprints**
-Instantiations of the core architecture for each C‑suite role.
-
-| File | Role Focus |
-|------|------------|
-| `CEO-Agent.md` | Vision stewardship, strategic orchestration, consensus facilitation. |
-| `Founder-Agent.md` | Vision origination, innovation pipeline, cultural DNA. |
-| `Investor-Agent.md` | Capital allocation, ROI analysis, market signal interpretation. |
-| `CMO-Agent.md` | Tribe building, brand storytelling, growth marketing. |
-| `CFO-Agent.md` | Financial stewardship, capital optimisation, risk management. |
-| `CTO-Agent.md` | Technology architecture, scalability, innovation enablement. |
-| `COO-Agent.md` | Operational optimisation, capacity planning, process improvement. |
-| `CHRO-Agent.md` | People strategy, culture building, talent stewardship. |
-
----
+- `CEO-Agent.md`
+- `Founder-Agent.md`
+- `Investor-Agent.md`
+- `CMO-Agent.md`
+- `CFO-Agent.md`
+- `CTO-Agent.md`
+- `COO-Agent.md`
+- `CHRO-Agent.md`
 
 ### **C. Federated C‑Suite Network**
-Specifications for **multi‑company collaboration**.
-
-| File | Description |
-|------|-------------|
-| `C-Suite-AI-Council.md` | Internal governance and decision protocols for a single company’s AI council. |
-| `Federated-C-Suite-Network.md` | Cross‑company governance, decision scoring, and artifact exchange protocols. |
-
----
+- `C-Suite-AI-Council.md`
+- `Federated-C-Suite-Network.md`
 
 ### **D. Collaboration Archetypes**
-Protocols for different **relationship types** across companies.
-
-| File | Archetype |
-|------|-----------|
-| `Peer-to-Peer-Collaboration.md` | Equivalent roles in different companies align on standards, best practices, and joint initiatives. |
-| `Customer-Seller-Collaboration.md` | Buyer–seller coordination for demand, supply, quality, and campaigns. |
-| `Client-ServiceProvider-Collaboration.md` | Service integration into client planning and execution cycles. |
-| `ValueChain-Collaboration.md` | Multi‑tier coordination across the entire supply/value chain. |
-| `Regulator-Industry-Collaboration.md` | Compliance, reporting, and standard‑setting with regulators. |
-| `Consortium-Alliance-Collaboration.md` | Multi‑company alliances for R&D, standards, or advocacy. |
-| `Coopetition-Collaboration.md` | Competitors collaborating in non‑differentiating areas (safety, sustainability). |
-| `Supplier-Supplier-Collaboration.md` | Upstream supplier coordination for capacity, quality, and logistics. |
-
----
+- `Peer-to-Peer-Collaboration.md`
+- `Customer-Seller-Collaboration.md`
+- `Client-ServiceProvider-Collaboration.md`
+- `ValueChain-Collaboration.md`
+- `Regulator-Industry-Collaboration.md`
+- `Consortium-Alliance-Collaboration.md`
+- `Coopetition-Collaboration.md`
+- `Supplier-Supplier-Collaboration.md`
 
 ### **E. MCP‑UI Specifications**
-User interface designs for interacting with MCP servers and agents.
-
-| File | Context |
-|------|---------|
-| `MCP-UI-SingleCompany.md` | Local council interface for a single company. |
-| `MCP-UI-ValueChain.md` | Federated interface for multi‑company collaboration. |
-| `MCP-UI-SingleCompany-Autonomy.md` | Autonomy phase integration into single‑company UI. |
-| `MCP-UI-ValueChain-Autonomy.md` | Autonomy phase integration into federated UI. |
-
----
+- `MCP-UI-SingleCompany.md`
+- `MCP-UI-ValueChain.md`
+- `MCP-UI-SingleCompany-Autonomy.md`
+- `MCP-UI-ValueChain-Autonomy.md`
 
 ### **F. Deployment & Governance**
-Guidelines for **safe, trust‑building rollout**.
+- `Progressive-Autonomy-Deployment.md`
 
-| File | Description |
-|------|-------------|
-| `Progressive-Autonomy-Deployment.md` | Phased autonomy model with guardrails, promotion criteria, and governance integration. |
+### **G. Artifacts & Governance**
+- `Artifacts.md`
+- `Artifact-Relationships-Governance.md`
 
----
-
-## 3. How the Pieces Fit Together
-
-### **Single Company Flow**
-1. **Instantiate Core Architecture** → Build each role’s agent using the four core components.
-2. **Apply Role Blueprint** → Configure LLM tuning, MCP integrations, and responsibilities.
-3. **Deploy MCP‑UI (SingleCompany)** → Give stakeholders visibility and control.
-4. **Roll Out Progressive Autonomy** → Start in Phase 0 (Observer) and advance based on performance.
-
-### **Federated / Value Chain Flow**
-1. **Establish Local Councils** → Each company implements its own AI C‑suite.
-2. **Adopt Federated Network Spec** → Enable secure cross‑org collaboration.
-3. **Select Collaboration Archetypes** → Apply the right protocol for each relationship.
-4. **Deploy MCP‑UI (ValueChain)** → Facilitate joint decision‑making and artifact sharing.
-5. **Roll Out Progressive Autonomy Federated** → Build trust across companies.
+### **H. Dynamics**
+- `Business-Infinity-Dynamics.md`
+- `Business-Infinity-Dynamic-Interaction-Map.md`
+- `Business-Infinity-Dynamic-Scenarios-Playbook.md`
+- `Business-Infinity-Scenario-Traceability-Matrix.md`
 
 ---
 
-## 4. Key Concepts
+## 3. How to Use This Repository
 
-- **Dual‑Horizon Memory:** Short‑term operational context + long‑term strategic ledger.
-- **Legendary Lens:** Domain heuristics embedded in LLM weights.
-- **Decision Scoring:** Vision alignment, purpose alignment, legendary lens.
-- **Guardrails:** Policy‑driven boundaries and human‑in‑loop triggers.
-- **Provenance:** Immutable links between decisions, actions, and source data.
+### Single Company
+1. Implement **Core Architecture**.
+2. Instantiate **Role Blueprints**.
+3. Deploy **MCP‑UI (SingleCompany)**.
+4. Roll out **Progressive Autonomy**.
+
+### Federated / Value Chain
+1. Establish **Local Councils**.
+2. Adopt **Federated Network Spec**.
+3. Select **Collaboration Archetypes**.
+4. Deploy **MCP‑UI (ValueChain)**.
+5. Roll out **Progressive Autonomy Federated**.
 
 ---
 
-## 5. Navigation Map
+## 4. Dynamics in Action
+
+The **Dynamic Scenarios Playbook** shows how the system behaves in real‑world contexts:
+- Supply Chain Disruption
+- Joint Product Launch
+- Regulatory Change
+- Internal Innovation Sprint
+- Crisis Response Drill
+
+---
+
+## 5. Scenario Traceability Matrix
+
+The **Scenario Traceability Matrix** maps each scenario to:
+- **Artifacts** created, updated, or consumed.
+- **MCP‑UI modules** where those artifacts appear.
+- **Governance policies** applied.
+
+| Scenario | Key Artifacts | UI Modules | Governance |
+|----------|--------------|------------|------------|
+| Supply Chain Disruption | SharedEvent, SharedForecast, DecisionTree, DecisionScore, JointGovernanceDecision, ProvenanceReceipt, JointPerformanceReport, ImprovementPlan | Ecosystem Dashboard, Multi‑Company Artifact Library, Decision Workspace, Joint Decision Room, Execution Console, Governance Panel | MultiPartyDecisionPolicy, tier‑scoped access, human‑in‑loop for contracts |
+| Joint Product Launch | SharedEvent, CampaignCalendar, PartnershipAgreement, DecisionTree, DecisionScore, GovernanceDecision, ProvenanceReceipt, JointPerformanceReport, ImprovementPlan | Ecosystem Dashboard, Artifact Browser, Decision Workspace, Joint Decision Room, Execution Console, Governance Panel | InterOrgDecisionPolicy, marketing‑role scoped access |
+| Regulatory Change | SharedEvent, RegulatorySchema, ComplianceReport, DecisionTree, DecisionScore, JointGovernanceDecision, ProvenanceReceipt, JointPerformanceReport, ImprovementPlan | Ecosystem Dashboard, Artifact Browser, Decision Workspace, Joint Decision Room, Execution Console, Governance Panel | MultiPartyDecisionPolicy, regulator consultation guardrail |
+| Internal Innovation Sprint | EventArtifact, CustomerFeedback, ProductRoadmap, DecisionTree, DecisionScore, GovernanceDecision, ProvenanceReceipt, PerformanceReport, ImprovementPlan | Local Dashboard, Artifact Browser, Decision Workspace, Execution Console, Metrics Dashboard, Governance Panel | DecisionPolicy, innovation‑role scoped access |
+| Crisis Response Drill | SharedEvent, LogisticsData, CostExposure, CrisisCoordinationBrief, DecisionTree, DecisionScore, JointGovernanceDecision, ProvenanceReceipt, JointPerformanceReport, ImprovementPlan | Ecosystem Dashboard, Artifact Browser, Decision Workspace, Joint Decision Room, Execution Console, Governance Panel | MultiPartyDecisionPolicy, Value Chain Collaboration archetype |
+
+---
+
+## 6. Navigation Map
 
 ```text
 README.md
  ├── Core Architecture
- │    ├── 1-Domain-Tuned-LLM.md
- │    ├── 2-Organizational-Data-MCP.md
- │    ├── 3-Community-Engagement-MCP.md
- │    └── 4-Persistent-AI-Agent.md
- │
  ├── Role Blueprints
- │    ├── CEO-Agent.md
- │    ├── Founder-Agent.md
- │    ├── Investor-Agent.md
- │    ├── CMO-Agent.md
- │    ├── CFO-Agent.md
- │    ├── CTO-Agent.md
- │    ├── COO-Agent.md
- │    └── CHRO-Agent.md
- │
  ├── Federated Network
- │    ├── C-Suite-AI-Council.md
- │    └── Federated-C-Suite-Network.md
- │
  ├── Collaboration Archetypes
- │    ├── Peer-to-Peer-Collaboration.md
- │    ├── Customer-Seller-Collaboration.md
- │    ├── Client-ServiceProvider-Collaboration.md
- │    ├── ValueChain-Collaboration.md
- │    ├── Regulator-Industry-Collaboration.md
- │    ├── Consortium-Alliance-Collaboration.md
- │    ├── Coopetition-Collaboration.md
- │    └── Supplier-Supplier-Collaboration.md
- │
- ├── MCP-UI
- │    ├── MCP-UI-SingleCompany.md
- │    ├── MCP-UI-ValueChain.md
- │    ├── MCP-UI-SingleCompany-Autonomy.md
- │    └── MCP-UI-ValueChain-Autonomy.md
- │
- └── Deployment & Governance
-      └── Progressive-Autonomy-Deployment.md
+ ├── MCP‑UI
+ ├── Deployment & Governance
+ ├── Artifacts & Governance
+ └── Dynamics
