@@ -1,35 +1,44 @@
-# Peer-to-Peer Collaboration Spec
+# Peer-to-Peer collaboration spec
 
 ## Purpose
-Enable equivalent C-suite roles in different companies to align strategies, share best practices, and coordinate joint initiatives without compromising competitive autonomy.
+- **Goal:** Align equivalent roles across companies on standards, knowledge, and joint initiatives without compromising autonomy.
+- **Outcome:** Faster interoperability, shared learning, and pooled execution where incentives match.
 
 ## Participants
-- Equivalent roles across companies (e.g., COO ↔ COO, CTO ↔ CTO, CMO ↔ CMO).
+- **Roles:** COO ↔ COO, CTO ↔ CTO, CMO ↔ CMO, CFO ↔ CFO, CHRO ↔ CHRO, CEO ↔ CEO, Founder ↔ Founder, Investor ↔ Investor.
 
-## Use Cases
-- Standards alignment (technical, operational, quality).
-- Joint R&D or innovation projects.
-- Shared infrastructure or resource pooling.
-- Knowledge exchange and benchmarking.
+## Typical use cases
+- **Standards alignment:** Technical, operational, quality, data schemas.
+- **Joint R&D:** Co-develop enabling tech, pilots, proof-of-concepts.
+- **Shared infrastructure:** Test labs, data exchanges, logistics hubs.
+- **Benchmarking:** Comparative metrics and best practice exchange.
 
-## Shared Artifacts
-- **PeerAgreement.v1** — Defines scope, objectives, and confidentiality terms.
-- **JointInitiativePlan.v1** — Execution plan for shared projects.
-- **BenchmarkReport.v1** — Comparative performance metrics.
-- **StandardsDoc.v1** — Agreed technical or operational standards.
+## Shared artifacts
+- **PeerAgreement.v1:** Scope, objectives, confidentiality, IP stance.
+- **StandardsDoc.v1:** Spec with versioning and conformance tests.
+- **JointInitiativePlan.v1:** Milestones, roles, resources, KPIs.
+- **BenchmarkReport.v1:** Normalized metric snapshots with context.
 
-## Decision Protocol
-1. **Initiation:** One peer proposes a collaboration topic.
-2. **Context Assembly:** Each peer gathers relevant internal context.
-3. **Scoring:** Each peer’s LLM evaluates options for:
-   - Local Vision Alignment
-   - Local Purpose Alignment
-   - Peer Initiative Fit
-   - Legendary Lens
-4. **Aggregation:** Combine scores per PeerDecisionPolicy.v1.
-5. **Finalization:** JointGovernanceDecision.v1 issued; actions scheduled.
+## Decision protocol
+1. **Initiation:** Proposer drafts Topic + ExpectedBenefits.
+2. **Context:** Each peer compiles internal context slice.
+3. **Scoring:** Per-agent LLM scores options on Local Vision, Local Purpose, Peer Fit, Legendary Lens.
+4. **Aggregation:** PeerDecisionPolicy.v1 (weighted majority or unanimity for standards).
+5. **Finalization:** JointGovernanceDecision.v1 + execution plan.
 
-## Governance
-- **Selective Disclosure:** Share only agreed data.
-- **Provenance:** All artifacts signed and timestamped.
-- **Conflict Resolution:** Escalate to CEO agents if unresolved.
+## Governance & trust
+- **Selective disclosure:** Share the minimum necessary; redaction allowed.
+- **Provenance:** Signed artifacts with timestamps and role identity.
+- **Conflict resolution:** Escalate to CEO agents; mediation window; recorded rationale.
+
+## Data sharing & privacy
+- **Reciprocity:** Access contingent on equivalent contribution.
+- **Data classes:** Public, Shared-Confidential, Private; enforce by policy.
+- **Audit:** Immutable logs of access, updates, and signatures.
+
+## Observability
+- **Metrics:** Adoption rate, conformance pass rates, time-to-consensus.
+- **Reviews:** Periodic postmortems with ImprovementPlan.v1.
+
+## Extensibility
+- **Onboarding:** Template PeerAgreement + checklist; dry-run sandbox before production.
