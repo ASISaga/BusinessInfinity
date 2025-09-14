@@ -60,3 +60,103 @@ To visualise and describe the real-time flows between events, AI agents, artifac
 ---
 
 ## 2. Interaction Map (Text Diagram)
+[Event Source]
+    ├── Internal systems (ERP, CRM, HRIS, analytics)
+    ├── External feeds (market data, news, regulatory updates)
+    └── Cross‑org partners (SharedForecast, JointPerformanceReport)
+
+        │
+        ▼
+
+[Event Ingestion via MCP]
+    • Normalise event into structured format
+    • Tag with:
+        - Scope: local | inter_org | value_chain
+        - Urgency: low | medium | high | critical
+        - Domains: finance, ops, marketing, HR, tech, etc.
+
+        │
+        ▼
+
+[Context Assembly by Role Agent]
+    • Filter events by relevance to role
+    • Pull fresh context slices from Organizational Data MCP
+    • Retrieve related shared artifacts (DecisionTree, SharedForecast, PartnershipAgreement)
+
+        │
+        ▼
+
+[Decision Loop Activation]
+    ├── Re‑score existing DecisionTree.v1
+    └── Create new DecisionTree.v1
+
+        │
+        ▼
+
+[DecisionScore Generation]
+    • Score each branch for:
+        - Vision Alignment
+        - Purpose Alignment
+        - Legendary Lens
+        - (Federated) Ecosystem Vision Alignment
+
+        │
+        ▼
+
+[Aggregation & Governance]
+    ├── Local: Aggregate into GovernanceDecision.v1 per DecisionPolicy.v1
+    └── Federated: Aggregate into JointGovernanceDecision.v1 per InterOrgDecisionPolicy.v1 or MultiPartyDecisionPolicy.v1
+    • Enforce guardrails; trigger human‑in‑loop if thresholds breached
+
+        │
+        ▼
+
+[Execution]
+    • Execute approved actions via:
+        - Community Engagement MCP (external comms, campaigns)
+        - Organizational Data MCP (internal ops, system updates)
+    • Create ProvenanceReceipt.v1 linking decision → action → source data
+
+        │
+        ▼
+
+[Outcome Tracking]
+    • Generate PerformanceReport.v1 (local) or JointPerformanceReport.v1 (federated)
+    • Create DecisionOutcome.v1 comparing expected vs actual metrics
+
+        │
+        ▼
+
+[Learning & Evolution]
+    • Draft ImprovementPlan.v1 for gaps
+    • Update AlignmentMatrix.v1 if vision/purpose interpretations shift
+    • Schedule domain LLM fine‑tuning if systemic drift detected 
+
+---
+
+## 3. Dynamic Features
+
+- **Event Priority Routing:** Critical events bypass periodic loops for immediate attention.
+- **Context Freshness Bias:** Preference for most recent, high‑confidence data slices.
+- **Adaptive Weighting:** Influence shifts based on decision type and agent reputation.
+- **Simulation Mode:** Optional pre‑execution scenario testing.
+- **Feedback Loop:** Outcomes directly influence future decision weights and guardrails.
+
+---
+
+## 4. Governance Touchpoints
+
+- **At Event Ingestion:** Scope and urgency classification.
+- **At Aggregation:** Policy enforcement (DecisionPolicy, InterOrgDecisionPolicy).
+- **At Execution:** Guardrail checks, human approval if required.
+- **At Learning:** Policy and model updates logged for audit.
+
+---
+
+## 5. Observability
+
+- **Dashboards:** Real‑time view of active decisions, event backlog, guardrail status.
+- **Metrics:** Consensus time, override frequency, decision accuracy, outcome variance.
+- **Alerts:** Governance breaches, KPI anomalies, stalled decisions.
+
+---
