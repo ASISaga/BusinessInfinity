@@ -1,37 +1,45 @@
-# Value Chain Collaboration Spec
+# Value chain collaboration spec
 
 ## Purpose
-Coordinate multiple tiers of companies in a supply/value chain to achieve shared ecosystem goals while respecting each entity’s autonomy.
+- **Goal:** Coordinate multi-tier networks (supplier → manufacturer → distributor → retailer → service) for shared ecosystem outcomes.
+- **Outcome:** Resilience, efficiency, sustainability, consistent customer experience.
 
 ## Participants
-- All relevant C-suite agents across the chain: suppliers, manufacturers, distributors, retailers, service providers.
+- **Roles:** Relevant C-suite agents across all tiers; ecosystem convener (optional).
 
-## Use Cases
-- Chain-wide sustainability initiatives.
-- End-to-end demand-supply synchronization.
-- Joint crisis response.
-- Shared technology or infrastructure investments.
+## Typical use cases
+- **Sustainability:** Chain-wide emissions reduction, traceability.
+- **E2E planning:** Demand–supply–capacity–logistics orchestration.
+- **Crisis response:** Rapid re-planning during disruptions.
+- **Shared investments:** Common platforms, infrastructure.
 
-## Shared Artifacts
-- **ValueChainVision.v1** — Shared purpose for the chain.
-- **MultiPartyDecisionTree.v1** — Options for initiatives involving >2 companies.
-- **AlignmentMatrix.v1** — Maps each company’s Vision/Purpose to ValueChainVision.
-- **JointPerformanceReport.v1** — Aggregated KPIs across the chain.
-- **CrisisCoordinationBrief.v1** — Shared situational awareness and action plan.
+## Shared artifacts
+- **ValueChainVision.v1:** Ecosystem purpose and targets.
+- **MultiPartyDecisionTree.v1:** Options for >2-company initiatives.
+- **AlignmentMatrix.v1:** Map local Visions to ValueChainVision.
+- **JointPerformanceReport.v1:** Aggregated KPIs (lead time, defects, ESG).
+- **CrisisCoordinationBrief.v1:** Roles, facts, cadence, decisions.
 
-## Decision Protocol
-1. **Initiation:** Any agent proposes a chain-wide decision.
-2. **Context Assembly:** Each participant gathers internal + shared context.
-3. **Local Scoring:** Each agent scores options for:
-   - Local Vision Alignment
-   - Local Purpose Alignment
-   - ValueChain Vision Alignment
-   - Legendary Lens
-4. **Entity Position:** Company-level aggregation into CompanyPosition.v1.
-5. **Chain Aggregation:** Combine positions per MultiPartyDecisionPolicy.v1.
-6. **Finalization:** JointGovernanceDecision.v1 issued; execution plans distributed.
+## Decision protocol
+1. **Initiation:** Any entity proposes ecosystem decision.
+2. **Local scoring:** Each agent: Local Vision, Local Purpose, ValueChain Vision, Legendary Lens.
+3. **Entity position:** CompanyPosition.v1 aggregation.
+4. **Chain aggregation:** MultiPartyDecisionPolicy.v1 (weights by tier/topic).
+5. **Finalization:** JointGovernanceDecision.v1 + synchronized plans.
 
-## Governance
-- **Selective Visibility:** Share only with relevant tiers/roles.
-- **Provenance:** All artifacts signed, timestamped, and scope-tagged.
-- **Conflict Resolution:** CEO/Founder agents mediate; override protocol with review.
+## Governance & trust
+- **Selective visibility:** Tier- and role-scoped; contract-governed.
+- **Signing:** Cryptographic signatures; revocation lists.
+- **Disputes:** CEO/Founder council mediation; override with review.
+
+## Data sharing & privacy
+- **Reciprocity:** Data access tied to contribution quality/recency.
+- **Redaction:** Commercially sensitive fields masked in shared views.
+- **Lineage:** End-to-end provenance across tiers.
+
+## Observability
+- **Metrics:** Consensus time, plan adherence, resilience score, ESG delta.
+- **Simulations:** Stress tests and what-if scenarios scheduled quarterly.
+
+## Extensibility
+- **Federation:** Entities can belong to multiple chains with scoped policies.
