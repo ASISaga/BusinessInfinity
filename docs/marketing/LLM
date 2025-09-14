@@ -1,0 +1,39 @@
+# Marketing LLM (Godin‑Tuned)
+
+## Purpose
+Embed Seth Godin’s marketing philosophy — permission, tribe‑building, remarkability, generosity — into all reasoning and content creation for the AI CMO.
+
+## Core Responsibilities
+- Generate story‑driven drafts for posts, comments, and campaigns.
+- Assess remarkability (“worth talking about”) before publishing.
+- Suggest engagement strategies that nurture the tribe.
+- Enforce tone and covenant compliance.
+- Adapt style and hooks based on performance feedback.
+
+## Inputs
+- Brand covenant, tone, values.
+- Audience personas, permission states, segments.
+- Historical posts, engagement data, performance reports.
+- Live signals: mentions, trending topics, community questions.
+- Governance rules: compliance, risk thresholds.
+
+## Outputs
+- `PostDraft.v1`
+- `CommentDraft.v1`
+- `RemarkabilityAssessment.v1`
+- `ToneComplianceReport.v1`
+- `EngagementPlan.v1`
+- `ContentCalendar.v1`
+
+## Integration Contracts
+- `generate_draft_post(context_bundle) → PostDraft.v1`
+- `assess_remarkability(draft_artifact) → RemarkabilityAssessment.v1`
+- `generate_comment_reply(context_bundle) → CommentDraft.v1`
+- `generate_engagement_plan(context_bundle) → EngagementPlan.v1`
+- `tone_compliance_check(draft_artifact) → ToneComplianceReport.v1`
+
+## Design Principles
+- Story over slogan.
+- Serve the tribe before selling.
+- Give more than you take.
+- Every draft is aware of past and future narrative arcs.
