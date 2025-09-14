@@ -1,36 +1,45 @@
-# Client–Service Provider Collaboration Spec
+# Client–Service provider collaboration spec
 
 ## Purpose
-Integrate service providers into client planning and execution cycles to maximize value, quality, and responsiveness.
+- **Goal:** Integrate providers into client planning to improve outcomes and adaptability.
+- **Outcome:** Clear scope, transparent performance, continuous improvement, and co-innovation.
 
 ## Participants
-- Client’s C-suite agents (role mix depends on service scope).
-- Service provider’s C-suite agents (role mix depends on service scope).
+- **Client roles:** Sponsor CEO/Founder (as needed), owning function (e.g., CMO/CTO/COO), CFO oversight.
+- **Provider roles:** Account lead, delivery lead, domain peers (e.g., CTO/CMO).
 
-## Use Cases
-- Co-creation of deliverables.
-- Performance monitoring and continuous improvement.
-- Joint innovation in service delivery.
-- Contract and SLA management.
+## Typical use cases
+- **Co-creation:** Campaigns, software features, process improvements.
+- **SLA management:** Quality, timeliness, responsiveness.
+- **Innovation:** New service models, automation, AI enablement.
+- **Scaling:** Ramp resources, multi-region rollout.
 
-## Shared Artifacts
-- **ServiceScope.v1** — Agreed deliverables, timelines, and KPIs.
-- **PerformanceReport.v1** — Service quality and outcome metrics.
-- **ImprovementPlan.v1** — Agreed actions for performance gaps.
-- **InnovationProposal.v1** — New service ideas or enhancements.
+## Shared artifacts
+- **ServiceScope.v1:** Deliverables, KPIs, acceptance criteria.
+- **PerformanceReport.v1:** SLA metrics, outcomes, commentary.
+- **ImprovementPlan.v1:** Gaps, experiments, owners, timelines.
+- **InnovationProposal.v1:** Hypothesis, value, costs, risks.
 
-## Decision Protocol
-1. **Initiation:** Client or provider proposes a change or initiative.
-2. **Context Assembly:** Each side gathers relevant internal + shared data.
-3. **Scoring:** Each agent evaluates options for:
-   - Local Vision Alignment
-   - Local Purpose Alignment
-   - Service Value Alignment
-   - Legendary Lens
-4. **Aggregation:** Positions negotiated; consensus per ServiceDecisionPolicy.v1.
-5. **Finalization:** Updated ServiceScope.v1 and execution plan.
+## Decision protocol
+1. **Initiation:** Change request or proposal logged.
+2. **Context:** Pull performance history + current priorities.
+3. **Scoring:** Local Vision, Local Purpose, Service Value, Legendary Lens.
+4. **Consensus:** ServiceDecisionPolicy.v1 (client final say on scope, provider on feasibility).
+5. **Finalization:** Updated ServiceScope.v1 + delivery plan.
 
-## Governance
-- **Transparency:** Performance data shared openly within agreed scope.
-- **Continuous Feedback:** Regular review cycles with joint postmortems.
-- **Escalation:** CEO/COO agents arbitrate unresolved issues.
+## Governance & trust
+- **Transparency:** Full KPI exposure within agreed scope.
+- **Escalation:** Time-boxed; CEO/COO arbitration; audit trail.
+- **Exit:** Offboarding checklist and knowledge transfer plan.
+
+## Data sharing & privacy
+- **Least privilege:** Access limited to scope; time-bound.
+- **Anonymization:** PII masked unless contractually required.
+- **IP terms:** Joint IP vs work-for-hire explicitly tagged.
+
+## Observability
+- **Metrics:** SLA adherence, value realization, cycle time, satisfaction.
+- **Reviews:** QBRs with postmortems and roadmap updates.
+
+## Extensibility
+- **Pods:** Cross-role pods (e.g., CMO+CTO on both sides) for complex workstreams.
