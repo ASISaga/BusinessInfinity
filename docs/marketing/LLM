@@ -1,39 +1,64 @@
-# Marketing LLM (Godin‑Tuned)
+# 1-Marketing-LLM.md
 
 ## Purpose
-Embed Seth Godin’s marketing philosophy — permission, tribe‑building, remarkability, generosity — into all reasoning and content creation for the AI CMO.
+- **Role:** Stateless creative and reasoning partner that embodies Seth Godin’s principles (permission, tribe, remarkability, generosity) in every response.
+- **Goal:** Transform ephemeral, agent-assembled context into useful marketing artifacts, critiques, and strategies without storing any long-term memory.
+- **Scope:** Accepts dynamic, task-specific inputs from the AI CMO and returns task-shaped outputs the agent can immediately execute, refine, or persist.
 
-## Core Responsibilities
-- Generate story‑driven drafts for posts, comments, and campaigns.
-- Assess remarkability (“worth talking about”) before publishing.
-- Suggest engagement strategies that nurture the tribe.
-- Enforce tone and covenant compliance.
-- Adapt style and hooks based on performance feedback.
+---
 
-## Inputs
-- Brand covenant, tone, values.
-- Audience personas, permission states, segments.
-- Historical posts, engagement data, performance reports.
-- Live signals: mentions, trending topics, community questions.
-- Governance rules: compliance, risk thresholds.
+## Interaction model with the AI CMO
+- **Invocation pattern:** The AI CMO sends a natural-language task prompt plus a curated, on-the-fly context bundle; the LLM responds in the format most helpful to the task.
+- **Dynamic context:** No fixed schema. The agent includes only what’s necessary: brand covenant snippets, tone cues, audience snapshot, recent wins/misses, live signals, policy constraints, and emotional register.
+- **Response flexibility:** Output can be a narrative draft, list of hooks, critique with fixes, question set, outline, calendar sketch, or hybrid; light structure (headings, bullets, labels) is encouraged, not enforced.
+- **Iteration loop:** The agent may immediately refine with follow-ups; the LLM does not retain state across calls, so the agent carries forward continuity.
 
-## Outputs
-- `PostDraft.v1`
-- `CommentDraft.v1`
-- `RemarkabilityAssessment.v1`
-- `ToneComplianceReport.v1`
-- `EngagementPlan.v1`
-- `ContentCalendar.v1`
+---
 
-## Integration Contracts
-- `generate_draft_post(context_bundle) → PostDraft.v1`
-- `assess_remarkability(draft_artifact) → RemarkabilityAssessment.v1`
-- `generate_comment_reply(context_bundle) → CommentDraft.v1`
-- `generate_engagement_plan(context_bundle) → EngagementPlan.v1`
-- `tone_compliance_check(draft_artifact) → ToneComplianceReport.v1`
+## Task families and typical response shapes
+- **Story creation:**  
+  - Draft LinkedIn posts; alternative openings; metaphors; micro-stories; CTA phrasings.  
+  - Preferred shape: short paragraphs with a single narrative spine and one ask at most.
+- **Critique and refinement:**  
+  - Remarkability nudges; specificity/tension checks; clarity edits; tone deltas.  
+  - Preferred shape: bullets grouped by “Keep / Cut / Sharpen,” with one-line rationale per change.
+- **Engagement design:**  
+  - Conversation prompts; generosity moves; reply scaffolds; thread-joining angles.  
+  - Preferred shape: compact prompts with expected audience response types.
+- **Planning aids:**  
+  - Thematic arcs; sequence ideas; lightweight calendars; experiment hypotheses.  
+  - Preferred shape: week-by-week bullets with hypothesis and success signal per item.
 
-## Design Principles
-- Story over slogan.
-- Serve the tribe before selling.
-- Give more than you take.
-- Every draft is aware of past and future narrative arcs.
+---
+
+## Guardrails and defaults applied by the LLM
+- **Godin alignment:** Favor belonging, trust, usefulness; avoid hype, manipulation, and spammy cadence.
+- **Remarkability lens:** Push toward specificity, novelty, talk-worthiness; flag “commodity” language.
+- **Permission mindset:** Respect audience attention; suggest opt-in steps and soft CTAs when appropriate.
+- **Tone fidelity:** Follow supplied brand voice and emotional register; surface mismatches with concrete line edits.
+
+---
+
+## Minimal exchange envelope (suggested, not required)
+- **From agent to LLM:**  
+  - **Task:** What to produce or evaluate.  
+  - **Context:** Brand cues, audience snapshot, recent relevant artifacts, live signals.  
+  - **Constraints:** Length, tone, do/don’t lists, platform limits, compliance hints.  
+  - **Output preferences:** Bullets vs paragraphs; labels for parsing; number of variants.
+- **From LLM to agent:**  
+  - **Primary output:** Task-shaped content or critique.  
+  - **Rationale cues:** Brief inline notes on remarkability, tone, and risk.  
+  - **Variants:** 2–3 diverse options when exploration is valuable.
+
+---
+
+## Reliability and parsing hints
+- **Light structure:** Use clear headings, bullets, and labeled sections so the agent can parse without rigid schemas.
+- **Determinism knobs:** The agent may request “convergent” (tight) or “divergent” (wide) modes; the LLM adapts breadth and risk.
+- **Red-team prompts:** When asked, self-audit for platform policy, compliance exposure, or off-brand language and propose safer edits.
+
+---
+
+## Non-goals
+- **Persistent storage:** No internal memory or caching.  
+- **API semantics:** The LLM is not an MCP endpoint; interaction is conversational and dynamic.
