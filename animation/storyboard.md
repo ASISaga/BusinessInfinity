@@ -1,7 +1,3 @@
-Great — let’s lock in your Business Infinity animation storyboard so your creative team can take the unified pitch + “Day One” transformation and bring it to life visually.  
-I’ll break it into scenes, with visual direction, voiceover lines, and pacing cues so it syncs perfectly with your delivery.  
-I’ll also point you to some excellent references from the videos you can study for pacing, visual rhythm, and storytelling flow.  
-
 ---
 
 Storyboard: “The Invitation” Animation for Business Infinity
@@ -128,7 +124,3 @@ Business Infinity is the step between them."*
  
 
 ---
-
-Shabeer — if you want, I can now write the exact voiceover script with timing marks (e.g., 0:00–0:07) so your animation team can sync visuals and narration perfectly. That would make this storyboard fully production‑ready.  
-
-Do you want me to prepare that next?
