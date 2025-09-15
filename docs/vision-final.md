@@ -1,0 +1,1 @@
+To empower every founder and organisation with a perpetual, self‑evolving Boardroom of legendary Agents — seamlessly connected to their world — so that every decision, action, and evolution moves them closer to their highest possibility, without the limits of resource, speed, or scale.
