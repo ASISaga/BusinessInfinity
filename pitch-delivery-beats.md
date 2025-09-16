@@ -1,4 +1,4 @@
-Got it — here’s your 90‑second spoken pitch for Business Infinity with delivery beats so it lands as a true invitation and not just a description.  
+90‑second spoken pitch for Business Infinity with delivery beats so it lands as a true invitation and not just a description.  
 I’ve marked [PAUSE] for moments to let the words breathe, [LEAN IN] for intimacy, and [EMPHASISE] for key phrases that should hit with weight.  
 
 ---
