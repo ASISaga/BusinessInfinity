@@ -24,7 +24,6 @@ A 24/7, real‑time, self‑evolving Boardroom of Agents — each with the maste
 
 Your network, your instincts, your leadership DNA — captured, codified, and made operational.  
 So the business can move at the speed of opportunity, scale without breaking, and carry your vision forward — not just for the next quarter, but for the next generation.  
-
 *Welcome to the future of your business, with Business Infinity*
 
 ---
