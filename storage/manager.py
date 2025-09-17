@@ -28,15 +28,15 @@ class UnifiedStorageManager:
     def __init__(self):
         # Initialize environment variables
         try:
-            from ..environment import env_manager as env
-            self.storage_conn = env.get_required("AzureWebJobsStorage")
-            self.table_conn = env.get_required("AZURE_TABLES_CONNECTION_STRING", self.storage_conn)
-            self.queue_conn = env.get_required("AZURE_QUEUES_CONNECTION_STRING", self.storage_conn)
-            self.cosmos_endpoint = env.get_optional("COSMOS_ENDPOINT")
-            self.cosmos_key = env.get_optional("COSMOS_KEY")
-            self.profiles_blob = env.get_required("AGENTPROFILESBLOB")
-            self.directives_blob = env.get_required("AGENTDIRECTIVESBLOB")
-            self.knowledge_blob = env.get_required("DOMAINKNOWLEDGEBLOB")
+            from environment import env_manager
+            self.storage_conn = env_manager.get_required("AzureWebJobsStorage")
+            self.table_conn = env_manager.get_required("AZURE_TABLES_CONNECTION_STRING", self.storage_conn)
+            self.queue_conn = env_manager.get_required("AZURE_QUEUES_CONNECTION_STRING", self.storage_conn)
+            self.cosmos_endpoint = env_manager.get_optional("COSMOS_ENDPOINT")
+            self.cosmos_key = env_manager.get_optional("COSMOS_KEY")
+            self.profiles_blob = env_manager.get_required("AGENTPROFILESBLOB")
+            self.directives_blob = env_manager.get_required("AGENTDIRECTIVESBLOB")
+            self.knowledge_blob = env_manager.get_required("DOMAINKNOWLEDGEBLOB")
         except (ImportError, Exception):
             # Fallback to direct environment variables
             self.storage_conn = os.getenv("AzureWebJobsStorage")

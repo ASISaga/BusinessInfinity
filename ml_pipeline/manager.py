@@ -29,11 +29,11 @@ class UnifiedMLManager:
     def __init__(self):
         # Initialize environment variables
         try:
-            from ..environment import env_manager as env
-            self.subscription_id = env.get_required("AZURESUBSCRIPTION_ID")
-            self.resource_group_name = env.get_required("AZURERESOURCEGROUP")
-            self.workspace_name = env.get_required("AZUREML_WORKSPACE")
-            self.pipeline_name = env.get_required("PIPELINEENDPOINT_NAME")
+            from environment import env_manager
+            self.subscription_id = env_manager.get_required("AZURESUBSCRIPTION_ID")
+            self.resource_group_name = env_manager.get_required("AZURERESOURCEGROUP")
+            self.workspace_name = env_manager.get_required("AZUREML_WORKSPACE")
+            self.pipeline_name = env_manager.get_required("PIPELINEENDPOINT_NAME")
         except (ImportError, Exception):
             # Fallback to direct environment variables
             self.subscription_id = os.getenv("AZURESUBSCRIPTION_ID")

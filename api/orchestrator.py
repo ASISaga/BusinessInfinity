@@ -1,10 +1,10 @@
 import os, json, uuid, datetime, requests
-from ..environment import env_manager
-from ..agents import agent_manager
-from ..storage import storage_manager
-from ..ml_pipeline import ml_manager
+from environment import env_manager
+from agents import agent_manager
+from storage import storage_manager
+from ml_pipeline import ml_manager
 
-from ..authentication import validate_jwt, UNAUTHORIZED_MSG
+from authentication import validate_jwt, UNAUTHORIZED_MSG
 
 class Orchestrator:
     def handle_servicebus_message(self, message_body):

@@ -56,9 +56,9 @@ class UnifiedAgentManager:
         
         # Initialize environment manager if available
         try:
-            from ..environment import env_manager as env
-            self.agent_profile_blob = env.get_required("AGENTPROFILESBLOB")
-            self.agent_directives_blob = env.get_required("AGENTDIRECTIVESBLOB")
+            from environment import env_manager
+            self.agent_profile_blob = env_manager.get_required("AGENTPROFILESBLOB")
+            self.agent_directives_blob = env_manager.get_required("AGENTDIRECTIVESBLOB")
         except (ImportError, Exception):
             self.agent_profile_blob = None
             self.agent_directives_blob = None

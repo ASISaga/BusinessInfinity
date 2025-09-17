@@ -20,9 +20,6 @@ from dashboard.mcp_handlers import handle_mcp
 from utils.governance import validate_request, GovernanceError
 
 # === Assimilated from utils/app.py ===
-from utils.manifest import get_ui_schema
-from utils.storage import enqueue_request, query_messages
-from utils.aml import aml_infer as utils_aml_infer, aml_train as utils_aml_train
 from shared.models import UiAction, Envelope
 
 
@@ -165,7 +162,8 @@ def register_http_routes(app: func.FunctionApp):
     async def get_dashboard(req: func.HttpRequest) -> func.HttpResponse:
         role = req.params.get("role")
         scope = req.params.get("scope", "local")
-        schema = get_ui_schema(role, scope)
+        # Simple UI schema - can be enhanced based on needs
+        schema = {"role": role, "scope": scope, "components": []}
         return func.HttpResponse(
             json.dumps({"uiSchema": schema}),
             mimetype="application/json",
@@ -178,7 +176,7 @@ def register_http_routes(app: func.FunctionApp):
         boardroomId = req.params.get("boardroomId")
         conversationId = req.params.get("conversationId")
         since = req.params.get("since")
-        rows = query_messages(boardroomId, conversationId, since)
+        rows = storage_manager.query_messages(boardroomId, conversationId, since)
         return func.HttpResponse(
             json.dumps({"messages": rows}),
             mimetype="application/json",
@@ -214,7 +212,7 @@ def register_http_routes(app: func.FunctionApp):
                     mimetype="application/json",
                     status_code=403
                 )
-            enqueue_request(env)
+            storage_manager.enqueue_request(env)
             return func.HttpResponse(
                 json.dumps({"status": "queued", "correlationId": corr}),
                 mimetype="application/json",
@@ -243,7 +241,7 @@ def register_http_routes(app: func.FunctionApp):
                     mimetype="application/json",
                     status_code=403
                 )
-            res = await utils_aml_infer(agentId, prompt)
+            res = await ml_manager.aml_infer(agentId, prompt)
             return func.HttpResponse(
                 json.dumps(res),
                 mimetype="application/json",
@@ -274,7 +272,7 @@ def register_http_routes(app: func.FunctionApp):
                     mimetype="application/json",
                     status_code=403
                 )
-            res = await utils_aml_train(jobName, {"modelName": modelName, "datasetUri": datasetUri})
+            res = await ml_manager.aml_train(jobName, {"modelName": modelName, "datasetUri": datasetUri})
             return func.HttpResponse(
                 json.dumps(res),
                 mimetype="application/json",
