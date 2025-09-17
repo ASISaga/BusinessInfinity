@@ -46,9 +46,7 @@ except ImportError:
 
 
 def register_http_routes(app: func.FunctionApp):
-    # --- Router endpoints merged from api/router.py ---
-    from api.orchestrator import Orchestrator
-    orchestrator = Orchestrator()
+    """Register all HTTP route handlers with the FunctionApp"""
 
     @app.route(methods=["GET"], route="auth/linkedin", auth_level=func.AuthLevel.ANONYMOUS)
     def auth_linkedin(req: func.HttpRequest) -> func.HttpResponse:

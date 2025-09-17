@@ -202,3 +202,7 @@ Response:"""
             return await agent_func(user_input, {})
         except Exception as e:
             return f"Error running agent {agent_id}: {str(e)}"
+
+    def get_agent_count(self) -> int:
+        """Get total number of registered agents"""
+        return len(self.agents)
