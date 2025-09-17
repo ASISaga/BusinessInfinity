@@ -2,12 +2,15 @@
 Service Bus Triggers for Azure Functions
 
 This module contains all Azure Service Bus triggers consolidated from function_app.py
-and shared/framework/functions/
+and shared/framework/functions/. Updated to use consolidated core system.
 """
 
 import json
 import logging
 import azure.functions as func
+
+# Import consolidated core system
+from core import api_orchestrator
 
 
 def register_service_bus_triggers(app: func.FunctionApp):
@@ -18,16 +21,23 @@ def register_service_bus_triggers(app: func.FunctionApp):
                                   subscription_name="governance",
                                   connection="AZURE_SERVICE_BUS_CONNECTION_STRING")
     def process_decision_event(msg: func.ServiceBusMessage):
-        """Process decision events from service bus"""
-        body = msg.get_body().decode("utf-8")
-        subject = msg.subject
-        logging.info(f"[GOV] Event: {subject} Payload: {body}")
-        # Add side effects: persist to Cosmos DB, trigger notifications, etc.
-        
-        # Additional processing can be added here
+        """Process decision events from service bus using consolidated API orchestrator"""
         try:
-            # Parse the message body if it's JSON
-            if body:
+            body = msg.get_body().decode("utf-8")
+            subject = msg.subject
+            logging.info(f"[GOV] Event: {subject} Payload: {body}")
+            
+            # Use consolidated API orchestrator to handle the message
+            result = api_orchestrator.handle_servicebus_message(body)
+            
+            if result:
+                logging.info(f"Successfully processed service bus message: {subject}")
+            else:
+                logging.warning(f"Failed to process service bus message: {subject}")
+                
+        except Exception as e:
+            logging.error(f"Error processing service bus message: {e}")
+            raise
                 payload = json.loads(body) if body.strip().startswith('{') else body
                 logging.info(f"[GOV] Processed payload type: {type(payload)}")
         except json.JSONDecodeError as e:

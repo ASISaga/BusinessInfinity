@@ -12,25 +12,12 @@ from pathlib import Path
 import uuid
 
 # Import consolidated core system
-from core import agent_manager, mcp_handler, orchestrator, unified_server
+from core import (
+    agent_manager, mcp_handler, orchestrator, 
+    storage_manager, ml_manager, env_manager, api_orchestrator
+)
 
-# Import remaining feature modules  
-try:
-    from ml_pipeline import ml_manager
-except ImportError:
-    ml_manager = None
-
-try:
-    from storage import storage_manager
-except ImportError:
-    storage_manager = None
-
-try:
-    from environment import env_manager
-except ImportError:
-    env_manager = None
-
-# Import utilities
+# Import remaining utilities
 try:
     from utils.governance import validate_request, GovernanceError
 except ImportError:
@@ -45,24 +32,6 @@ try:
 except ImportError:
     def get_ui_schema():
         return {"error": "Manifest service not available"}
-
-try:
-    from utils.storage import enqueue_request, query_messages
-except ImportError:
-    def enqueue_request(*args, **kwargs):
-        return {"error": "Storage service not available"}
-    
-    def query_messages(*args, **kwargs):
-        return {"error": "Storage service not available"}
-
-try:
-    from utils.aml import aml_infer as utils_aml_infer, aml_train as utils_aml_train
-except ImportError:
-    def utils_aml_infer(*args, **kwargs):
-        return {"error": "AML inference not available"}
-    
-    def utils_aml_train(*args, **kwargs):
-        return {"error": "AML training not available"}
 
 try:
     from shared.models import UiAction, Envelope
@@ -83,96 +52,96 @@ def register_http_routes(app: func.FunctionApp):
 
     @app.route(methods=["GET"], route="auth/linkedin", auth_level=func.AuthLevel.ANONYMOUS)
     def auth_linkedin(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.linkedin_auth_redirect(req)
+        result = api_orchestrator.linkedin_auth_redirect(req)
         return func.HttpResponse(f"<script>window.location.href='{result['redirect_url']}'</script>", mimetype=result["mimetype"])
 
     @app.route(methods=["GET"], route="auth/linkedin/callback", auth_level=func.AuthLevel.ANONYMOUS)
     def auth_linkedin_callback(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.linkedin_auth_callback(req)
+        result = api_orchestrator.linkedin_auth_callback(req)
+        if "error" in result:
+            return func.HttpResponse(json.dumps(result), mimetype="application/json", status_code=400)
         return func.HttpResponse(json.dumps({"profile": result["profile"], "email": result["email"]}), mimetype=result["mimetype"])
 
     @app.route(methods=["GET", "POST"], route="http_trigger", auth_level=func.AuthLevel.FUNCTION)
     def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
         logging.info('Python HTTP trigger function processed a request.')
-        result = orchestrator.extract_name(req)
+        result = api_orchestrator.extract_name(req)
         return func.HttpResponse(result["message"], status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="auth/login", auth_level=func.AuthLevel.FUNCTION)
     def auth_login(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.login(req)
-        return result
+        return api_orchestrator.login(req)
 
     @app.route(methods=["POST"], route="auth/refresh", auth_level=func.AuthLevel.FUNCTION)
     def auth_refresh(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.refresh(req)
-        return result
+        return api_orchestrator.refresh(req)
 
     @app.route(methods=["POST"], route="conversations", auth_level=func.AuthLevel.FUNCTION)
     def start_conv(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.start_conversation(req)
+        result = api_orchestrator.start_conversation(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(json.dumps({"conversationId": result["conversationId"]}), mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="conversations/{id}/messages", auth_level=func.AuthLevel.FUNCTION)
     async def post_message(req: func.HttpRequest) -> func.HttpResponse:
-        result = await orchestrator.post_message(req)
+        result = await api_orchestrator.post_message(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["answer_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["GET"], route="conversations/{id}/messages", auth_level=func.AuthLevel.FUNCTION)
     def get_messages(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.get_messages(req)
+        result = api_orchestrator.get_messages(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["conv_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="mentor/test", auth_level=func.AuthLevel.FUNCTION)
     async def mentor_test(req: func.HttpRequest) -> func.HttpResponse:
-        result = await orchestrator.mentor_test(req)
+        result = await api_orchestrator.mentor_test(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["answer_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="mentor/qapair", auth_level=func.AuthLevel.FUNCTION)
     def mentorsubmitqa(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.mentorsubmitqa(req)
+        result = api_orchestrator.mentorsubmitqa(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(status_code=result["status_code"])
 
     @app.route(methods=["GET"], route="mentor/qapairs", auth_level=func.AuthLevel.FUNCTION)
     def mentorlistqa(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.mentorlistqa(req)
+        result = api_orchestrator.mentorlistqa(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["pairs_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="mentor/fine-tune", auth_level=func.AuthLevel.FUNCTION)
     def mentortriggerfine_tune(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.mentortriggerfine_tune(req)
+        result = api_orchestrator.mentortriggerfine_tune(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["result_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["GET"], route="agents", auth_level=func.AuthLevel.FUNCTION)
     def list_agents(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.list_agents(req)
+        result = api_orchestrator.list_agents(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["agents_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["GET"], route="agents/{agentId}", auth_level=func.AuthLevel.FUNCTION)
     def get_agent(req: func.HttpRequest) -> func.HttpResponse:
-        result = orchestrator.get_agent(req)
+        result = api_orchestrator.get_agent(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["prof_json"], mimetype="application/json", status_code=result["status_code"])
 
     @app.route(methods=["POST"], route="chat/{agentId}", auth_level=func.AuthLevel.FUNCTION)
     async def chat_agent(req: func.HttpRequest) -> func.HttpResponse:
-        result = await orchestrator.chat(req)
+        result = await api_orchestrator.chat(req)
         if "error" in result:
             return func.HttpResponse(result["error"], status_code=result["status_code"])
         return func.HttpResponse(result["answer_json"], mimetype="application/json", status_code=result["status_code"])
