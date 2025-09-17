@@ -1,7 +1,0 @@
-{
-  "schedule_cron": "0 0 0",
-  "adapter_store": "s3://my-bucket/adapters",
-  "domains": ["sales", "tech", "hr"],
-  "topkexperiences": 500,
-  "leadershipadaptername": "leadership_lora"
-}

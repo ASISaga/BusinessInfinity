@@ -1,8 +1,0 @@
-{
-  "leadershipadapter": "s3://my-bucket/adapters/leadershiplora.safetensors",
-  "domain_adapters": {
-    "sales": "s3://my-bucket/adapters/sales_lora.safetensors",
-    "tech": "s3://my-bucket/adapters/tech_lora.safetensors",
-    "hr": "s3://my-bucket/adapters/hr_lora.safetensors"
-  }
-}

@@ -1,38 +1,35 @@
-server/__pycache__/conversation_api.cpython-312.pyc
-server/__pycache__/server.cpython-312.pyc
-server/__init__.py
-
+# Build artifacts
 bin
 obj
 csx
 .vs
 edge
 Publish
+dist
+node_modules
 
+# User-specific files
 *.user
 *.suo
 *.cscfg
 *.Cache
 project.lock.json
 
-/packages
-/TestResults
+# Packages and dependencies
+packages/
+TestResults/
+.python_packages/
 
-/tools/NuGet.exe
-/App_Data
-/secrets
-/data
+# Configuration and secrets
+tools/NuGet.exe
+App_Data/
+secrets/
+data/
 .secrets
 appsettings.json
 local.settings.json
 
-node_modules
-dist
-
-# Local python packages
-.python_packages/
-
-# Python Environments
+# Python environments
 .env
 .venv
 env/
@@ -41,12 +38,16 @@ ENV/
 env.bak/
 venv.bak/
 
-# Byte-compiled / optimized / DLL files
+# Python compiled files
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
-# Azurite artifacts
+# Azure storage emulator
 __blobstorage__
 __queuestorage__
 __azurite_db*__.json
+
+# IDE and editor files
+.vscode/settings.json
