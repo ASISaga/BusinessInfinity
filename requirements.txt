@@ -1,43 +1,71 @@
-# Azure Functions
+# Business Infinity - Consolidated Dependencies
+# All dependencies for the unified system
+
+# === Azure Functions Platform ===
 azure-functions
 
 # Azure Data Tables
 azure-data-tables
 
-# Azure Storage Blob
+# Azure Storage Services
 azure-storage-blob
+azure-storage-queue
 
-# chromadb
-chromadb
+# Azure Service Bus
+azure-servicebus>=7.12.3
 
-# semantic-kernel
-semantic-kernel
-
-# requests
-requests
-
-# azure-ai-ml
+# Azure AI/ML Services
 azure-ai-ml
+azure-identity>=1.17.1
 
-# azure-identity
-azure-identity
+# === Web Framework & API ===
+# FastAPI for REST API and ASGI support
+fastapi>=0.112.2
+pydantic>=2.7
+uvicorn>=0.30.5
 
-# Do not include azure-functions-worker in this file
-# The Python Worker is managed by the Azure Functions platform
-# Manually managing azure-functions-worker may cause unexpected issues
+# WebSocket support for MCP
+websockets>=12.0
 
-msal
-pyjwt
+# HTTP routing utilities
 http-router
 
+# === AI & ML Libraries ===
+# Semantic Kernel for AI orchestration
+semantic-kernel>=0.9.18
+
+# OpenAI integration
+openai
+
+# Vector database for knowledge management
+chromadb
+
+# Transformers and model fine-tuning
 transformers
 peft
 datasets
 
-# FastAPI for ASGI support
-fastapi
-pydantic>=2.7
-uvicorn
+# === Authentication & Security ===
+# Microsoft Authentication Library
+msal
 
-# Azure storage queue
-azure-storage-queue
+# JWT token handling
+pyjwt
+
+# === Utility Libraries ===
+# HTTP requests
+requests
+
+# Environment variable management
+python-dotenv>=1.0.1
+
+# JSON schema validation
+jsonschema>=4.23.0
+
+# Additional HTTP client
+httpx
+
+# === Development & Configuration ===
+# Do not include azure-functions-worker in this file
+# The Python Worker is managed by the Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues

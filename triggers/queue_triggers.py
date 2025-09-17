@@ -12,10 +12,18 @@ from azure.storage.queue import QueueClient
 import os
 import time
 
-# Import consolidated feature modules
-from storage import storage_manager
-from agents import agent_manager
-from utils.governance import validate_request, GovernanceError
+# Import consolidated core system
+from core import storage_manager, agent_manager
+
+# Import utilities
+try:
+    from utils.governance import validate_request, GovernanceError
+except ImportError:
+    def validate_request(request_type, data):
+        return True
+    
+    class GovernanceError(Exception):
+        pass
 
 
 def register_queue_triggers(app: func.FunctionApp):

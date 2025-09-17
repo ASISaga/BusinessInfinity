@@ -1,8 +1,20 @@
 """
 API and Orchestration Feature
-Consolidates all API routing, orchestration, and business logic coordination
+Consolidated into core system - this module is deprecated.
+Use core.api_orchestrator instead.
 """
-from .router import Router
-from .orchestrator import Orchestrator
 
-__all__ = ['Router', 'Orchestrator']
+# Backward compatibility - redirect to core system
+try:
+    from core.features.api import UnifiedAPIOrchestrator
+    
+    # Create alias for backward compatibility
+    Orchestrator = UnifiedAPIOrchestrator
+    
+    __all__ = ['Orchestrator']
+except ImportError:
+    # If core system not available, provide empty placeholder
+    class Orchestrator:
+        pass
+    
+    __all__ = ['Orchestrator']

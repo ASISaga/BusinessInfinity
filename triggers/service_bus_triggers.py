@@ -38,28 +38,24 @@ def register_service_bus_triggers(app: func.FunctionApp):
         except Exception as e:
             logging.error(f"Error processing service bus message: {e}")
             raise
-                payload = json.loads(body) if body.strip().startswith('{') else body
-                logging.info(f"[GOV] Processed payload type: {type(payload)}")
-        except json.JSONDecodeError as e:
-            logging.warning(f"[GOV] Non-JSON payload received: {e}")
-        except Exception as e:
-            logging.error(f"[GOV] Error processing decision event: {e}")
 
-
-    # Router Service Bus queue trigger merged from api/router.py
-    from api.orchestrator import Orchestrator
-    orchestrator = Orchestrator()
-
-    @app.function_name(name="servicebus_queue_trigger")
-    @app.service_bus_queue_trigger(arg_name="msg", queue_name="myqueue", connection="AzureServiceBusConnection")
+    # Service Bus queue trigger (consolidated from api/router.py)
+    @app.service_bus_queue_trigger(arg_name="msg", queue_name="myqueue", 
+                                  connection="AzureServiceBusConnection")
     def servicebus_queue_trigger(msg: func.ServiceBusMessage):
-        message_body = msg.get_body().decode('utf-8')
-        logging.info(f"Received Service Bus message: {message_body}")
-        orchestrator.handle_servicebus_message(message_body)
-    # @app.service_bus_queue_trigger(arg_name="msg", queue_name="myqueue", 
-    #                               connection="AzureServiceBusConnection")
-    # def servicebus_queue_trigger(msg: func.ServiceBusMessage):
-    #     """Process Service Bus queue messages"""
-    #     message_body = msg.get_body().decode('utf-8')
-    #     logging.info(f"Received Service Bus queue message: {message_body}")
-    #     # Add custom handling logic here
+        """Process Service Bus queue messages"""
+        try:
+            message_body = msg.get_body().decode('utf-8')
+            logging.info(f"Received Service Bus queue message: {message_body}")
+            
+            # Use consolidated API orchestrator to handle the message
+            result = api_orchestrator.handle_servicebus_message(message_body)
+            
+            if result:
+                logging.info("Successfully processed service bus queue message")
+            else:
+                logging.warning("Failed to process service bus queue message")
+                
+        except Exception as e:
+            logging.error(f"Error processing service bus queue message: {e}")
+            raise
