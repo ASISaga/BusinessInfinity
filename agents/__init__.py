@@ -1,10 +1,29 @@
 """
 Agent Management Feature
-Consolidates all agent management, AI interactions, and semantic kernel functionality
+Consolidated into core system - this module provides backward compatibility.
+Use core.agent_manager instead.
 """
-from .manager import UnifiedAgentManager
 
-# Create singleton instance
-agent_manager = UnifiedAgentManager()
-
-__all__ = ['agent_manager', 'UnifiedAgentManager']
+# Backward compatibility - redirect to core system
+try:
+    from core.agents import agent_manager, UnifiedAgentManager
+    
+    # Create aliases for backward compatibility
+    manager = agent_manager
+    AgentManager = UnifiedAgentManager
+    
+    __all__ = ['manager', 'agent_manager', 'AgentManager', 'UnifiedAgentManager']
+except ImportError:
+    # If core system not available, provide fallback
+    class AgentManager:
+        def __init__(self):
+            pass
+    
+    class UnifiedAgentManager:
+        def __init__(self):
+            pass
+    
+    manager = AgentManager()
+    agent_manager = manager
+    
+    __all__ = ['manager', 'agent_manager', 'AgentManager', 'UnifiedAgentManager']

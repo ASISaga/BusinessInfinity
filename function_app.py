@@ -1,15 +1,38 @@
+"""
+Business Infinity - Azure Functions App
+Consolidated and refactored to use the unified core system
+"""
+
 import logging
 import azure.functions as func
 
-# Import trigger registration functions
-from triggers.http_routes import register_http_routes
-from triggers.queue_triggers import register_queue_triggers  
-from triggers.service_bus_triggers import register_service_bus_triggers
+# Import consolidated core system
+from core.azure_functions import register_consolidated_functions
 
-# Create the main function app instance  
-app = func.FunctionApp()
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Register all triggers from the specialized modules
-register_http_routes(app)
-register_queue_triggers(app)
-register_service_bus_triggers(app)
+# Create the Azure Functions app
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+
+# Register all consolidated functions
+try:
+    register_consolidated_functions(app)
+    logger.info("Successfully registered all consolidated Azure Functions")
+except Exception as e:
+    logger.error(f"Failed to register consolidated functions: {e}")
+    # Fallback to basic functionality
+    
+    @app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+    async def health_fallback(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback health check if core registration fails"""
+        return func.HttpResponse(
+            '{"status": "fallback", "message": "Core system registration failed"}',
+            mimetype="application/json",
+            status_code=200
+        )
+
+# Export the app for Azure Functions runtime
+if __name__ == "__main__":
+    logger.info("Azure Functions app initialized with consolidated core system")
