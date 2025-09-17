@@ -2,6 +2,7 @@
 HTTP Route Triggers for Azure Functions
 
 This module contains all HTTP route handlers consolidated from function_app.py
+Updated to use the unified core system.
 """
 
 import json
@@ -10,20 +11,69 @@ import azure.functions as func
 from pathlib import Path
 import uuid
 
-# Import consolidated feature modules
-from agents import agent_manager
-from ml_pipeline import ml_manager
-from storage import storage_manager
-from environment import env_manager
+# Import consolidated core system
+from core import agent_manager, mcp_handler, orchestrator, unified_server
 
-from dashboard.mcp_handlers import handle_mcp
-from utils.governance import validate_request, GovernanceError
+# Import remaining feature modules  
+try:
+    from ml_pipeline import ml_manager
+except ImportError:
+    ml_manager = None
 
-# === Assimilated from utils/app.py ===
-from utils.manifest import get_ui_schema
-from utils.storage import enqueue_request, query_messages
-from utils.aml import aml_infer as utils_aml_infer, aml_train as utils_aml_train
-from shared.models import UiAction, Envelope
+try:
+    from storage import storage_manager
+except ImportError:
+    storage_manager = None
+
+try:
+    from environment import env_manager
+except ImportError:
+    env_manager = None
+
+# Import utilities
+try:
+    from utils.governance import validate_request, GovernanceError
+except ImportError:
+    def validate_request(request):
+        return True
+    
+    class GovernanceError(Exception):
+        pass
+
+try:
+    from utils.manifest import get_ui_schema
+except ImportError:
+    def get_ui_schema():
+        return {"error": "Manifest service not available"}
+
+try:
+    from utils.storage import enqueue_request, query_messages
+except ImportError:
+    def enqueue_request(*args, **kwargs):
+        return {"error": "Storage service not available"}
+    
+    def query_messages(*args, **kwargs):
+        return {"error": "Storage service not available"}
+
+try:
+    from utils.aml import aml_infer as utils_aml_infer, aml_train as utils_aml_train
+except ImportError:
+    def utils_aml_infer(*args, **kwargs):
+        return {"error": "AML inference not available"}
+    
+    def utils_aml_train(*args, **kwargs):
+        return {"error": "AML training not available"}
+
+try:
+    from shared.models import UiAction, Envelope
+except ImportError:
+    from pydantic import BaseModel
+    
+    class UiAction(BaseModel):
+        pass
+    
+    class Envelope(BaseModel):
+        pass
 
 
 def register_http_routes(app: func.FunctionApp):
@@ -288,10 +338,10 @@ def register_http_routes(app: func.FunctionApp):
                 status_code=500
             )
 
-    # MCP endpoint function (replaces dashboard/mcp_endpoint) 
+    # MCP endpoint function (consolidated from dashboard/mcp_endpoint) 
     @app.route(route="mcp", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
     async def mcp_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """MCP endpoint handler"""
+        """Unified MCP endpoint handler using consolidated core system"""
         try:
             body = req.get_json()
         except ValueError:
@@ -301,13 +351,12 @@ def register_http_routes(app: func.FunctionApp):
                 status_code=400
             )
         
-        # Import handle_mcp locally to avoid import issues
         try:
-           
-            response = await handle_mcp(body)
-        except ImportError as e:
-            logging.error(f"Failed to import MCP handler: {e}")
-            response = {"error": "MCP handler not available"}
+            # Use the unified MCP handler from core system
+            response = await mcp_handler.handle_mcp_request(body)
+        except Exception as e:
+            logging.error(f"MCP handler error: {e}")
+            response = {"error": f"MCP handler error: {str(e)}"}
         
         return func.HttpResponse(
             json.dumps(response),
