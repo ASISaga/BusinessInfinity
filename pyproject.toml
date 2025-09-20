@@ -39,7 +39,8 @@ dependencies = [
     "Investor @ git+https://github.com/ASISaga/Investor.git",
     "Leader @ git+https://github.com/ASISaga/Leader.git",
     "Poet @ git+https://github.com/ASISaga/Poet.git",
-    "Seeker @ git+https://github.com/ASISaga/Seeker.git"
+    "Seeker @ git+https://github.com/ASISaga/Seeker.git",
+    "AgentOperatingSystem @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
 ]
 
 [build-system]
