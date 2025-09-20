@@ -1,7 +1,7 @@
 {
   "BusinessInfinity": {
     "name": "BusinessInfinity",
-    "path": "BusinessInfinity",
+    "local-path": "BusinessInfinity",
     "description": "BusinessInfinity is a comprehensive business automation and orchestration platform. It leverages the AgentOperatingSystem to coordinate domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks. Integrates Azure Functions, AI, and custom modules for scalable, intelligent business processes. Provides a unified interface for business logic, automation, and decision support.",
     "repo": "https://github.com/ASISaga/BusinessInfinity",
     "hierarchy": "deployment of AgentOperatingSystem",
@@ -22,7 +22,7 @@
         "functions": [
           {"name": "strategic_direction", "description": "Provides strategic direction, high-level decision-making, and coordination across business domains."}
         ],
-        "path": "Buddhi/CEO",
+        "local-path": "Buddhi/CEO",
         "description": "CEO is an AI agent module based on PurposeDrivenAgent, focused on executive leadership. It provides strategic direction, high-level decision-making, and coordination across business domains, leveraging knowledge management and reasoning to achieve organizational goals.",
         "dependencies": ["PurposeDrivenAgent"],
         "repo": "https://github.com/ASISaga/Buddhi",
@@ -34,7 +34,7 @@
         "functions": [
           {"name": "financial_management", "description": "Automates financial operations, budgeting, and reporting; supports data-driven financial decisions."}
         ],
-        "path": "Buddhi/CFO",
+        "local-path": "Buddhi/CFO",
         "description": "CFO is an AI agent module based on PurposeDrivenAgent, specializing in financial management, planning, and analysis. It automates financial operations, budgeting, and reporting, supporting data-driven financial decisions.",
         "dependencies": ["PurposeDrivenAgent"],
         "repo": "https://github.com/ASISaga/Buddhi",
@@ -46,7 +46,7 @@
         "functions": [
           {"name": "operational_efficiency", "description": "Manages workflows, resource allocation, and ensures smooth business operations."}
         ],
-        "path": "Buddhi/COO",
+        "local-path": "Buddhi/COO",
         "description": "COO is an AI agent module based on PurposeDrivenAgent, responsible for operational efficiency and process optimization. It manages workflows, resource allocation, and ensures smooth business operations.",
         "dependencies": ["PurposeDrivenAgent"],
         "repo": "https://github.com/ASISaga/Buddhi",
@@ -58,7 +58,7 @@
         "functions": [
           {"name": "marketing_strategy", "description": "Focuses on marketing strategy, campaign management, and customer engagement."}
         ],
-        "path": "Buddhi/CMO",
+        "local-path": "Buddhi/CMO",
         "description": "CMO is an AI agent module based on PurposeDrivenAgent, focused on marketing strategy, campaign management, and customer engagement. It leverages analytics and automation to drive business growth.",
         "dependencies": ["PurposeDrivenAgent"],
         "repo": "https://github.com/ASISaga/Buddhi",
@@ -70,7 +70,7 @@
         "functions": [
           {"name": "business_strategy", "description": "Supports long-term planning, market research, and strategic initiatives."}
         ],
-        "path": "Buddhi/CSO",
+        "local-path": "Buddhi/CSO",
         "description": "CSO is an AI agent module based on PurposeDrivenAgent, specializing in business strategy and competitive analysis. It supports long-term planning, market research, and strategic initiatives.",
         "dependencies": ["PurposeDrivenAgent"],
         "repo": "https://github.com/ASISaga/Buddhi",
@@ -83,7 +83,7 @@
       "functions": [
         {"name": "startup_creation", "description": "Assists in startup creation, business model development, and early-stage growth strategies."}
       ],
-      "path": "Buddhi/Founder",
+      "local-path": "Buddhi/Founder",
       "description": "Founder is an AI agent module based on PurposeDrivenAgent, designed for entrepreneurship and innovation. It assists in startup creation, business model development, and early-stage growth strategies.",
       "dependencies": ["PurposeDrivenAgent"],
       "repo": "https://github.com/ASISaga/Buddhi",
@@ -95,7 +95,7 @@
       "functions": [
         {"name": "investment_analysis", "description": "Provides investment analysis, portfolio management, and funding strategies."}
       ],
-      "path": "Buddhi/Investor",
+      "local-path": "Buddhi/Investor",
       "description": "Investor is an AI agent module based on PurposeDrivenAgent, focused on investment analysis, portfolio management, and funding strategies. It provides insights for capital allocation and risk assessment.",
       "dependencies": ["PurposeDrivenAgent"],
       "repo": "https://github.com/ASISaga/Buddhi",
@@ -107,7 +107,7 @@
       "functions": [
         {"name": "web_interface", "description": "Delivers a modern web interface for business automation, agent management, and analytics."}
       ],
-      "path": "Website/businessinfinity.asisaga.com",
+      "local-path": "Website/businessinfinity.asisaga.com",
       "description": "Frontend application for BusinessInfinity, delivering a modern web interface for business automation, agent management, and analytics. Enables users to interact with the platform's features and monitor business processes.",
       "dependencies": ["BusinessInfinity"],
       "repo": "https://github.com/ASISaga/Website",
@@ -125,7 +125,7 @@
       "functions": [
         {"name": "orchestrate_agents", "description": "Enables coordination, communication, and lifecycle management of autonomous agents. Provides communication infrastructure for agent orchestration using Azure Service Bus."}
       ],
-      "path": "RealmOfAgents/AgentOperatingSystem",
+      "local-path": "RealmOfAgents/AgentOperatingSystem",
       "description": "AgentOperatingSystem is the core multi-agent orchestration engine. It enables coordination, communication, and lifecycle management of autonomous agents, supporting extensibility and integration with business and AI modules. It also provides the communication infrastructure for agent orchestration, using Azure Service Bus.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/RealmOfAgents"
@@ -135,7 +135,7 @@
       "functions": [
         {"name": "goal_driven_agent", "description": "Builds intelligent agents with explicit goals, learning, and reasoning. Supports composability, inheritance, and integration with knowledge and code generation modules."}
       ],
-      "path": "RealmOfAgents/PurposeDrivenAgent",
+      "local-path": "RealmOfAgents/PurposeDrivenAgent",
       "description": "PurposeDrivenAgent is a modular agent framework for building intelligent agents with explicit goals, learning, and reasoning. It supports composability, inheritance, and integration with knowledge and code generation modules.",
       "dependencies": ["SelfLearningAgent"],
       "repo": "https://github.com/ASISaga/RealmOfAgents",
@@ -146,7 +146,7 @@
       "functions": [
         {"name": "autonomous_learning", "description": "Enables agents to adapt, optimize, and improve performance over time through experience and feedback."}
       ],
-      "path": "RealmOfAgents/SelfLearningAgent",
+      "local-path": "RealmOfAgents/SelfLearningAgent",
       "description": "SelfLearningAgent is the foundational core for agents with autonomous learning capabilities. It enables agents to adapt, optimize, and improve performance over time through experience and feedback.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/RealmOfAgents"
@@ -156,7 +156,7 @@
       "functions": [
         {"name": "domain_specific_llm", "description": "Manages AML MLOps for domain-specific LLM training using LoRA adapters. Provides LLMs to PurposeDrivenAgent(s) for specialized knowledge."}
       ],
-      "path": "RealmOfAgents/FineTunedLLM",
+      "local-path": "RealmOfAgents/FineTunedLLM",
       "description": "FineTunedLLM manages Azure Machine Learning (AML) MLOps for domain-specific LLM training using LoRA adapters. It provides domain-specific LLMs to PurposeDrivenAgent(s) (including C-Suite, Investor, and Founder), enabling them to leverage specialized knowledge and expertise.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/RealmOfAgents",
@@ -175,7 +175,7 @@
       "functions": [
         {"name": "reddit_data_integration", "description": "Enables access to Reddit APIs and fast data pipelines for analytics and automation."}
       ],
-      "path": "MCP/mcp-reddit",
+      "local-path": "MCP/mcp-reddit",
       "description": "mcp-reddit-server provides Reddit data integration for MCP, enabling access to Reddit APIs and fast data pipelines for analytics and automation.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/MCP"
@@ -185,7 +185,7 @@
       "functions": [
         {"name": "asisaga_integration", "description": "Exposes business operations and data via scalable, serverless APIs for asisaga.com."}
       ],
-      "path": "MCP/mcp.asisaga.com",
+      "local-path": "MCP/mcp.asisaga.com",
       "description": "mcp-asisaga-com is an Azure Functions-based MCP server for asisaga.com integration. It exposes business operations and data via scalable, serverless APIs.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/MCP"
@@ -195,7 +195,7 @@
       "functions": [
         {"name": "erpnext_integration", "description": "Exposes business operations and data via Python APIs. Supports Frappe, Uvicorn, and enterprise integration."}
       ],
-      "path": "MCP/ERPNext-MCP",
+      "local-path": "MCP/ERPNext-MCP",
       "description": "ERPNext-MCP is an MCP server for ERPNext, exposing business operations and data via Python APIs. It supports Frappe, Uvicorn, and integration with enterprise systems.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/MCP"
@@ -205,7 +205,7 @@
       "functions": [
         {"name": "linkedin_integration", "description": "Provides LinkedIn API integration for MCP, supporting data ingestion, automation, and business process integration."}
       ],
-      "path": "MCP/linkedin-mcp-server",
+      "local-path": "MCP/linkedin-mcp-server",
       "description": "linkedin-mcp-server provides LinkedIn API integration for MCP, supporting data ingestion, automation, and business process integration via Azure Functions and CLI tools.",
       "dependencies": [],
       "repo": "https://github.com/ASISaga/MCP"
@@ -213,11 +213,11 @@
   },
   "workspace": {
     "modules": [
-      {"name": "BusinessInfinity", "path": "BusinessInfinity", "repo": "https://github.com/ASISaga/BusinessInfinity"},
-      {"name": "Buddhi", "path": "Buddhi", "repo": "https://github.com/ASISaga/Buddhi"},
-      {"name": "RealmOfAgents", "path": "RealmOfAgents", "repo": "https://github.com/ASISaga/RealmOfAgents"},
-      {"name": "MCP", "path": "MCP", "repo": "https://github.com/ASISaga/MCP"},
-      {"name": "Website", "path": "Website", "repo": "https://github.com/ASISaga/Website"}
+      {"name": "BusinessInfinity", "local-path": "BusinessInfinity", "repo": "https://github.com/ASISaga/BusinessInfinity"},
+      {"name": "Buddhi", "local-path": "Buddhi", "repo": "https://github.com/ASISaga/Buddhi"},
+      {"name": "RealmOfAgents", "local-path": "RealmOfAgents", "repo": "https://github.com/ASISaga/RealmOfAgents"},
+      {"name": "MCP", "local-path": "MCP", "repo": "https://github.com/ASISaga/MCP"},
+      {"name": "Website", "local-path": "Website", "repo": "https://github.com/ASISaga/Website"}
     ],
     "description": "All git modules that make up the BusinessInfinity product."
   },
