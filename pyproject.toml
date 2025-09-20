@@ -13,7 +13,7 @@ dependencies = [
     "azure-ai-ml",
     "azure-identity>=1.17.1",
     "fastapi>=0.112.2",
-    "pydantic>=2.7",
+    "pydantic>=2.8.2",
     "uvicorn>=0.30.5",
     "websockets>=12.0",
     "http-router",
@@ -23,13 +23,17 @@ dependencies = [
     "transformers",
     "peft",
     "datasets",
-    "msal"
+    "msal",
     "pyjwt",
     "requests",
     "python-dotenv>=1.0.1",
     "jsonschema>=4.23.0",
-    "httpx"
-    ,
+    "httpx",
+    "streamlit",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-otlp-proto-grpc",
+    "opentelemetry-instrumentation-fastapi",
     "CEO @ git+https://github.com/ASISaga/CEO.git",
     "CFO @ git+https://github.com/ASISaga/CFO.git",
     "CMO @ git+https://github.com/ASISaga/CMO.git",
@@ -38,8 +42,6 @@ dependencies = [
     "Founder @ git+https://github.com/ASISaga/Founder.git",
     "Investor @ git+https://github.com/ASISaga/Investor.git",
     "Leader @ git+https://github.com/ASISaga/Leader.git",
-    "Poet @ git+https://github.com/ASISaga/Poet.git",
-    "Seeker @ git+https://github.com/ASISaga/Seeker.git",
     "AgentOperatingSystem @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
 ]
 
