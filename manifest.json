@@ -1,0 +1,259 @@
+{
+  "BusinessInfinity": {
+    "name": "BusinessInfinity",
+    "path": "BusinessInfinity",
+    "description": "BusinessInfinity is a comprehensive business automation and orchestration platform. It leverages the AgentOperatingSystem to coordinate domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks. Integrates Azure Functions, AI, and custom modules for scalable, intelligent business processes. Provides a unified interface for business logic, automation, and decision support.",
+    "repo": "https://github.com/ASISaga/BusinessInfinity",
+    "hierarchy": "deployment of AgentOperatingSystem",
+    "deployment": "Azure Functions",
+    "C-Suite": {
+      "name": "C-Suite",
+      "description": "C-Suite is a logical group within BusinessInfinity, representing the executive team of domain-specific agents (CEO, CFO, COO, CMO, CSO). Each agent specializes in a business domain, providing leadership, financial, operational, marketing, and strategic expertise through AI-driven modules.",
+      "CEO": {
+        "name": "CEO",
+        "path": "Buddhi/CEO",
+        "description": "CEO is an AI agent module based on PurposeDrivenAgent, focused on executive leadership. It provides strategic direction, high-level decision-making, and coordination across business domains, leveraging knowledge management and reasoning to achieve organizational goals.",
+        "dependencies": ["PurposeDrivenAgent"],
+        "repo": "https://github.com/ASISaga/Buddhi",
+        "hierarchy": "implements PurposeDrivenAgent",
+        "domain": "Executive Leadership"
+      },
+      "CFO": {
+        "name": "CFO",
+        "path": "Buddhi/CFO",
+        "description": "CFO is an AI agent module based on PurposeDrivenAgent, specializing in financial management, planning, and analysis. It automates financial operations, budgeting, and reporting, supporting data-driven financial decisions.",
+        "dependencies": ["PurposeDrivenAgent"],
+        "repo": "https://github.com/ASISaga/Buddhi",
+        "hierarchy": "implements PurposeDrivenAgent",
+        "domain": "Finance"
+      },
+      "COO": {
+        "name": "COO",
+        "path": "Buddhi/COO",
+        "description": "COO is an AI agent module based on PurposeDrivenAgent, responsible for operational efficiency and process optimization. It manages workflows, resource allocation, and ensures smooth business operations.",
+        "dependencies": ["PurposeDrivenAgent"],
+        "repo": "https://github.com/ASISaga/Buddhi",
+        "hierarchy": "implements PurposeDrivenAgent",
+        "domain": "Operations"
+      },
+      "CMO": {
+        "name": "CMO",
+        "path": "Buddhi/CMO",
+        "description": "CMO is an AI agent module based on PurposeDrivenAgent, focused on marketing strategy, campaign management, and customer engagement. It leverages analytics and automation to drive business growth.",
+        "dependencies": ["PurposeDrivenAgent"],
+        "repo": "https://github.com/ASISaga/Buddhi",
+        "hierarchy": "implements PurposeDrivenAgent",
+        "domain": "Marketing"
+      },
+      "CSO": {
+        "name": "CSO",
+        "path": "Buddhi/CSO",
+        "description": "CSO is an AI agent module based on PurposeDrivenAgent, specializing in business strategy and competitive analysis. It supports long-term planning, market research, and strategic initiatives.",
+        "dependencies": ["PurposeDrivenAgent"],
+        "repo": "https://github.com/ASISaga/Buddhi",
+        "hierarchy": "implements PurposeDrivenAgent",
+        "domain": "Strategy"
+      }
+    },
+    "Founder": {
+      "name": "Founder",
+      "path": "Buddhi/Founder",
+      "description": "Founder is an AI agent module based on PurposeDrivenAgent, designed for entrepreneurship and innovation. It assists in startup creation, business model development, and early-stage growth strategies.",
+      "dependencies": ["PurposeDrivenAgent"],
+      "repo": "https://github.com/ASISaga/Buddhi",
+      "hierarchy": "implements PurposeDrivenAgent",
+      "domain": "Entrepreneurship"
+    },
+    "Investor": {
+      "name": "Investor",
+      "path": "Buddhi/Investor",
+      "description": "Investor is an AI agent module based on PurposeDrivenAgent, focused on investment analysis, portfolio management, and funding strategies. It provides insights for capital allocation and risk assessment.",
+      "dependencies": ["PurposeDrivenAgent"],
+      "repo": "https://github.com/ASISaga/Buddhi",
+      "hierarchy": "implements PurposeDrivenAgent",
+      "domain": "Investment"
+    },
+    "businessinfinity.asisaga.com": {
+      "name": "businessinfinity.asisaga.com",
+      "path": "Website/businessinfinity.asisaga.com",
+      "description": "Frontend application for BusinessInfinity, delivering a modern web interface for business automation, agent management, and analytics. Enables users to interact with the platform's features and monitor business processes.",
+      "dependencies": ["BusinessInfinity"],
+      "repo": "https://github.com/ASISaga/Website",
+      "type": "frontend"
+    }
+  },
+  "RealmOfAgents": {
+    "name": "RealmOfAgents",
+    "description": "RealmOfAgents is a collection of advanced agent frameworks and the core AgentOperatingSystem. It provides the foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors.",
+    "AgentOperatingSystem": {
+      "name": "AgentOperatingSystem",
+      "path": "RealmOfAgents/AgentOperatingSystem",
+      "description": "AgentOperatingSystem is the core multi-agent orchestration engine. It enables coordination, communication, and lifecycle management of autonomous agents, supporting extensibility and integration with business and AI modules.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/RealmOfAgents"
+    },
+    "PurposeDrivenAgent": {
+      "name": "PurposeDrivenAgent",
+      "path": "RealmOfAgents/PurposeDrivenAgent",
+      "description": "PurposeDrivenAgent is a modular agent framework for building intelligent agents with explicit goals, learning, and reasoning. It supports composability, inheritance, and integration with knowledge and code generation modules.",
+      "dependencies": ["SelfLearningAgent"],
+      "repo": "https://github.com/ASISaga/RealmOfAgents",
+      "hierarchy": "extends SelfLearningAgent"
+    },
+    "SelfLearningAgent": {
+      "name": "SelfLearningAgent",
+      "path": "RealmOfAgents/SelfLearningAgent",
+      "description": "SelfLearningAgent is the foundational core for agents with autonomous learning capabilities. It enables agents to adapt, optimize, and improve performance over time through experience and feedback.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/RealmOfAgents"
+    }
+  },
+  "MCP": {
+    "name": "MCP",
+    "description": "MCP (Model Context Protocol) is a suite of integrations and servers for spec-driven development, data integration, and orchestration. It provides standardized APIs and tools for connecting business logic, data sources, and external services.",
+    "mcp-reddit-server": {
+      "name": "mcp-reddit-server",
+      "path": "MCP/mcp-reddit",
+      "description": "mcp-reddit-server provides Reddit data integration for MCP, enabling access to Reddit APIs and fast data pipelines for analytics and automation.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/MCP"
+    },
+    "mcp-asisaga-com": {
+      "name": "mcp-asisaga-com",
+      "path": "MCP/mcp.asisaga.com",
+      "description": "mcp-asisaga-com is an Azure Functions-based MCP server for asisaga.com integration. It exposes business operations and data via scalable, serverless APIs.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/MCP"
+    },
+    "ERPNext-MCP": {
+      "name": "ERPNext-MCP",
+      "path": "MCP/ERPNext-MCP",
+      "description": "ERPNext-MCP is an MCP server for ERPNext, exposing business operations and data via Python APIs. It supports Frappe, Uvicorn, and integration with enterprise systems.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/MCP"
+    },
+    "linkedin-mcp-server": {
+      "name": "linkedin-mcp-server",
+      "path": "MCP/linkedin-mcp-server",
+      "description": "linkedin-mcp-server provides LinkedIn API integration for MCP, supporting data ingestion, automation, and business process integration via Azure Functions and CLI tools.",
+      "dependencies": [],
+      "repo": "https://github.com/ASISaga/MCP"
+    }
+  },
+  "workspace": {
+    "modules": [
+      {"name": "BusinessInfinity", "path": "BusinessInfinity", "repo": "https://github.com/ASISaga/BusinessInfinity"},
+      {"name": "Buddhi", "path": "Buddhi", "repo": "https://github.com/ASISaga/Buddhi"},
+      {"name": "RealmOfAgents", "path": "RealmOfAgents", "repo": "https://github.com/ASISaga/RealmOfAgents"},
+      {"name": "MCP", "path": "MCP", "repo": "https://github.com/ASISaga/MCP"},
+      {"name": "Website", "path": "Website", "repo": "https://github.com/ASISaga/Website"}
+    ],
+    "description": "All git modules that make up the BusinessInfinity product."
+  },
+  "pythonPackages": [
+    {"name": "BusinessInfinity", "packageRoot": "BusinessInfinity", "pyproject": "BusinessInfinity/pyproject.toml"},
+    {"name": "AgentOperatingSystem", "packageRoot": "RealmOfAgents/AgentOperatingSystem", "pyproject": "RealmOfAgents/AgentOperatingSystem/pyproject.toml"},
+    {"name": "PurposeDrivenAgent", "packageRoot": "RealmOfAgents/PurposeDrivenAgent", "pyproject": "RealmOfAgents/PurposeDrivenAgent/pyproject.toml"},
+    {"name": "SelfLearningAgent", "packageRoot": "RealmOfAgents/SelfLearningAgent", "pyproject": "RealmOfAgents/SelfLearningAgent/pyproject.toml"},
+    {"name": "CEO", "packageRoot": "Buddhi/CEO", "pyproject": "Buddhi/CEO/pyproject.toml"},
+    {"name": "CFO", "packageRoot": "Buddhi/CFO", "pyproject": "Buddhi/CFO/pyproject.toml"},
+    {"name": "COO", "packageRoot": "Buddhi/COO", "pyproject": "Buddhi/COO/pyproject.toml"},
+    {"name": "CMO", "packageRoot": "Buddhi/CMO", "pyproject": "Buddhi/CMO/pyproject.toml"},
+    {"name": "CSO", "packageRoot": "Buddhi/CSO", "pyproject": "Buddhi/CSO/pyproject.toml"},
+    {"name": "Founder", "packageRoot": "Buddhi/Founder", "pyproject": "Buddhi/Founder/pyproject.toml"},
+    {"name": "Investor", "packageRoot": "Buddhi/Investor", "pyproject": "Buddhi/Investor/pyproject.toml"}
+  ],
+  "globalDependencies": {
+    "graph": [
+      {"from": "BusinessInfinity", "to": "AgentOperatingSystem"},
+      {"from": "AgentOperatingSystem", "to": "PurposeDrivenAgent"},
+      {"from": "PurposeDrivenAgent", "to": "SelfLearningAgent"},
+      {"from": "BusinessInfinity", "to": "C-Suite"},
+      {"from": "C-Suite", "to": "CEO"},
+      {"from": "C-Suite", "to": "CFO"},
+      {"from": "C-Suite", "to": "COO"},
+      {"from": "C-Suite", "to": "CMO"},
+      {"from": "C-Suite", "to": "CSO"},
+      {"from": "BusinessInfinity", "to": "Founder"},
+      {"from": "BusinessInfinity", "to": "Investor"}
+    ],
+    "description": "Unified dependency graph for all major modules."
+  },
+  "integration": {
+    "strategy": "BusinessInfinity loads and orchestrates all submodules as Python packages. Shared interfaces and contracts are defined in AgentOperatingSystem and PurposeDrivenAgent. Cross-module imports are supported via relative imports and shared virtual environments. All modules are installed in the same Python environment for seamless integration.",
+    "entrypoints": [
+      {"module": "BusinessInfinity", "main": "function_app.py"},
+      {"module": "AgentOperatingSystem", "main": "multi_agent.py"},
+      {"module": "PurposeDrivenAgent", "main": "__init__.py"}
+    ]
+  },
+  "refactorability": {
+    "guidelines": "All modules follow PEP 420 namespace packages and use explicit relative imports where possible. Code can be moved between modules as long as shared interfaces are respected. Refactoring tools should treat the workspace as a monorepo, and cross-module changes should be committed atomically. All pyproject.toml files are discoverable for dependency management.",
+    "monorepo": true
+  },
+  "fileGlobs": {
+    "BusinessInfinity": ["BusinessInfinity/**/*.py", "BusinessInfinity/**/*.md", "BusinessInfinity/**/*.json"],
+    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/**/*.py"],
+    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/**/*.py"],
+    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/**/*.py"],
+    "CEO": ["Buddhi/CEO/**/*.py"],
+    "CFO": ["Buddhi/CFO/**/*.py"],
+    "COO": ["Buddhi/COO/**/*.py"],
+    "CMO": ["Buddhi/CMO/**/*.py"],
+    "CSO": ["Buddhi/CSO/**/*.py"],
+    "Founder": ["Buddhi/Founder/**/*.py"],
+    "Investor": ["Buddhi/Investor/**/*.py"]
+  },
+  "testSuites": {
+    "BusinessInfinity": "BusinessInfinity/tests/",
+    "AgentOperatingSystem": "RealmOfAgents/AgentOperatingSystem/tests/",
+    "PurposeDrivenAgent": "RealmOfAgents/PurposeDrivenAgent/tests/",
+    "SelfLearningAgent": "RealmOfAgents/SelfLearningAgent/tests/",
+    "CEO": "Buddhi/CEO/tests/",
+    "CFO": "Buddhi/CFO/tests/",
+    "COO": "Buddhi/COO/tests/",
+    "CMO": "Buddhi/CMO/tests/",
+    "CSO": "Buddhi/CSO/tests/",
+    "Founder": "Buddhi/Founder/tests/",
+    "Investor": "Buddhi/Investor/tests/"
+  },
+  "sharedConfig": {
+    "BusinessInfinity": ["BusinessInfinity/pyproject.toml", "BusinessInfinity/requirements.txt", "BusinessInfinity/.env"],
+    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/pyproject.toml"],
+    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/pyproject.toml"],
+    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/pyproject.toml"],
+    "CEO": ["Buddhi/CEO/pyproject.toml"],
+    "CFO": ["Buddhi/CFO/pyproject.toml"],
+    "COO": ["Buddhi/COO/pyproject.toml"],
+    "CMO": ["Buddhi/CMO/pyproject.toml"],
+    "CSO": ["Buddhi/CSO/pyproject.toml"],
+    "Founder": ["Buddhi/Founder/pyproject.toml"],
+    "Investor": ["Buddhi/Investor/pyproject.toml"]
+  },
+  "documentation": {
+    "BusinessInfinity": ["BusinessInfinity/README.md", "BusinessInfinity/docs/architecture.md"],
+    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/README.md"],
+    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/README.md"],
+    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/README.md"],
+    "CEO": ["Buddhi/CEO/README.md"],
+    "CFO": ["Buddhi/CFO/README.md"],
+    "COO": ["Buddhi/COO/README.md"],
+    "CMO": ["Buddhi/CMO/README.md"],
+    "CSO": ["Buddhi/CSO/README.md"],
+    "Founder": ["Buddhi/Founder/README.md"],
+    "Investor": ["Buddhi/Investor/README.md"]
+  },
+  "apiContracts": {
+    "BusinessInfinity": ["BusinessInfinity/openapi.json"],
+    "AgentOperatingSystem": [],
+    "PurposeDrivenAgent": [],
+    "SelfLearningAgent": [],
+    "CEO": [],
+    "CFO": [],
+    "COO": [],
+    "CMO": [],
+    "CSO": [],
+    "Founder": [],
+    "Investor": []
+  }
+}
