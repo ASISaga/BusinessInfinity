@@ -4,7 +4,7 @@ bi-boardroom-backend/
 ├── mcp_handlers.py
 ├── state.py
 ├── prompts.py
-├── requirements.txt
+├── pyproject.toml
 ├── .env
 │
 ├── get_manifest/

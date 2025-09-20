@@ -8,15 +8,15 @@ business-infinity/
 │  ├─ decision_engine.py
 │  ├─ adapters.py
 │  ├─ config_loader.py
-│  └─ requirements.txt
+│  └─ pyproject.toml
 ├─ functions/
 │  ├─ process_decision_event/__init__.py
 │  ├─ process_decision_event/function.json
-│  └─ requirements.txt
+│  └─ pyproject.toml
 ├─ mcp/
 │  ├─ server.py
 │  ├─ protocol.py
-│  └─ requirements.txt
+│  └─ pyproject.toml
 ├─ webclient/
 │  ├─ index.html
 │  ├─ app.js

@@ -95,7 +95,7 @@ from core import (
 
 ### Installation
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
 ### Basic Usage

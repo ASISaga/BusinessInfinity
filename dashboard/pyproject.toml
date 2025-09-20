@@ -1,0 +1,12 @@
+[project]
+name = "dashboard"
+version = "0.1.0"
+dependencies = [
+    "azure-functions",
+    "semantic-kernel",
+    "openai",
+    "python-dotenv"
+]
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

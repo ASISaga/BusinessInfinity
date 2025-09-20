@@ -1,0 +1,10 @@
+[project]
+name = "framework-functions"
+version = "0.1.0"
+dependencies = [
+    "azure-functions==1.19.0",
+    "azure-servicebus==7.12.3"
+]
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

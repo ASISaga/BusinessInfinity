@@ -83,7 +83,7 @@ RESOURCE_GROUP=rg-business-infinity-dev
 ```powershell
 # Install Python dependencies
 cd server
-pip install -r requirements.txt
+pip install .
 
 # Install Node.js dependencies for frontend
 cd ..\businessinfinity.asisaga.com
@@ -342,7 +342,7 @@ stages:
       inputs:
         versionSpec: '3.9'
     - script: |
-        pip install -r requirements.txt
+  pip install .
         python -m pytest tests/
       displayName: 'Install dependencies and run tests'
 
@@ -387,7 +387,7 @@ jobs:
         python-version: '3.9'
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        pip install .
     - name: Run tests
       run: |
         python -m pytest tests/

@@ -70,7 +70,7 @@ from api.orchestrator import Orchestrator
 - Comprehensive error handling and logging
 
 ### 🧹 **Simplified Dependencies**
-- Consolidated `requirements.txt` with all dependencies
+- Consolidated `pyproject.toml` with all dependencies
 - No duplicate or conflicting package versions
 - Optional imports with graceful fallbacks
 
@@ -124,7 +124,7 @@ function_app.py  # Main entry point
 - Triggers updated to use consolidated system
 
 ### 📦 Dependencies
-- Single comprehensive `requirements.txt`
+- Single comprehensive `pyproject.toml`
 - All Azure services integrated
 - Optional dependencies with fallbacks
 
