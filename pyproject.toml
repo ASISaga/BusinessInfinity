@@ -29,6 +29,17 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "jsonschema>=4.23.0",
     "httpx"
+    ,
+    "CEO @ git+https://github.com/ASISaga/CEO.git",
+    "CFO @ git+https://github.com/ASISaga/CFO.git",
+    "CMO @ git+https://github.com/ASISaga/CMO.git",
+    "COO @ git+https://github.com/ASISaga/COO.git",
+    "CSO @ git+https://github.com/ASISaga/CSO.git",
+    "Founder @ git+https://github.com/ASISaga/Founder.git",
+    "Investor @ git+https://github.com/ASISaga/Investor.git",
+    "Leader @ git+https://github.com/ASISaga/Leader.git",
+    "Poet @ git+https://github.com/ASISaga/Poet.git",
+    "Seeker @ git+https://github.com/ASISaga/Seeker.git"
 ]
 
 [build-system]
