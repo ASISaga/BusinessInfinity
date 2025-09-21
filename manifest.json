@@ -9,13 +9,15 @@
       "platform": "Azure Functions",
       "domain": "cloud.businessinfinity.asisaga.com"
     },
-    "architecture_note": "BusinessInfinity is responsible for its own storage and environment management, including configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS). The AgentOperatingSystem is a reusable, domain-agnostic orchestration and agent management layer, and does not include application-specific storage or environment managers. This separation of concerns keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.",
+  "architecture_note": "BusinessInfinity is responsible for its own storage and environment management, including configuration files, secrets, persistent data, and environment variables. All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain FineTunedLLM module (see RealmOfAgents/FineTunedLLM). BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features. The AgentOperatingSystem is a reusable, domain-agnostic orchestration and agent management layer, and does not include application-specific storage, environment managers, or ML/LLM logic. This separation of concerns keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.",
     "functions": [
       {"name": "orchestrate_agents", "description": "Coordinates domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks."},
       {"name": "integrate_azure_functions", "description": "Integrates Azure Functions for scalable, intelligent business processes."},
-      {"name": "unified_interface", "description": "Provides a unified interface for business logic, automation, and decision support."}
+      {"name": "unified_interface", "description": "Provides a unified interface for business logic, automation, and decision support."},
+      {"name": "use_finetunedllm", "description": "All ML/LLM capabilities are provided by the shared FineTunedLLM module. BusinessInfinity does not implement its own ML pipeline."}
     ],
-    "C-Suite": {
+  "dependencies": ["AgentOperatingSystem", "FineTunedLLM"],
+  "C-Suite": {
       "name": "C-Suite",
       "functions": [
         {"name": "leadership_decision_support", "description": "Provides leadership, financial, operational, marketing, and strategic expertise through AI-driven modules."}

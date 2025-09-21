@@ -62,16 +62,21 @@ Startups and scaling businesses face three universal constraints:
 
 ---
 
-## Architecture Note: Storage and Environment Managers
+## Architecture Note: Storage, Environment, and ML/LLM Capabilities
 
 BusinessInfinity is responsible for its own storage and environment management. This includes configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS).
 
+**ML/LLM Capabilities:**
+- All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain `FineTunedLLM` module (see RealmOfAgents/FineTunedLLM).
+- BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features.
+
 **Why?**
-- The AgentOperatingSystem (AOS) is a reusable, domain-agnostic orchestration and agent management layer. It does not include application-specific storage or environment managers, so it can be used as a foundation for many different domains and applications.
-- BusinessInfinity, as an application built on top of AOS, manages its own configuration, secrets, and persistent data according to its business needs.
+- The AgentOperatingSystem (AOS) is a reusable, domain-agnostic orchestration and agent management layer. It does not include application-specific storage, environment managers, or ML/LLM logic, so it can be used as a foundation for many different domains and applications.
+- BusinessInfinity, as an application built on top of AOS, manages its own configuration, secrets, and persistent data according to its business needs, and leverages FineTunedLLM for advanced ML/LLM features.
 
 **Separation of Concerns:**
 - AOS provides agent orchestration, resource management, and inter-agent communication.
+- FineTunedLLM provides all ML/LLM capabilities for all domains.
 - BI handles business logic, user interface, storage, and environment configuration.
 
-This separation keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.
+This separation keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.
