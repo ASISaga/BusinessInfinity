@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "BusinessInfinity": "BusinessInfinity/tests/",
+  "AgentOperatingSystem": "RealmOfAgents/AgentOperatingSystem/tests/",
+  "PurposeDrivenAgent": "RealmOfAgents/PurposeDrivenAgent/tests/",
+  "SelfLearningAgent": "RealmOfAgents/SelfLearningAgent/tests/",
+  "FineTunedLLM": "RealmOfAgents/FineTunedLLM/tests/",
+  "CEO": "Buddhi/CEO/tests/",
+  "CFO": "Buddhi/CFO/tests/",
+  "COO": "Buddhi/COO/tests/",
+  "CMO": "Buddhi/CMO/tests/",
+  "CSO": "Buddhi/CSO/tests/",
+  "Founder": "Buddhi/Founder/tests/",
+  "Investor": "Buddhi/Investor/tests/"
+}

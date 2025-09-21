@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "BusinessInfinity": ["BusinessInfinity/pyproject.toml", "BusinessInfinity/requirements.txt", "BusinessInfinity/.env"],
+  "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/pyproject.toml"],
+  "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/pyproject.toml"],
+  "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/pyproject.toml"],
+  "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/pyproject.toml"],
+  "CEO": ["Buddhi/CEO/pyproject.toml"],
+  "CFO": ["Buddhi/CFO/pyproject.toml"],
+  "COO": ["Buddhi/COO/pyproject.toml"],
+  "CMO": ["Buddhi/CMO/pyproject.toml"],
+  "CSO": ["Buddhi/CSO/pyproject.toml"],
+  "Founder": ["Buddhi/Founder/pyproject.toml"],
+  "Investor": ["Buddhi/Investor/pyproject.toml"]
+}

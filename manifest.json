@@ -173,181 +173,77 @@
       "domain": "Machine Learning Operations"
     }
   },
-  "MCP": {
-    "name": "MCP",
-    "functions": [
-      {"name": "data_integration", "description": "Provides standardized APIs and tools for connecting business logic, data sources, and external services."}
-    ],
-    "description": "MCP (Model Context Protocol) is a suite of integrations and servers for spec-driven development, data integration, and orchestration. It provides standardized APIs and tools for connecting business logic, data sources, and external services.",
-    "mcp-reddit-server": {
-      "name": "mcp-reddit-server",
-      "functions": [
-        {"name": "reddit_data_integration", "description": "Enables access to Reddit APIs and fast data pipelines for analytics and automation."}
-      ],
-      "local-path": "MCP/mcp-reddit",
-      "description": "mcp-reddit-server provides Reddit data integration for MCP, enabling access to Reddit APIs and fast data pipelines for analytics and automation.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/MCP"
+  "MCP": "config/mcp.json",
+  "workspace": "config/workspace.json",
+  "pythonPackages": "config/pythonPackages.json",
+  "globalDependencies": "config/globalDependencies.json",
+  "integration": "config/integration.json",
+  "refactorability": "config/refactorability.json",
+  "fileGlobs": "config/fileGlobs.json",
+  "testSuites": "config/testSuites.json",
+  "sharedConfig": "config/sharedConfig.json",
+  "documentation": "config/documentation.json",
+  "apiContracts": "config/apiContracts.json",
+  "_aiContext": [
+    {
+      "source": "schema/",
+      "purpose": "Contains JSON Schema files for all configuration types. Used for validation and editor support."
     },
-    "mcp-asisaga-com": {
-      "name": "mcp-asisaga-com",
-      "functions": [
-        {"name": "asisaga_integration", "description": "Exposes business operations and data via scalable, serverless APIs for asisaga.com."}
-      ],
-      "local-path": "MCP/mcp.asisaga.com",
-      "description": "mcp-asisaga-com is an Azure Functions-based MCP server for asisaga.com integration. It exposes business operations and data via scalable, serverless APIs.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/MCP"
+    {
+      "source": "docs/",
+      "purpose": "Contains markdown documentation for all configuration files and the configuration changelog. Used for onboarding, reference, and AI context."
     },
-    "ERPNext-MCP": {
-      "name": "ERPNext-MCP",
-      "functions": [
-        {"name": "erpnext_integration", "description": "Exposes business operations and data via Python APIs. Supports Frappe, Uvicorn, and enterprise integration."}
-      ],
-      "local-path": "MCP/ERPNext-MCP",
-      "description": "ERPNext-MCP is an MCP server for ERPNext, exposing business operations and data via Python APIs. It supports Frappe, Uvicorn, and integration with enterprise systems.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/MCP"
+    {
+      "source": "docs/examples/",
+      "purpose": "Contains example workflows and sample input files for the system. Used for demonstration and testing."
     },
-    "linkedin-mcp-server": {
-      "name": "linkedin-mcp-server",
-      "functions": [
-        {"name": "linkedin_integration", "description": "Provides LinkedIn API integration for MCP, supporting data ingestion, automation, and business process integration."}
-      ],
-      "local-path": "MCP/linkedin-mcp-server",
-      "description": "linkedin-mcp-server provides LinkedIn API integration for MCP, supporting data ingestion, automation, and business process integration via Azure Functions and CLI tools.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/MCP"
+    {
+      "source": "config/secrets.example.json",
+      "purpose": "Template for required secrets and environment variables. Used for documentation and onboarding."
+    },
+    {
+      "source": "config/workspace.json",
+      "purpose": "Provides additional documentation and module structure for AI assistants and tools. Not merged into the manifest at runtime."
+    },
+    {
+      "source": "config/apiContracts.json",
+      "purpose": "Contains OpenAPI and API contract documentation for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/documentation.json",
+      "purpose": "Contains documentation file references for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/testSuites.json",
+      "purpose": "Contains test suite directory references for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/sharedConfig.json",
+      "purpose": "Contains shared configuration file references for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/pythonPackages.json",
+      "purpose": "Contains Python package metadata for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/globalDependencies.json",
+      "purpose": "Contains the unified dependency graph for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/integration.json",
+      "purpose": "Contains integration strategy and entrypoints for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/refactorability.json",
+      "purpose": "Contains refactorability guidelines and monorepo status. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/fileGlobs.json",
+      "purpose": "Contains file glob patterns for all modules. Used for AI and tooling context only."
+    },
+    {
+      "source": "config/mcp.json",
+      "purpose": "Contains the MCP (Model Context Protocol) module and all MCP submodules. Used for AI and tooling context only."
     }
-  },
-  "workspace": {
-    "modules": [
-      {"name": "BusinessInfinity", "local-path": "BusinessInfinity", "repository": "https://github.com/ASISaga/BusinessInfinity"},
-      {"name": "Buddhi", "local-path": "Buddhi", "repository": "https://github.com/ASISaga/Buddhi"},
-      {"name": "RealmOfAgents", "local-path": "RealmOfAgents", "repository": "https://github.com/ASISaga/RealmOfAgents"},
-      {"name": "MCP", "local-path": "MCP", "repository": "https://github.com/ASISaga/MCP"},
-      {"name": "Website", "local-path": "Website", "repository": "https://github.com/ASISaga/Website"}
-    ],
-    "description": "All git modules that make up the BusinessInfinity product."
-  },
-  "pythonPackages": [
-    {"name": "BusinessInfinity", "packageRoot": "BusinessInfinity", "pyproject": "BusinessInfinity/pyproject.toml"},
-    {"name": "AgentOperatingSystem", "packageRoot": "RealmOfAgents/AgentOperatingSystem", "pyproject": "RealmOfAgents/AgentOperatingSystem/pyproject.toml"},
-    {"name": "PurposeDrivenAgent", "packageRoot": "RealmOfAgents/PurposeDrivenAgent", "pyproject": "RealmOfAgents/PurposeDrivenAgent/pyproject.toml"},
-    {"name": "SelfLearningAgent", "packageRoot": "RealmOfAgents/SelfLearningAgent", "pyproject": "RealmOfAgents/SelfLearningAgent/pyproject.toml"},
-    {"name": "FineTunedLLM", "packageRoot": "RealmOfAgents/FineTunedLLM", "pyproject": "RealmOfAgents/FineTunedLLM/pyproject.toml"},
-    {"name": "CEO", "packageRoot": "Buddhi/CEO", "pyproject": "Buddhi/CEO/pyproject.toml"},
-    {"name": "CFO", "packageRoot": "Buddhi/CFO", "pyproject": "Buddhi/CFO/pyproject.toml"},
-    {"name": "COO", "packageRoot": "Buddhi/COO", "pyproject": "Buddhi/COO/pyproject.toml"},
-    {"name": "CMO", "packageRoot": "Buddhi/CMO", "pyproject": "Buddhi/CMO/pyproject.toml"},
-    {"name": "CSO", "packageRoot": "Buddhi/CSO", "pyproject": "Buddhi/CSO/pyproject.toml"},
-    {"name": "Founder", "packageRoot": "Buddhi/Founder", "pyproject": "Buddhi/Founder/pyproject.toml"},
-    {"name": "Investor", "packageRoot": "Buddhi/Investor", "pyproject": "Buddhi/Investor/pyproject.toml"}
-  ],
-  "globalDependencies": {
-    "graph": [
-      {"from": "BusinessInfinity", "to": "AgentOperatingSystem"},
-      {"from": "AgentOperatingSystem", "to": "PurposeDrivenAgent"},
-      {"from": "PurposeDrivenAgent", "to": "SelfLearningAgent"},
-      {"from": "FineTunedLLM", "to": "PurposeDrivenAgent"},
-      {"from": "BusinessInfinity", "to": "C-Suite"},
-      {"from": "C-Suite", "to": "CEO"},
-      {"from": "C-Suite", "to": "CFO"},
-      {"from": "C-Suite", "to": "COO"},
-      {"from": "C-Suite", "to": "CMO"},
-      {"from": "C-Suite", "to": "CSO"},
-      {"from": "CEO", "to": "FineTunedLLM"},
-      {"from": "CFO", "to": "FineTunedLLM"},
-      {"from": "COO", "to": "FineTunedLLM"},
-      {"from": "CMO", "to": "FineTunedLLM"},
-      {"from": "CSO", "to": "FineTunedLLM"},
-      {"from": "BusinessInfinity", "to": "Founder"},
-      {"from": "BusinessInfinity", "to": "Investor"},
-      {"from": "Founder", "to": "FineTunedLLM"},
-      {"from": "Investor", "to": "FineTunedLLM"}
-    ],
-    "description": "Unified dependency graph for all major modules."
-  },
-  "integration": {
-    "strategy": "BusinessInfinity loads and orchestrates all submodules as Python packages. Shared interfaces and contracts are defined in AgentOperatingSystem and PurposeDrivenAgent. Cross-module imports are supported via relative imports and shared virtual environments. All modules are installed in the same Python environment for seamless integration.",
-    "entrypoints": [
-      {"module": "BusinessInfinity", "main": "function_app.py"},
-      {"module": "AgentOperatingSystem", "main": "multi_agent.py"},
-      {"module": "PurposeDrivenAgent", "main": "__init__.py"}
-    ]
-  },
-  "refactorability": {
-    "guidelines": "All modules follow PEP 420 namespace packages and use explicit relative imports where possible. Code can be moved between modules as long as shared interfaces are respected. Refactoring tools should treat the workspace as a monorepo, and cross-module changes should be committed atomically. All pyproject.toml files are discoverable for dependency management.",
-    "monorepo": true
-  },
-  "fileGlobs": {
-    "BusinessInfinity": ["BusinessInfinity/**/*.py", "BusinessInfinity/**/*.md", "BusinessInfinity/**/*.json"],
-    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/**/*.py"],
-    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/**/*.py"],
-    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/**/*.py"],
-    "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/**/*.py"],
-    "CEO": ["Buddhi/CEO/**/*.py"],
-    "CFO": ["Buddhi/CFO/**/*.py"],
-    "COO": ["Buddhi/COO/**/*.py"],
-    "CMO": ["Buddhi/CMO/**/*.py"],
-    "CSO": ["Buddhi/CSO/**/*.py"],
-    "Founder": ["Buddhi/Founder/**/*.py"],
-    "Investor": ["Buddhi/Investor/**/*.py"]
-  },
-  "testSuites": {
-    "BusinessInfinity": "BusinessInfinity/tests/",
-    "AgentOperatingSystem": "RealmOfAgents/AgentOperatingSystem/tests/",
-    "PurposeDrivenAgent": "RealmOfAgents/PurposeDrivenAgent/tests/",
-    "SelfLearningAgent": "RealmOfAgents/SelfLearningAgent/tests/",
-    "FineTunedLLM": "RealmOfAgents/FineTunedLLM/tests/",
-    "CEO": "Buddhi/CEO/tests/",
-    "CFO": "Buddhi/CFO/tests/",
-    "COO": "Buddhi/COO/tests/",
-    "CMO": "Buddhi/CMO/tests/",
-    "CSO": "Buddhi/CSO/tests/",
-    "Founder": "Buddhi/Founder/tests/",
-    "Investor": "Buddhi/Investor/tests/"
-  },
-  "sharedConfig": {
-    "BusinessInfinity": ["BusinessInfinity/pyproject.toml", "BusinessInfinity/requirements.txt", "BusinessInfinity/.env"],
-    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/pyproject.toml"],
-    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/pyproject.toml"],
-    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/pyproject.toml"],
-    "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/pyproject.toml"],
-    "CEO": ["Buddhi/CEO/pyproject.toml"],
-    "CFO": ["Buddhi/CFO/pyproject.toml"],
-    "COO": ["Buddhi/COO/pyproject.toml"],
-    "CMO": ["Buddhi/CMO/pyproject.toml"],
-    "CSO": ["Buddhi/CSO/pyproject.toml"],
-    "Founder": ["Buddhi/Founder/pyproject.toml"],
-    "Investor": ["Buddhi/Investor/pyproject.toml"]
-  },
-  "documentation": {
-    "BusinessInfinity": ["BusinessInfinity/README.md", "BusinessInfinity/docs/architecture.md"],
-    "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/README.md"],
-    "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/README.md"],
-    "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/README.md"],
-    "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/README.md"],
-    "CEO": ["Buddhi/CEO/README.md"],
-    "CFO": ["Buddhi/CFO/README.md"],
-    "COO": ["Buddhi/COO/README.md"],
-    "CMO": ["Buddhi/CMO/README.md"],
-    "CSO": ["Buddhi/CSO/README.md"],
-    "Founder": ["Buddhi/Founder/README.md"],
-    "Investor": ["Buddhi/Investor/README.md"]
-  },
-  "apiContracts": {
-    "BusinessInfinity": ["BusinessInfinity/openapi.json"],
-    "AgentOperatingSystem": [],
-    "PurposeDrivenAgent": [],
-    "SelfLearningAgent": [],
-    "FineTunedLLM": [],
-    "CEO": [],
-    "CFO": [],
-    "COO": [],
-    "CMO": [],
-    "CSO": [],
-    "Founder": [],
-    "Investor": []
-  }
+  ]
 }

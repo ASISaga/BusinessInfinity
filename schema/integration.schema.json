@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IntegrationConfig",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string" },
+    "strategy": { "type": "string" },
+    "entrypoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string" },
+          "main": { "type": "string" }
+        },
+        "required": ["module", "main"]
+      }
+    }
+  },
+  "required": ["version", "strategy", "entrypoints"]
+}

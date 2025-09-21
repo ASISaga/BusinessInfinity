@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "BusinessInfinity": ["BusinessInfinity/openapi.json"],
+  "AgentOperatingSystem": [],
+  "PurposeDrivenAgent": [],
+  "SelfLearningAgent": [],
+  "FineTunedLLM": [],
+  "CEO": [],
+  "CFO": [],
+  "COO": [],
+  "CMO": [],
+  "CSO": [],
+  "Founder": [],
+  "Investor": []
+}

@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "graph": [
+    {"from": "BusinessInfinity", "to": "AgentOperatingSystem"},
+    {"from": "AgentOperatingSystem", "to": "PurposeDrivenAgent"},
+    {"from": "PurposeDrivenAgent", "to": "SelfLearningAgent"},
+    {"from": "FineTunedLLM", "to": "PurposeDrivenAgent"},
+    {"from": "BusinessInfinity", "to": "C-Suite"},
+    {"from": "C-Suite", "to": "CEO"},
+    {"from": "C-Suite", "to": "CFO"},
+    {"from": "C-Suite", "to": "COO"},
+    {"from": "C-Suite", "to": "CMO"},
+    {"from": "C-Suite", "to": "CSO"},
+    {"from": "CEO", "to": "FineTunedLLM"},
+    {"from": "CFO", "to": "FineTunedLLM"},
+    {"from": "COO", "to": "FineTunedLLM"},
+    {"from": "CMO", "to": "FineTunedLLM"},
+    {"from": "CSO", "to": "FineTunedLLM"},
+    {"from": "BusinessInfinity", "to": "Founder"},
+    {"from": "BusinessInfinity", "to": "Investor"},
+    {"from": "Founder", "to": "FineTunedLLM"},
+    {"from": "Investor", "to": "FineTunedLLM"}
+  ],
+  "description": "Unified dependency graph for all major modules."
+}

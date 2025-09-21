@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "moduleRelationships": [
+    {"from": "BusinessInfinity", "to": "AgentOperatingSystem", "type": "depends_on"},
+    {"from": "BusinessInfinity", "to": "PurposeDrivenAgent", "type": "depends_on"},
+    {"from": "BusinessInfinity", "to": "SelfLearningAgent", "type": "depends_on"},
+    {"from": "BusinessInfinity", "to": "FineTunedLLM", "type": "depends_on"},
+    {"from": "BusinessInfinity", "to": "Buddhi/CEO", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/CFO", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/COO", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/CMO", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/CSO", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/Founder", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "Buddhi/Investor", "type": "contains"},
+    {"from": "BusinessInfinity", "to": "MCP", "type": "integrates"},
+    {"from": "MCP", "to": "mcp-reddit-server", "type": "contains"},
+    {"from": "MCP", "to": "mcp-asisaga-com", "type": "contains"},
+    {"from": "MCP", "to": "ERPNext-MCP", "type": "contains"},
+    {"from": "MCP", "to": "linkedin-mcp-server", "type": "contains"}
+  ]
+}

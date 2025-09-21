@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "modules": [
+    {"name": "BusinessInfinity", "local-path": "BusinessInfinity", "repository": "https://github.com/ASISaga/BusinessInfinity"},
+    {"name": "Buddhi", "local-path": "Buddhi", "repository": "https://github.com/ASISaga/Buddhi"},
+    {"name": "RealmOfAgents", "local-path": "RealmOfAgents", "repository": "https://github.com/ASISaga/RealmOfAgents"},
+    {"name": "MCP", "local-path": "MCP", "repository": "https://github.com/ASISaga/MCP"},
+    {"name": "Website", "local-path": "Website", "repository": "https://github.com/ASISaga/Website"}
+  ],
+  "description": "All git modules that make up the BusinessInfinity product."
+}

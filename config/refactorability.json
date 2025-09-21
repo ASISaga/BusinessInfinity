@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "guidelines": "All modules follow PEP 420 namespace packages and use explicit relative imports where possible. Code can be moved between modules as long as shared interfaces are respected. Refactoring tools should treat the workspace as a monorepo, and cross-module changes should be committed atomically. All pyproject.toml files are discoverable for dependency management.",
+  "monorepo": true
+}

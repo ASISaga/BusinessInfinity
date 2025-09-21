@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "packages": [
+    {"name": "BusinessInfinity", "packageRoot": "BusinessInfinity", "pyproject": "BusinessInfinity/pyproject.toml"},
+    {"name": "AgentOperatingSystem", "packageRoot": "RealmOfAgents/AgentOperatingSystem", "pyproject": "RealmOfAgents/AgentOperatingSystem/pyproject.toml"},
+    {"name": "PurposeDrivenAgent", "packageRoot": "RealmOfAgents/PurposeDrivenAgent", "pyproject": "RealmOfAgents/PurposeDrivenAgent/pyproject.toml"},
+    {"name": "SelfLearningAgent", "packageRoot": "RealmOfAgents/SelfLearningAgent", "pyproject": "RealmOfAgents/SelfLearningAgent/pyproject.toml"},
+    {"name": "FineTunedLLM", "packageRoot": "RealmOfAgents/FineTunedLLM", "pyproject": "RealmOfAgents/FineTunedLLM/pyproject.toml"},
+    {"name": "CEO", "packageRoot": "Buddhi/CEO", "pyproject": "Buddhi/CEO/pyproject.toml"},
+    {"name": "CFO", "packageRoot": "Buddhi/CFO", "pyproject": "Buddhi/CFO/pyproject.toml"},
+    {"name": "COO", "packageRoot": "Buddhi/COO", "pyproject": "Buddhi/COO/pyproject.toml"},
+    {"name": "CMO", "packageRoot": "Buddhi/CMO", "pyproject": "Buddhi/CMO/pyproject.toml"},
+    {"name": "CSO", "packageRoot": "Buddhi/CSO", "pyproject": "Buddhi/CSO/pyproject.toml"},
+    {"name": "Founder", "packageRoot": "Buddhi/Founder", "pyproject": "Buddhi/Founder/pyproject.toml"},
+    {"name": "Investor", "packageRoot": "Buddhi/Investor", "pyproject": "Buddhi/Investor/pyproject.toml"}
+  ]
+}

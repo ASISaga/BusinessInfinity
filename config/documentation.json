@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "BusinessInfinity": ["BusinessInfinity/README.md", "BusinessInfinity/docs/architecture.md"],
+  "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/README.md"],
+  "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/README.md"],
+  "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/README.md"],
+  "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/README.md"],
+  "CEO": ["Buddhi/CEO/README.md"],
+  "CFO": ["Buddhi/CFO/README.md"],
+  "COO": ["Buddhi/COO/README.md"],
+  "CMO": ["Buddhi/CMO/README.md"],
+  "CSO": ["Buddhi/CSO/README.md"],
+  "Founder": ["Buddhi/Founder/README.md"],
+  "Investor": ["Buddhi/Investor/README.md"]
+}

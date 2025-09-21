@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "BusinessInfinity": ["BusinessInfinity/**/*.py", "BusinessInfinity/**/*.md", "BusinessInfinity/**/*.json"],
+  "AgentOperatingSystem": ["RealmOfAgents/AgentOperatingSystem/**/*.py"],
+  "PurposeDrivenAgent": ["RealmOfAgents/PurposeDrivenAgent/**/*.py"],
+  "SelfLearningAgent": ["RealmOfAgents/SelfLearningAgent/**/*.py"],
+  "FineTunedLLM": ["RealmOfAgents/FineTunedLLM/**/*.py"],
+  "CEO": ["Buddhi/CEO/**/*.py"],
+  "CFO": ["Buddhi/CFO/**/*.py"],
+  "COO": ["Buddhi/COO/**/*.py"],
+  "CMO": ["Buddhi/CMO/**/*.py"],
+  "CSO": ["Buddhi/CSO/**/*.py"],
+  "Founder": ["Buddhi/Founder/**/*.py"],
+  "Investor": ["Buddhi/Investor/**/*.py"]
+}

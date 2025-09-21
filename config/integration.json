@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "strategy": "BusinessInfinity loads and orchestrates all submodules as Python packages. Shared interfaces and contracts are defined in AgentOperatingSystem and PurposeDrivenAgent. Cross-module imports are supported via relative imports and shared virtual environments. All modules are installed in the same Python environment for seamless integration.",
+  "entrypoints": [
+    {"module": "BusinessInfinity", "main": "function_app.py"},
+    {"module": "AgentOperatingSystem", "main": "multi_agent.py"},
+    {"module": "PurposeDrivenAgent", "main": "__init__.py"}
+  ]
+}

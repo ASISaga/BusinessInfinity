@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "name": "End-to-End Business Orchestration",
+      "description": "Demonstrates how BusinessInfinity coordinates C-Suite agents and integrates with MCP for a business process.",
+      "steps": [
+        "Trigger orchestrate_agents function in BusinessInfinity.",
+        "CEO agent provides strategic direction.",
+        "CFO agent manages financial operations.",
+        "COO agent optimizes workflows.",
+        "CMO agent runs marketing campaigns.",
+        "CSO agent supports long-term planning.",
+        "Founder and Investor agents contribute as needed.",
+        "BusinessInfinity integrates with MCP for external data and automation."
+      ]
+    },
+    {
+      "name": "MCP Data Integration",
+      "description": "Shows how MCP modules (e.g., mcp-reddit-server) are used for data ingestion and analytics.",
+      "steps": [
+        "Call MCP data_integration function.",
+        "mcp-reddit-server ingests Reddit data.",
+        "Data is processed and made available to BusinessInfinity agents."
+      ]
+    }
+  ]
+}

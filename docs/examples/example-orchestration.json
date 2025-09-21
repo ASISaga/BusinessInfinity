@@ -1,0 +1,12 @@
+{
+  "description": "Example input for orchestrating all C-Suite agents in a business process.",
+  "input": {
+    "trigger": "orchestrate_agents",
+    "agents": ["CEO", "CFO", "COO", "CMO", "CSO", "Founder", "Investor"],
+    "context": {
+      "business_goal": "Launch new product line",
+      "budget": 1000000,
+      "timeline": "Q4 2025"
+    }
+  }
+}
