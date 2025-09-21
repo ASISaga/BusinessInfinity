@@ -9,6 +9,7 @@
       "platform": "Azure Functions",
       "domain": "cloud.businessinfinity.asisaga.com"
     },
+    "architecture_note": "BusinessInfinity is responsible for its own storage and environment management, including configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS). The AgentOperatingSystem is a reusable, domain-agnostic orchestration and agent management layer, and does not include application-specific storage or environment managers. This separation of concerns keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.",
     "functions": [
       {"name": "orchestrate_agents", "description": "Coordinates domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks."},
       {"name": "integrate_azure_functions", "description": "Integrates Azure Functions for scalable, intelligent business processes."},

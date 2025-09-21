@@ -2,6 +2,22 @@
 
 BusinessInfinity is an implementation of the AgentOperatingSystem for use in a business.
 
+---
+
+## Architecture Note: Storage and Environment Managers
+
+BusinessInfinity is responsible for its own storage and environment management, including configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS).
+
+**Why?**
+- The AgentOperatingSystem (AOS) is a reusable, domain-agnostic orchestration and agent management layer. It does not include application-specific storage or environment managers, so it can be used as a foundation for many different domains and applications.
+- BusinessInfinity, as an application built on top of AOS, manages its own configuration, secrets, and persistent data according to its business needs.
+
+**Separation of Concerns:**
+- AOS provides agent orchestration, resource management, and inter-agent communication.
+- BI handles business logic, user interface, storage, and environment configuration.
+
+This separation keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.
+
 ## Overview
 
 BusinessInfinity transforms business operations through AI-powered automation by leveraging the AgentOperatingSystem framework to create a comprehensive ecosystem of specialized agents. Each agent operates with a specific business purpose, utilizing domain-specific knowledge to automate critical business functions across operations, strategy, utilities, and stakeholder management.

@@ -59,3 +59,19 @@ Startups and scaling businesses face three universal constraints:
 
 ## The Promise
 **"A 24/7, real‑time, self‑evolving Boardroom of Agents — each with the mastery of legends in their domain, steered by your vision, plugged into your tools — built to remove the limits of resource, speed, and scale."**
+
+---
+
+## Architecture Note: Storage and Environment Managers
+
+BusinessInfinity is responsible for its own storage and environment management. This includes configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS).
+
+**Why?**
+- The AgentOperatingSystem (AOS) is a reusable, domain-agnostic orchestration and agent management layer. It does not include application-specific storage or environment managers, so it can be used as a foundation for many different domains and applications.
+- BusinessInfinity, as an application built on top of AOS, manages its own configuration, secrets, and persistent data according to its business needs.
+
+**Separation of Concerns:**
+- AOS provides agent orchestration, resource management, and inter-agent communication.
+- BI handles business logic, user interface, storage, and environment configuration.
+
+This separation keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.
