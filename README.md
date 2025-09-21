@@ -80,3 +80,21 @@ BusinessInfinity is responsible for its own storage and environment management. 
 - BI handles business logic, user interface, storage, and environment configuration.
 
 This separation keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.
+
+---
+
+## Updated Storage Architecture (2025)
+
+BusinessInfinity now uses the generic, reusable `UnifiedStorageManager` provided by the AgentOperatingSystem (AOS) in `RealmOfAgents/AgentOperatingSystem/storage/manager.py`.
+
+- **Storage logic is no longer implemented directly in BusinessInfinity.**
+- All storage, queue, and blob operations are handled by instantiating the AOS storage manager with Boardroom-specific configuration.
+- This keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.
+
+**How to use:**
+```python
+from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
+storage = UnifiedStorageManager()
+```
+
+See the AOS documentation for more details.

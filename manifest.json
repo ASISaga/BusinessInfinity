@@ -9,14 +9,21 @@
       "platform": "Azure Functions",
       "domain": "cloud.businessinfinity.asisaga.com"
     },
-  "architecture_note": "BusinessInfinity is responsible for its own storage and environment management, including configuration files, secrets, persistent data, and environment variables. All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain FineTunedLLM module (see RealmOfAgents/FineTunedLLM). BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features. The AgentOperatingSystem is a reusable, domain-agnostic orchestration and agent management layer, and does not include application-specific storage, environment managers, or ML/LLM logic. This separation of concerns keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.",
+  "architecture_note": "BusinessInfinity now uses the generic, reusable UnifiedStorageManager provided by the AgentOperatingSystem (AOS) for all storage, queue, and blob operations. BusinessInfinity instantiates and configures this manager for Boardroom-specific needs, keeping AOS generic and reusable. All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain FineTunedLLM module (see RealmOfAgents/FineTunedLLM). BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features. This separation of concerns keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.",
     "functions": [
       {"name": "orchestrate_agents", "description": "Coordinates domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks."},
       {"name": "integrate_azure_functions", "description": "Integrates Azure Functions for scalable, intelligent business processes."},
       {"name": "unified_interface", "description": "Provides a unified interface for business logic, automation, and decision support."},
       {"name": "use_finetunedllm", "description": "All ML/LLM capabilities are provided by the shared FineTunedLLM module. BusinessInfinity does not implement its own ML pipeline."}
     ],
-  "dependencies": ["AgentOperatingSystem", "FineTunedLLM"],
+  "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "PossibilityDrivenAgent"],
+    "PossibilityDrivenAgent": {
+      "name": "PossibilityDrivenAgent",
+      "local-path": "RealmOfAgents/PossibilityDrivenAgent",
+      "description": "PossibilityDrivenAgent is a base agent module that determines the overarching Possibility for a system or organization. It provides foundational logic for agents that derive their Purpose from Possibility, and is inherited by PurposeDrivenAgent and other domain agents.",
+      "repository": "https://github.com/ASISaga/PossibilityDrivenAgent",
+      "relationship": "base for PurposeDrivenAgent and domain agents"
+    },
   "C-Suite": {
       "name": "C-Suite",
       "functions": [
@@ -31,7 +38,7 @@
         "local-path": "Buddhi/CEO",
         "description": "CEO is an AI agent module based on PurposeDrivenAgent, focused on executive leadership. It provides strategic direction, high-level decision-making, and coordination across business domains, leveraging knowledge management and reasoning to achieve organizational goals.",
         "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/Buddhi",
+        "repository": "https://github.com/ASISaga/CEO",
         "relationship": "implements PurposeDrivenAgent",
         "domain": "Executive Leadership"
       },
@@ -43,7 +50,7 @@
         "local-path": "Buddhi/CFO",
         "description": "CFO is an AI agent module based on PurposeDrivenAgent, specializing in financial management, planning, and analysis. It automates financial operations, budgeting, and reporting, supporting data-driven financial decisions.",
         "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/Buddhi",
+        "repository": "https://github.com/ASISaga/CFO",
         "relationship": "implements PurposeDrivenAgent",
         "domain": "Finance"
       },
@@ -55,7 +62,7 @@
         "local-path": "Buddhi/COO",
         "description": "COO is an AI agent module based on PurposeDrivenAgent, responsible for operational efficiency and process optimization. It manages workflows, resource allocation, and ensures smooth business operations.",
         "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/Buddhi",
+        "repository": "https://github.com/ASISaga/COO",
         "relationship": "implements PurposeDrivenAgent",
         "domain": "Operations"
       },
@@ -67,7 +74,7 @@
         "local-path": "Buddhi/CMO",
         "description": "CMO is an AI agent module based on PurposeDrivenAgent, focused on marketing strategy, campaign management, and customer engagement. It leverages analytics and automation to drive business growth.",
         "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/Buddhi",
+        "repository": "https://github.com/ASISaga/CMO",
         "relationship": "implements PurposeDrivenAgent",
         "domain": "Marketing"
       },
@@ -79,7 +86,7 @@
         "local-path": "Buddhi/CSO",
         "description": "CSO is an AI agent module based on PurposeDrivenAgent, specializing in business strategy and competitive analysis. It supports long-term planning, market research, and strategic initiatives.",
         "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/Buddhi",
+        "repository": "https://github.com/ASISaga/CSO",
         "relationship": "implements PurposeDrivenAgent",
         "domain": "Strategy"
       }
@@ -92,7 +99,7 @@
       "local-path": "Buddhi/Founder",
       "description": "Founder is an AI agent module based on PurposeDrivenAgent, designed for entrepreneurship and innovation. It assists in startup creation, business model development, and early-stage growth strategies.",
       "dependencies": ["PurposeDrivenAgent"],
-      "repository": "https://github.com/ASISaga/Buddhi",
+      "repository": "https://github.com/ASISaga/Founder",
       "relationship": "implements PurposeDrivenAgent",
       "domain": "Entrepreneurship"
     },
@@ -104,7 +111,7 @@
       "local-path": "Buddhi/Investor",
       "description": "Investor is an AI agent module based on PurposeDrivenAgent, focused on investment analysis, portfolio management, and funding strategies. It provides insights for capital allocation and risk assessment.",
       "dependencies": ["PurposeDrivenAgent"],
-      "repository": "https://github.com/ASISaga/Buddhi",
+      "repository": "https://github.com/ASISaga/Investor",
       "relationship": "implements PurposeDrivenAgent",
       "domain": "Investment"
     },
@@ -116,7 +123,7 @@
       "local-path": "Website/businessinfinity.asisaga.com",
       "description": "Frontend application for BusinessInfinity, delivering a modern web interface for business automation, agent management, and analytics. Enables users to interact with the platform's features and monitor business processes.",
       "dependencies": ["BusinessInfinity"],
-      "repository": "https://github.com/ASISaga/Website",
+      "repository": "https://github.com/ASISaga/businessinfinity.asisaga.com",
       "type": "frontend",
       "backend": {
         "name": "BusinessInfinity Cloud API",
