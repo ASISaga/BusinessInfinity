@@ -9,7 +9,13 @@ business-specific functionality while leveraging the generic orchestration
 capabilities provided by AOS.
 """
 
-# Import all business-specific agents
+"""Agent shims for backward compatibility.
+
+These modules re-export the canonical agent implementations which
+now live under `RealmOfAgents/<AgentName>/`.
+"""
+
+# Re-exported agents (shims)
 from .ChiefExecutiveOfficer import ChiefExecutiveOfficer
 from .ChiefFinancialOfficer import ChiefFinancialOfficer
 from .ChiefMarketingOfficer import ChiefMarketingOfficer

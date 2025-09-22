@@ -41,12 +41,36 @@ Startups and scaling businesses face three universal constraints:
 
 ---
 
+
 ## Key Features
 - **24/7 Perpetual Boardroom** — Always in session, always aligned.
 - **Legendary Domain Mastery** — Agents modelled on the best in their fields.
 - **Vision‑Anchored Scoring** — Every move measured against your highest possibility.
 - **Seamless Integration** — Works with your existing software stack.
 - **Self‑Evolving Architecture** — Improves itself continuously.
+- **Modular Agent Repositories** — Each C-Suite and leadership agent is now implemented in its own repository under `RealmOfAgents/` for maximum modularity and reuse.
+
+---
+
+## Agent Repository Structure (2025)
+
+All C-Suite and leadership agents have been moved to their own dedicated repositories under `RealmOfAgents/`:
+
+- CEO: `RealmOfAgents/CEO/ChiefExecutiveOfficer.py`
+- CFO: `RealmOfAgents/CFO/ChiefFinancialOfficer.py`
+- CMO: `RealmOfAgents/CMO/ChiefMarketingOfficer.py`
+- COO: `RealmOfAgents/COO/ChiefOperatingOfficer.py`
+- CTO: `RealmOfAgents/CTO/ChiefTechnologyOfficer.py`
+- CHRO: `RealmOfAgents/CHRO/ChiefHumanResourcesOfficer.py`
+- Founder: `RealmOfAgents/Founder/FounderAgent.py`
+- Investor: `RealmOfAgents/Investor/InvestorAgent.py`
+
+Each agent inherits from the generic `LeadershipAgent` in AOS and implements business-specific logic. This modular structure enables:
+- Clean separation of business logic and OS functionality
+- Easy extension and maintenance of individual agents
+- Reuse of agent logic across multiple business domains
+
+**Note:** All previous agent files in `BusinessInfinity/agents/` have been removed. Update your imports and integrations accordingly.
 
 ---
 

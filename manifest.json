@@ -19,49 +19,49 @@
     "agents": {
       "CEO": {
         "class": "ChiefExecutiveOfficer",
-        "file": "agents/ChiefExecutiveOfficer.py",
+        "file": "RealmOfAgents/CEO/ChiefExecutiveOfficer.py",
         "description": "Strategic leadership, organizational vision, stakeholder management, and executive decision-making",
         "inherits": "LeadershipAgent"
       },
       "CFO": {
         "class": "ChiefFinancialOfficer", 
-        "file": "agents/ChiefFinancialOfficer.py",
+        "file": "RealmOfAgents/CFO/ChiefFinancialOfficer.py",
         "description": "Financial strategy, budget management, investment analysis, and financial risk assessment",
         "inherits": "LeadershipAgent"
       },
       "CMO": {
         "class": "ChiefMarketingOfficer",
-        "file": "agents/ChiefMarketingOfficer.py", 
+        "file": "RealmOfAgents/CMO/ChiefMarketingOfficer.py", 
         "description": "Marketing strategy, brand management, customer acquisition, and market research",
         "inherits": "LeadershipAgent"
       },
       "COO": {
         "class": "ChiefOperatingOfficer",
-        "file": "agents/ChiefOperatingOfficer.py",
+        "file": "RealmOfAgents/COO/ChiefOperatingOfficer.py",
         "description": "Operational excellence, process optimization, resource management, and quality assurance",
         "inherits": "LeadershipAgent"
       },
       "CTO": {
         "class": "ChiefTechnologyOfficer",
-        "file": "agents/ChiefTechnologyOfficer.py",
+        "file": "RealmOfAgents/CTO/ChiefTechnologyOfficer.py",
         "description": "Technology strategy, architecture design, innovation management, and security oversight",
         "inherits": "LeadershipAgent"
       },
       "CHRO": {
         "class": "ChiefHumanResourcesOfficer",
-        "file": "agents/ChiefHumanResourcesOfficer.py",
+        "file": "RealmOfAgents/CHRO/ChiefHumanResourcesOfficer.py",
         "description": "Talent management, organizational culture, performance management, and employee development",
         "inherits": "LeadershipAgent"
       },
       "Founder": {
         "class": "FounderAgent",
-        "file": "agents/FounderAgent.py", 
+        "file": "RealmOfAgents/Founder/FounderAgent.py", 
         "description": "Vision creation, company building, product development, and entrepreneurial leadership",
         "inherits": "LeadershipAgent"
       },
       "Investor": {
         "class": "InvestorAgent",
-        "file": "agents/InvestorAgent.py",
+        "file": "RealmOfAgents/Investor/InvestorAgent.py",
         "description": "Investment analysis, portfolio management, market research, and due diligence",
         "inherits": "LeadershipAgent"
       }
@@ -89,9 +89,9 @@
       {"name": "business_intelligence", "description": "Delivers executive-level business intelligence and decision support."}
     ],
     "architecture": {
-      "inheritance": "all_agents_inherit_from_LeadershipAgent",
-      "location": "BusinessInfinity/agents/",
-      "pattern": "one_class_per_file_matching_class_name"
+  "inheritance": "all_agents_inherit_from_LeadershipAgent",
+  "location": "RealmOfAgents/<AgentName>/<AgentClass>.py",
+  "pattern": "one_class_per_file_matching_class_name"
     },
     "agents": {
       "CEO": {
