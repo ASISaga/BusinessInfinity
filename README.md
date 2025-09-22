@@ -122,3 +122,16 @@ storage = UnifiedStorageManager()
 ```
 
 See the AOS documentation for more details.
+
+---
+
+## MCP Protocol/Client Migration (2025)
+
+All Model Context Protocol (MCP) communication and protocol/client logic is now unified in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`. BusinessInfinity no longer implements or maintains any MCP protocol or handler code. All MCP communication with external services (ERPNext-MCP, linkedin-mcp-server, mcp-reddit, etc.) is handled exclusively via the AOS MCP client and Azure Service Bus.
+
+- **AOS MCP Client:** The reusable client is implemented in `RealmOfAgents/AgentOperatingSystem/mcp_servicebus_client.py`.
+- **Service Bus Management:** Topic/subscription management is handled in AOS, not in BI.
+- **Orchestrator Usage:** The `BusinessInfinityOrchestrator` uses the AOS MCP client for all external MCP calls.
+- **No Legacy Code:** All legacy MCP protocol/handler modules have been removed from BusinessInfinity.
+
+For details, see `AZURE_SERVICE_BUS.md` and `MCP_CLIENT_MIGRATION.md`.

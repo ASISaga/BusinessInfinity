@@ -72,7 +72,8 @@
       {"name": "business_automation", "description": "Automates business processes through intelligent agent-driven workflows."},
       {"name": "executive_analytics", "description": "Delivers executive-level analytics and decision support through specialized agents."}
     ],
-    "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "LeadershipAgent"],
+  "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "LeadershipAgent"],
+  "notes": "All MCP protocol/client logic is now unified in AgentOperatingSystem (RealmOfAgents/AgentOperatingSystem). MCP communication is handled via Azure Service Bus and the AOS MCP client. All legacy MCP protocol/handler modules in BusinessInfinity have been removed.",
   "PossibilityDrivenAgent": {
     "name": "PossibilityDrivenAgent",
     "local-path": "RealmOfAgents/PossibilityDrivenAgent",
