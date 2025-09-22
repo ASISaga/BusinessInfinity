@@ -14,17 +14,18 @@ try:
 except ImportError:
     AZURE_FUNCTIONS_AVAILABLE = False
 
-# Import consolidated core system
+
+# Import orchestrator from BusinessInfinityOrchestrator
 try:
+    from core.BusinessInfinityOrchestrator import orchestrator
     from core import (
-        agent_manager, mcp_handler, orchestrator, unified_server,
-        storage_manager, ml_manager, env_manager, api_orchestrator,
+        unified_server, storage_manager, ml_manager, env_manager, api_orchestrator,
         auth_handler, triggers_manager, utils_manager
     )
     CORE_AVAILABLE = True
 except ImportError:
     CORE_AVAILABLE = False
-    # Will need to handle this case
+    orchestrator = None
 
 
 class ConsolidatedAzureFunctions:
@@ -113,8 +114,8 @@ class ConsolidatedAzureFunctions:
         async def list_agents(req: func.HttpRequest) -> func.HttpResponse:
             """List all available agents"""
             try:
-                if self.core_available:
-                    agents = agent_manager.get_agent_profiles()
+                if self.core_available and orchestrator:
+                    agents = orchestrator.agent_manager.get_agent_profiles()
                     return func.HttpResponse(agents, mimetype="application/json")
                 else:
                     # Fallback to legacy agents
@@ -143,8 +144,8 @@ class ConsolidatedAzureFunctions:
                         status_code=400
                     )
                 
-                if self.core_available:
-                    response = await agent_manager.ask_agent(agent_id, message)
+                if self.core_available and orchestrator:
+                    response = await orchestrator.agent_manager.ask_agent(agent_id, message)
                     if response:
                         return func.HttpResponse(response, mimetype="application/json")
                     else:
@@ -182,8 +183,8 @@ class ConsolidatedAzureFunctions:
             try:
                 body = req.get_json()
                 
-                if self.core_available:
-                    response = await mcp_handler.handle_mcp_request(body)
+                if self.core_available and orchestrator:
+                    response = await orchestrator.mcp_handler.handle_mcp_request(body)
                 else:
                     # Basic MCP fallback
                     response = {

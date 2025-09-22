@@ -18,7 +18,7 @@ This module consolidates:
 from .server import unified_server, app as server_app
 from .agents import agent_manager, UnifiedAgentManager
 from .mcp import mcp_handler, handle_mcp
-from .orchestrator import orchestrator, process_decision, coordinate_agents
+from .BusinessInfinityOrchestrator import BusinessInfinityOrchestrator, process_decision, coordinate_agents
 
 # Import consolidated modules
 from .auth import auth_handler, UnifiedAuthHandler
@@ -44,7 +44,7 @@ __all__ = [
     'handle_mcp',
     
     # Orchestration components
-    'orchestrator',
+    'BusinessInfinityOrchestrator',
     'process_decision',
     'coordinate_agents',
     
