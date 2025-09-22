@@ -1,34 +1,45 @@
 """
-Agent Management Feature
-Consolidated into core system - this module provides backward compatibility.
-Use core.agent_manager instead.
+Business Infinity Agents Module
+
+This module contains all business-specific agents for Business Infinity,
+inheriting from the generic LeadershipAgent in AOS (Agent Operating System).
+
+All agents follow the one-class-per-file architecture and implement
+business-specific functionality while leveraging the generic orchestration
+capabilities provided by AOS.
 """
 
-# Backward compatibility - redirect to core system
-try:
-    from core.agents import agent_manager as core_agent_manager, UnifiedAgentManager
-    
-    # Create aliases for backward compatibility - ensure we use the core agent_manager
-    agent_manager = core_agent_manager
-    manager = core_agent_manager
-    AgentManager = UnifiedAgentManager
-    
-    __all__ = ['manager', 'agent_manager', 'AgentManager', 'UnifiedAgentManager']
-except ImportError:
-    # If core system not available, provide fallback
-    class AgentManager:
-        def __init__(self):
-            pass
-        def get_agent_profiles(self):
-            return "[]"
-    
-    class UnifiedAgentManager:
-        def __init__(self):
-            pass
-        def get_agent_profiles(self):
-            return "[]"
-    
-    manager = AgentManager()
-    agent_manager = manager
-    
-    __all__ = ['manager', 'agent_manager', 'AgentManager', 'UnifiedAgentManager']
+# Import all business-specific agents
+from .ChiefExecutiveOfficer import ChiefExecutiveOfficer
+from .ChiefFinancialOfficer import ChiefFinancialOfficer
+from .ChiefMarketingOfficer import ChiefMarketingOfficer
+from .ChiefOperatingOfficer import ChiefOperatingOfficer
+from .ChiefTechnologyOfficer import ChiefTechnologyOfficer
+from .ChiefHumanResourcesOfficer import ChiefHumanResourcesOfficer
+from .FounderAgent import FounderAgent
+from .InvestorAgent import InvestorAgent
+
+# Define agent registry for easy access
+AGENT_REGISTRY = {
+    "CEO": ChiefExecutiveOfficer,
+    "CFO": ChiefFinancialOfficer,
+    "CMO": ChiefMarketingOfficer,
+    "COO": ChiefOperatingOfficer,
+    "CTO": ChiefTechnologyOfficer,
+    "CHRO": ChiefHumanResourcesOfficer,
+    "Founder": FounderAgent,
+    "Investor": InvestorAgent
+}
+
+# Define all exports
+__all__ = [
+    'ChiefExecutiveOfficer',
+    'ChiefFinancialOfficer', 
+    'ChiefMarketingOfficer',
+    'ChiefOperatingOfficer',
+    'ChiefTechnologyOfficer',
+    'ChiefHumanResourcesOfficer',
+    'FounderAgent',
+    'InvestorAgent',
+    'AGENT_REGISTRY'
+]

@@ -2,21 +2,77 @@
   "BusinessInfinity": {
     "name": "BusinessInfinity",
     "local-path": "BusinessInfinity",
-    "description": "BusinessInfinity is a comprehensive business automation and orchestration platform. It leverages the AgentOperatingSystem to coordinate domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks. Integrates Azure Functions, AI, and custom modules for scalable, intelligent business processes. Provides a unified interface for business logic, automation, and decision support.",
+    "description": "BusinessInfinity is a comprehensive business automation and orchestration platform that deploys on Azure Functions. It implements business-specific C-Suite agents (CEO, CFO, CMO, COO, CTO, CHRO), Founder, and Investor agents that inherit from the generic LeadershipAgent in AOS (Agent Operating System). Provides intelligent business decision-making, strategic planning, and operational excellence through AI-driven executive leadership.",
     "repository": "https://github.com/ASISaga/BusinessInfinity",
-    "relationship": "deployment of AgentOperatingSystem",
+    "relationship": "business implementation of AgentOperatingSystem",
     "deployment": {
       "platform": "Azure Functions",
       "domain": "cloud.businessinfinity.asisaga.com"
     },
-    "architecture_note": "BusinessInfinity now uses the generic, reusable UnifiedStorageManager provided by the AgentOperatingSystem (AOS) for all storage, queue, and blob operations. BusinessInfinity instantiates and configures this manager for Boardroom-specific needs, keeping AOS generic and reusable. All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain FineTunedLLM module (see RealmOfAgents/FineTunedLLM). BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features. This separation of concerns keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.",
+    "architecture": {
+      "pattern": "one_class_per_file",
+      "inheritance": "LeadershipAgent_from_AOS",
+      "separation": "business_logic_in_BI_generic_orchestration_in_AOS",
+      "storage": "uses_AOS_UnifiedStorageManager",
+      "ml": "integrates_with_FineTunedLLM_module"
+    },
+    "agents": {
+      "CEO": {
+        "class": "ChiefExecutiveOfficer",
+        "file": "agents/ChiefExecutiveOfficer.py",
+        "description": "Strategic leadership, organizational vision, stakeholder management, and executive decision-making",
+        "inherits": "LeadershipAgent"
+      },
+      "CFO": {
+        "class": "ChiefFinancialOfficer", 
+        "file": "agents/ChiefFinancialOfficer.py",
+        "description": "Financial strategy, budget management, investment analysis, and financial risk assessment",
+        "inherits": "LeadershipAgent"
+      },
+      "CMO": {
+        "class": "ChiefMarketingOfficer",
+        "file": "agents/ChiefMarketingOfficer.py", 
+        "description": "Marketing strategy, brand management, customer acquisition, and market research",
+        "inherits": "LeadershipAgent"
+      },
+      "COO": {
+        "class": "ChiefOperatingOfficer",
+        "file": "agents/ChiefOperatingOfficer.py",
+        "description": "Operational excellence, process optimization, resource management, and quality assurance",
+        "inherits": "LeadershipAgent"
+      },
+      "CTO": {
+        "class": "ChiefTechnologyOfficer",
+        "file": "agents/ChiefTechnologyOfficer.py",
+        "description": "Technology strategy, architecture design, innovation management, and security oversight",
+        "inherits": "LeadershipAgent"
+      },
+      "CHRO": {
+        "class": "ChiefHumanResourcesOfficer",
+        "file": "agents/ChiefHumanResourcesOfficer.py",
+        "description": "Talent management, organizational culture, performance management, and employee development",
+        "inherits": "LeadershipAgent"
+      },
+      "Founder": {
+        "class": "FounderAgent",
+        "file": "agents/FounderAgent.py", 
+        "description": "Vision creation, company building, product development, and entrepreneurial leadership",
+        "inherits": "LeadershipAgent"
+      },
+      "Investor": {
+        "class": "InvestorAgent",
+        "file": "agents/InvestorAgent.py",
+        "description": "Investment analysis, portfolio management, market research, and due diligence",
+        "inherits": "LeadershipAgent"
+      }
+    },
     "functions": [
-      {"name": "orchestrate_agents", "description": "Coordinates domain-specific agents (C-Suite, Founder, Investor) for executive, financial, operational, and strategic tasks."},
-      {"name": "integrate_azure_functions", "description": "Integrates Azure Functions for scalable, intelligent business processes."},
-      {"name": "unified_interface", "description": "Provides a unified interface for business logic, automation, and decision support."},
-      {"name": "use_finetunedllm", "description": "All ML/LLM capabilities are provided by the shared FineTunedLLM module. BusinessInfinity does not implement its own ML pipeline."}
+      {"name": "c_suite_orchestration", "description": "Orchestrates C-Suite agents for comprehensive business leadership and decision-making."},
+      {"name": "strategic_planning", "description": "Provides strategic planning and vision execution through executive agent coordination."},
+      {"name": "business_automation", "description": "Automates business processes through intelligent agent-driven workflows."},
+      {"name": "executive_analytics", "description": "Delivers executive-level analytics and decision support through specialized agents."}
     ],
-    "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "PossibilityDrivenAgent"],
+    "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "LeadershipAgent"],
   "PossibilityDrivenAgent": {
     "name": "PossibilityDrivenAgent",
     "local-path": "RealmOfAgents/PossibilityDrivenAgent",
@@ -26,81 +82,103 @@
     },
   "C-Suite": {
     "name": "C-Suite",
+    "description": "C-Suite represents the executive leadership team within BusinessInfinity. All C-Suite agents inherit from LeadershipAgent in AOS and implement business-specific functionality. Each agent follows the one-class-per-file architecture and provides specialized executive capabilities.",
     "functions": [
-      {"name": "leadership_decision_support", "description": "Provides leadership, financial, operational, marketing, and strategic expertise through AI-driven modules."}
+      {"name": "executive_leadership", "description": "Provides comprehensive executive leadership through specialized C-Suite agents."},
+      {"name": "strategic_coordination", "description": "Coordinates strategic initiatives across all business functions."},
+      {"name": "business_intelligence", "description": "Delivers executive-level business intelligence and decision support."}
     ],
-    "description": "C-Suite is a logical group within BusinessInfinity, representing the executive team of domain-specific agents (CEO, CFO, COO, CMO, CSO). Each agent specializes in a business domain, providing leadership, financial, operational, marketing, and strategic expertise through AI-driven modules.",
-    "CEO": {
-      "name": "CEO",
-      "functions": [
-        {"name": "strategic_direction", "description": "Provides strategic direction, high-level decision-making, and coordination across business domains."}
-      ],
-      "local-path": "RealmOfAgents/CEO",
-      "description": "CEO is an AI agent module based on PurposeDrivenAgent, focused on executive leadership. It provides strategic direction, high-level decision-making, and coordination across business domains, leveraging knowledge management and reasoning to achieve organizational goals.",
-      "dependencies": ["LeadershipAgent"],
-      "repository": "https://github.com/ASISaga/CEO",
-      "relationship": "implements PurposeDrivenAgent",
-      "domain": "Executive Leadership"
+    "architecture": {
+      "inheritance": "all_agents_inherit_from_LeadershipAgent",
+      "location": "BusinessInfinity/agents/",
+      "pattern": "one_class_per_file_matching_class_name"
+    },
+    "agents": {
+      "CEO": {
+        "name": "ChiefExecutiveOfficer",
+        "file": "BusinessInfinity/agents/ChiefExecutiveOfficer.py",
+        "functions": [
+          {"name": "strategic_leadership", "description": "Provides strategic direction, organizational vision, and executive decision-making."},
+          {"name": "stakeholder_management", "description": "Manages relationships with board, investors, and key stakeholders."},
+          {"name": "organizational_culture", "description": "Shapes and maintains organizational culture and values."}
+        ],
+        "description": "Chief Executive Officer agent implementing strategic leadership, organizational vision, stakeholder management, and executive decision-making capabilities.",
+        "inherits": "LeadershipAgent",
+        "domain": "Executive Leadership"
       },
       "CFO": {
-        "name": "CFO",
+        "name": "ChiefFinancialOfficer",
+        "file": "BusinessInfinity/agents/ChiefFinancialOfficer.py", 
         "functions": [
-          {"name": "financial_management", "description": "Automates financial operations, budgeting, and reporting; supports data-driven financial decisions."}
+          {"name": "financial_strategy", "description": "Develops financial strategy, budget planning, and capital allocation."},
+          {"name": "risk_management", "description": "Manages financial risk, compliance, and regulatory requirements."},
+          {"name": "investment_analysis", "description": "Analyzes investments, acquisitions, and financial opportunities."}
         ],
-        "local-path": "RealmOfAgents/CFO",
-        "description": "CFO is an AI agent module based on PurposeDrivenAgent, specializing in financial management, planning, and analysis. It automates financial operations, budgeting, and reporting, supporting data-driven financial decisions.",
-        "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/CFO",
-        "relationship": "implements PurposeDrivenAgent",
+        "description": "Chief Financial Officer agent implementing financial strategy, budget management, investment analysis, and financial risk assessment.",
+        "inherits": "LeadershipAgent",
         "domain": "Finance"
       },
-      "COO": {
-        "name": "COO",
-        "functions": [
-          {"name": "operational_efficiency", "description": "Manages workflows, resource allocation, and ensures smooth business operations."}
-        ],
-        "local-path": "RealmOfAgents/COO",
-        "description": "COO is an AI agent module based on PurposeDrivenAgent, responsible for operational efficiency and process optimization. It manages workflows, resource allocation, and ensures smooth business operations.",
-        "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/COO",
-        "relationship": "implements PurposeDrivenAgent",
-        "domain": "Operations"
-      },
       "CMO": {
-        "name": "CMO",
+        "name": "ChiefMarketingOfficer",
+        "file": "BusinessInfinity/agents/ChiefMarketingOfficer.py",
         "functions": [
-          {"name": "marketing_strategy", "description": "Focuses on marketing strategy, campaign management, and customer engagement."}
+          {"name": "marketing_strategy", "description": "Develops marketing strategy, brand positioning, and customer acquisition."},
+          {"name": "market_research", "description": "Conducts market research, competitive analysis, and customer insights."},
+          {"name": "digital_marketing", "description": "Manages digital marketing campaigns and customer engagement."}
         ],
-        "local-path": "RealmOfAgents/CMO",
-        "description": "CMO is an AI agent module based on PurposeDrivenAgent, focused on marketing strategy, campaign management, and customer engagement. It leverages analytics and automation to drive business growth.",
-        "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/CMO",
-        "relationship": "implements PurposeDrivenAgent",
+        "description": "Chief Marketing Officer agent implementing marketing strategy, brand management, customer acquisition, and market research.",
+        "inherits": "LeadershipAgent", 
         "domain": "Marketing"
       },
-      "CSO": {
-        "name": "CSO",
+      "COO": {
+        "name": "ChiefOperatingOfficer",
+        "file": "BusinessInfinity/agents/ChiefOperatingOfficer.py",
         "functions": [
-          {"name": "business_strategy", "description": "Supports long-term planning, market research, and strategic initiatives."}
+          {"name": "operational_excellence", "description": "Manages operations, process optimization, and operational efficiency."},
+          {"name": "resource_management", "description": "Optimizes resource allocation and capacity planning."},
+          {"name": "quality_assurance", "description": "Ensures quality standards and continuous improvement."}
         ],
-        "local-path": "RealmOfAgents/CSO",
-        "description": "CSO is an AI agent module based on PurposeDrivenAgent, specializing in business strategy and competitive analysis. It supports long-term planning, market research, and strategic initiatives.",
-        "dependencies": ["PurposeDrivenAgent"],
-        "repository": "https://github.com/ASISaga/CSO",
-        "relationship": "implements PurposeDrivenAgent",
-        "domain": "Strategy"
+        "description": "Chief Operating Officer agent implementing operational excellence, process optimization, resource management, and quality assurance.",
+        "inherits": "LeadershipAgent",
+        "domain": "Operations"
+      },
+      "CTO": {
+        "name": "ChiefTechnologyOfficer", 
+        "file": "BusinessInfinity/agents/ChiefTechnologyOfficer.py",
+        "functions": [
+          {"name": "technology_strategy", "description": "Develops technology strategy, architecture, and innovation roadmap."},
+          {"name": "engineering_leadership", "description": "Leads engineering teams and technical excellence initiatives."},
+          {"name": "security_oversight", "description": "Ensures security, compliance, and risk management."}
+        ],
+        "description": "Chief Technology Officer agent implementing technology strategy, architecture design, innovation management, and security oversight.",
+        "inherits": "LeadershipAgent",
+        "domain": "Technology"
+      },
+      "CHRO": {
+        "name": "ChiefHumanResourcesOfficer",
+        "file": "BusinessInfinity/agents/ChiefHumanResourcesOfficer.py", 
+        "functions": [
+          {"name": "talent_management", "description": "Manages talent acquisition, development, and retention strategies."},
+          {"name": "organizational_culture", "description": "Builds organizational culture and employee engagement."},
+          {"name": "performance_management", "description": "Implements performance management and career development systems."}
+        ],
+        "description": "Chief Human Resources Officer agent implementing talent management, organizational culture, performance management, and employee development.",
+        "inherits": "LeadershipAgent",
+        "domain": "Human Resources"
       }
-    },
+    }
+  },
     "Founder": {
-      "name": "Founder",
+      "name": "FounderAgent",
+      "file": "BusinessInfinity/agents/FounderAgent.py",
       "functions": [
-        {"name": "startup_creation", "description": "Assists in startup creation, business model development, and early-stage growth strategies."}
+        {"name": "vision_creation", "description": "Creates and refines company vision, mission, and long-term strategic direction."},
+        {"name": "product_strategy", "description": "Develops product strategy, roadmaps, and innovation frameworks."},
+        {"name": "fundraising", "description": "Manages fundraising activities, investor relations, and capital strategy."},
+        {"name": "team_scaling", "description": "Builds founding team, establishes culture, and scales organizational structure."}
       ],
-      "local-path": "RealmOfAgents/Founder",
-      "description": "Founder is an AI agent module based on PurposeDrivenAgent, designed for entrepreneurship and innovation. It assists in startup creation, business model development, and early-stage growth strategies.",
-      "dependencies": ["PurposeDrivenAgent"],
-      "repository": "https://github.com/ASISaga/Founder",
-      "relationship": "implements PurposeDrivenAgent",
+      "description": "FounderAgent implements comprehensive founder-specific functionality including vision creation, product strategy, fundraising execution, team scaling, and market opportunity identification. Inherits from LeadershipAgent.",
+      "inherits": "LeadershipAgent",
       "domain": "Entrepreneurship"
     },
     "Investor": {
