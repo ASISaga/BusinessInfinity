@@ -19,7 +19,9 @@ from datetime import datetime, timezone
 
 # Import core Business Infinity components
 from .agents import agent_manager, UnifiedAgentManager
-from .mcp import mcp_handler
+
+# Use the new MCPServiceBusClient from AOS for external MCP communication
+from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
 
 # Import decision engine components (business-specific)
 try:
@@ -71,7 +73,40 @@ class BusinessInfinityOrchestrator(AgentOperatingSystem):
         
         # Business-specific components
         self.agent_manager = agent_manager
-        self.mcp_handler = mcp_handler
+        # Set up MCP clients for each external system
+        import os
+        self.erpnext_mcp_client = MCPServiceBusClient(
+            os.getenv('SERVICE_BUS_CONNECTION_STRING'),
+            os.getenv('ERP_MCP_TOPIC', 'erpnext-mcp-topic'),
+            os.getenv('AOS_SUBSCRIPTION', 'bi-orchestrator')
+        )
+        self.linkedin_mcp_client = MCPServiceBusClient(
+            os.getenv('SERVICE_BUS_CONNECTION_STRING'),
+            os.getenv('LINKEDIN_MCP_TOPIC', 'linkedin-mcp-topic'),
+            os.getenv('AOS_SUBSCRIPTION', 'bi-orchestrator')
+        )
+        self.reddit_mcp_client = MCPServiceBusClient(
+            os.getenv('SERVICE_BUS_CONNECTION_STRING'),
+            os.getenv('REDDIT_MCP_TOPIC', 'mcp-reddit-topic'),
+            os.getenv('AOS_SUBSCRIPTION', 'bi-orchestrator')
+        )
+    async def call_external_mcp(self, system: str, message: dict) -> dict:
+        """
+        Send an MCP message to an external system via Azure Service Bus and receive the response.
+        system: 'erpnext', 'linkedin', or 'reddit'
+        message: MCP request dict
+        """
+        client = {
+            'erpnext': self.erpnext_mcp_client,
+            'linkedin': self.linkedin_mcp_client,
+            'reddit': self.reddit_mcp_client
+        }.get(system)
+        if not client:
+            return {'error': f'Unknown MCP system: {system}'}
+        await client.send_message(message)
+        # For demo: receive one response (in production, use correlation id, etc.)
+        responses = await client.receive_messages(max_messages=1, timeout=10)
+        return responses[0] if responses else {'error': 'No response received'}
         
         # Initialize decision engine (business-specific)
         self.decision_engine = None
@@ -254,9 +289,11 @@ class BusinessInfinityOrchestrator(AgentOperatingSystem):
             **base_status,
             "business_components": {
                 "decision_engine": self.decision_engine is not None,
-                "mcp_handler": {
-                    "active": self.mcp_handler is not None,
-                    "methods": len(self.mcp_handler.method_handlers) if self.mcp_handler else 0
+                # MCP handler is now managed via Service Bus clients
+                "mcp_clients": {
+                    "erpnext": self.erpnext_mcp_client is not None,
+                    "linkedin": self.linkedin_mcp_client is not None,
+                    "reddit": self.reddit_mcp_client is not None
                 },
                 "storage_manager": self.storage_manager is not None,
                 "environment_manager": self.env_manager is not None
@@ -267,7 +304,6 @@ class BusinessInfinityOrchestrator(AgentOperatingSystem):
             },
             "system_type": "BusinessInfinity"
         }
-        
         return bi_status
 
 
