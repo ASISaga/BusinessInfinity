@@ -135,3 +135,15 @@ All Model Context Protocol (MCP) communication and protocol/client logic is now 
 - **No Legacy Code:** All legacy MCP protocol/handler modules have been removed from BusinessInfinity.
 
 For details, see `AZURE_SERVICE_BUS.md` and `MCP_CLIENT_MIGRATION.md`.
+
+---
+
+## Unified Authentication & Authorization (2025)
+
+All authentication and authorization logic—including Azure B2C, JWT validation, and LinkedIn OAuth—is now implemented in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem/aos_auth.py`.
+
+- **AOS UnifiedAuthHandler:** All authentication endpoints and handlers in BusinessInfinity now import and use the unified handler from AOS.
+- **LinkedIn OAuth:** The LinkedIn login and callback endpoints in BI use the AOS handler for all OAuth logic.
+- **No Legacy Code:** All legacy authentication code in BusinessInfinity has been removed or replaced with imports from AOS.
+
+For details, see the AOS documentation and `aos_auth.py`.
