@@ -2,78 +2,135 @@
   "BusinessInfinity": {
     "name": "BusinessInfinity",
     "local-path": "BusinessInfinity",
-    "description": "BusinessInfinity is a comprehensive business automation and orchestration platform that deploys on Azure Functions. It implements business-specific C-Suite agents (CEO, CFO, CMO, COO, CTO, CHRO), Founder, and Investor agents that inherit from the generic LeadershipAgent in AOS (Agent Operating System). Provides intelligent business decision-making, strategic planning, and operational excellence through AI-driven executive leadership.",
+    "description": "BusinessInfinity is a perpetual, fully autonomous boardroom of legendary AI agents with voting-based decision making. Features legendary expertise through LoRA adapters (Warren Buffett, Steve Jobs, Mary Barra, etc.) that vote on strategic decisions using domain-specific knowledge and purpose alignment. Operates 24/7 providing continuous high-level strategic decision-making through democratic consensus of legendary business minds.",
     "repository": "https://github.com/ASISaga/BusinessInfinity",
-    "relationship": "business implementation of AgentOperatingSystem",
+    "relationship": "autonomous_legendary_boardroom_with_voting_system",
     "deployment": {
       "platform": "Azure Functions",
       "domain": "cloud.businessinfinity.asisaga.com"
     },
-    "architecture": {
-      "pattern": "one_class_per_file",
-      "inheritance": "LeadershipAgent_from_AOS",
-      "separation": "business_logic_in_BI_generic_orchestration_in_AOS",
-      "storage": "uses_AOS_UnifiedStorageManager",
-      "ml": "integrates_with_FineTunedLLM_module"
+    "voting_system": {
+      "decision_method": "legendary_expertise_voting",
+      "vote_structure": "BoardroomVote_dataclass",
+      "scoring_method": "lora_adapter_plus_purpose_alignment",
+      "consensus_algorithm": "weighted_democratic_consensus",
+      "legendary_adapters": [
+        "warren_buffett_investment_strategy",
+        "steve_jobs_innovation_leadership", 
+        "mary_barra_operational_excellence",
+        "philip_kotler_marketing_mastery",
+        "alan_kay_technology_vision",
+        "jack_welch_organizational_development"
+      ]
     },
-    "agents": {
-      "CEO": {
-        "class": "ChiefExecutiveOfficer",
-        "file": "RealmOfAgents/CEO/ChiefExecutiveOfficer.py",
-        "description": "Strategic leadership, organizational vision, stakeholder management, and executive decision-making",
-        "inherits": "LeadershipAgent"
-      },
-      "CFO": {
-        "class": "ChiefFinancialOfficer", 
-        "file": "RealmOfAgents/CFO/ChiefFinancialOfficer.py",
-        "description": "Financial strategy, budget management, investment analysis, and financial risk assessment",
-        "inherits": "LeadershipAgent"
-      },
-      "CMO": {
-        "class": "ChiefMarketingOfficer",
-        "file": "RealmOfAgents/CMO/ChiefMarketingOfficer.py", 
-        "description": "Marketing strategy, brand management, customer acquisition, and market research",
-        "inherits": "LeadershipAgent"
-      },
-      "COO": {
-        "class": "ChiefOperatingOfficer",
-        "file": "RealmOfAgents/COO/ChiefOperatingOfficer.py",
-        "description": "Operational excellence, process optimization, resource management, and quality assurance",
-        "inherits": "LeadershipAgent"
-      },
-      "CTO": {
-        "class": "ChiefTechnologyOfficer",
-        "file": "RealmOfAgents/CTO/ChiefTechnologyOfficer.py",
-        "description": "Technology strategy, architecture design, innovation management, and security oversight",
-        "inherits": "LeadershipAgent"
-      },
-      "CHRO": {
-        "class": "ChiefHumanResourcesOfficer",
-        "file": "RealmOfAgents/CHRO/ChiefHumanResourcesOfficer.py",
-        "description": "Talent management, organizational culture, performance management, and employee development",
-        "inherits": "LeadershipAgent"
-      },
-      "Founder": {
-        "class": "FounderAgent",
-        "file": "RealmOfAgents/Founder/FounderAgent.py", 
-        "description": "Vision creation, company building, product development, and entrepreneurial leadership",
-        "inherits": "LeadershipAgent"
-      },
-      "Investor": {
-        "class": "InvestorAgent",
-        "file": "RealmOfAgents/Investor/InvestorAgent.py",
-        "description": "Investment analysis, portfolio management, market research, and due diligence",
-        "inherits": "LeadershipAgent"
+    "decision_outcomes": {
+      "approved_strong_consensus": "score > 0.6, consensus > 0.7",
+      "approved_majority_support": "score > 0.0, reasonable_consensus",
+      "rejected_strong_opposition": "score < -0.6", 
+      "deferred_lack_consensus": "consensus < 0.4",
+      "review_required_mixed": "moderate_scores_mixed_consensus"
+    },
+    "architecture": {
+      "pattern": "autonomous_boardroom_with_voting",
+      "decision_making": "legendary_expertise_consensus_voting",
+      "legendary_profiles": "lora_adapter_integration",
+      "storage": "uses_AOS_UnifiedStorageManager",
+      "ml": "integrates_with_FineTunedLLM_LoRA_Manager",
+      "perpetual_operation": "24_7_autonomous_boardroom",
+      "voting_components": {
+        "vote_collection": "_collect_boardroom_votes",
+        "lora_scoring": "_get_lora_adapter_score", 
+        "purpose_alignment": "_calculate_purpose_alignment",
+        "vote_calculation": "_calculate_vote_value",
+        "consensus_building": "_calculate_voting_results",
+        "decision_determination": "_determine_final_decision"
       }
     },
+    "legendary_boardroom_agents": {
+      "INVESTOR": {
+        "legendary_profile": "Warren Buffett",
+        "domain": "investment_strategy",
+        "expertise": ["value_investing", "financial_analysis", "risk_assessment"],
+        "voting_weight": 1.2,
+        "assigned_purpose": "maximize_long_term_value_creation",
+        "lora_adapter": "warren_buffett_investment_mastery"
+      },
+      "CEO": {
+        "legendary_profile": "Steve Jobs", 
+        "domain": "innovation_leadership",
+        "expertise": ["product_strategy", "market_vision", "brand_building"],
+        "voting_weight": 1.3,
+        "assigned_purpose": "drive_strategic_innovation_and_growth",
+        "lora_adapter": "steve_jobs_visionary_leadership"
+      },
+      "CFO": {
+        "legendary_profile": "Mary Barra",
+        "domain": "operational_excellence", 
+        "expertise": ["financial_planning", "operational_efficiency", "transformation"],
+        "voting_weight": 1.1,
+        "assigned_purpose": "ensure_financial_sustainability_and_efficiency",
+        "lora_adapter": "mary_barra_operational_mastery"
+      },
+      "CMO": {
+        "legendary_profile": "Philip Kotler",
+        "domain": "marketing_mastery",
+        "expertise": ["marketing_strategy", "brand_development", "customer_insights"],
+        "voting_weight": 1.0,
+        "assigned_purpose": "build_powerful_brands_and_customer_connections", 
+        "lora_adapter": "philip_kotler_marketing_genius"
+      },
+      "CTO": {
+        "legendary_profile": "Alan Kay",
+        "domain": "technology_vision",
+        "expertise": ["technology_strategy", "innovation", "systems_thinking"],
+        "voting_weight": 1.0,
+        "assigned_purpose": "drive_technological_innovation_and_excellence",
+        "lora_adapter": "alan_kay_technology_visionary"
+      },
+      "CHRO": {
+        "legendary_profile": "Jack Welch",
+        "domain": "organizational_development",
+        "expertise": ["leadership_development", "talent_management", "culture"],
+        "voting_weight": 1.0,
+        "assigned_purpose": "build_exceptional_organizational_capabilities",
+        "lora_adapter": "jack_welch_leadership_excellence"
+      }
+    },
+    "autonomous_boardroom_implementation": {
+      "core_class": "AutonomousBoardroom",
+      "file": "BusinessInfinity/autonomous_boardroom.py",
+      "description": "Perpetual autonomous boardroom with voting-based decision making using legendary AI agents",
+      "operation": "24_7_autonomous_strategic_decision_making",
+      "decision_method": "democratic_consensus_voting_with_legendary_expertise"
+    },
+    "voting_system_components": {
+      "BoardroomVote": {
+        "structure": "dataclass",
+        "fields": ["voter_id", "vote_value", "confidence", "reasoning", "lora_adapter_score", "purpose_alignment", "timestamp"],
+        "description": "Individual vote cast by legendary boardroom agent"
+      },
+      "voting_methods": [
+        "_collect_boardroom_votes",
+        "_get_agent_vote", 
+        "_get_lora_adapter_score",
+        "_calculate_purpose_alignment",
+        "_calculate_vote_value",
+        "_calculate_voting_results",
+        "_determine_final_decision",
+        "_generate_voting_rationale"
+      ]
+    },
     "functions": [
-      {"name": "c_suite_orchestration", "description": "Orchestrates C-Suite agents for comprehensive business leadership and decision-making."},
-      {"name": "strategic_planning", "description": "Provides strategic planning and vision execution through executive agent coordination."},
-      {"name": "business_automation", "description": "Automates business processes through intelligent agent-driven workflows."},
-      {"name": "executive_analytics", "description": "Delivers executive-level analytics and decision support through specialized agents."}
-    ],
-  "dependencies": ["AgentOperatingSystem", "FineTunedLLM", "LeadershipAgent"],
-  "notes": "All MCP protocol/client logic is now unified in AgentOperatingSystem (RealmOfAgents/AgentOperatingSystem). MCP communication is handled via Azure Service Bus and the AOS MCP client. All legacy MCP protocol/handler modules in BusinessInfinity have been removed.",
+      {"name": "autonomous_boardroom_operation", "description": "Perpetual 24/7 autonomous boardroom operation with legendary AI agents."},
+      {"name": "voting_based_decision_making", "description": "Democratic consensus voting using legendary expertise and LoRA adapters."},
+      {"name": "legendary_expertise_consultation", "description": "Access to Warren Buffett, Steve Jobs, Mary Barra and other legendary business minds."},
+      {"name": "strategic_consensus_building", "description": "Build strategic consensus through weighted democratic voting."},
+      {"name": "purpose_aligned_voting", "description": "Voting that aligns with each agent's assigned purpose and domain expertise."},
+      {"name": "real_time_business_intelligence", "description": "Continuous monitoring and decision-making for critical business events."}
+    ]
+  },
+  "dependencies": ["AgentOperatingSystem", "FineTunedLLM_LoRA_Manager", "Azure_Service_Bus", "MCP_Servers"],
+  "notes": "BusinessInfinity has been transformed into a perpetual autonomous boardroom with voting-based decision making. Each legendary agent uses LoRA adapters for domain expertise and votes on strategic decisions. All MCP communication is handled via Azure Service Bus through AOS. The voting system ensures democratic consensus among legendary business minds for all strategic decisions.",
   "PossibilityDrivenAgent": {
     "name": "PossibilityDrivenAgent",
     "local-path": "RealmOfAgents/PossibilityDrivenAgent",

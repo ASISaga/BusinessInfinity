@@ -97,29 +97,47 @@ class LegendaryExpertise:
 
 @dataclass
 class BoardroomAgent:
-    """Represents a boardroom member with legendary expertise"""
-    role: BoardroomRole
+    """Represents a boardroom member with legendary expertise and voting capability"""
     agent_id: str
+    role: BoardroomRole
     legendary_expertise: LegendaryExpertise
+    assigned_purpose: str  # Specific purpose/mandate for this role
+    voting_weight: float = 1.0  # Weight of this agent's vote
     mcp_connections: List[str] = field(default_factory=list)  # Connected MCP servers
     performance_history: List[Dict[str, Any]] = field(default_factory=list)
     current_tasks: List[str] = field(default_factory=list)
-    is_active: bool = True
+    status: str = "active"
+
+
+@dataclass
+class BoardroomVote:
+    """Represents a single boardroom member's vote"""
+    voter_id: str
+    voter_role: BoardroomRole
+    vote_value: float  # -1.0 to 1.0 (against to for)
+    confidence: float  # 0.0 to 1.0
+    reasoning: str
+    lora_adapter_score: float  # Domain expertise score from LoRA adapter
+    purpose_alignment: float  # How well the proposal aligns with voter's purpose
+    timestamp: datetime = field(default_factory=datetime.now)
 
 
 @dataclass
 class BoardroomDecision:
-    """Represents a boardroom decision with full context"""
+    """Represents a boardroom decision with voting-based results"""
     decision_id: str
+    proposal: str
     decision_type: DecisionType
-    context: Dict[str, Any]
-    participants: List[BoardroomRole]
-    recommendations: Dict[BoardroomRole, str]
-    final_decision: Optional[str] = None
-    confidence: float = 0.0
-    execution_status: str = "pending"
-    created_at: datetime = field(default_factory=datetime.now)
-    executed_at: Optional[datetime] = None
+    proposed_by: str
+    votes: List[BoardroomVote] = field(default_factory=list)
+    voting_results: Dict[str, Any] = field(default_factory=dict)
+    final_decision: str = ""
+    rationale: str = ""
+    confidence_score: float = 0.0
+    consensus_score: float = 0.0  # How aligned the votes were
+    implementation_plan: List[str] = field(default_factory=list)
+    timestamp: datetime = field(default_factory=datetime.now)
+    status: str = "pending"
 
 
 class AutonomousBoardroom:
@@ -498,55 +516,104 @@ class AutonomousBoardroom:
         return decisions
     
     async def _make_boardroom_decision(self, decision_context: Dict[str, Any]) -> BoardroomDecision:
-        """Make a boardroom decision through legendary agent collaboration"""
+        """Make a boardroom decision through voting by legendary agents with LoRA adapter scoring"""
         self.state = BoardroomState.DELIBERATING
         
         decision_id = f"decision_{datetime.now().timestamp()}"
+        proposal = decision_context.get("proposal", "")
+        decision_type = DecisionType(decision_context["type"])
+        
         decision = BoardroomDecision(
             decision_id=decision_id,
-            decision_type=DecisionType(decision_context["type"]),
-            context=decision_context,
-            participants=decision_context.get("participants", []),
-            recommendations={}
+            proposal=proposal,
+            decision_type=decision_type,
+            proposed_by=decision_context.get("proposed_by", "system")
         )
         
-        # Get recommendations from each participating agent
-        for role in decision.participants:
-            if role in self.agents and self.agents[role].is_active:
-                agent = self.agents[role]
-                recommendation = await self._get_legendary_recommendation(agent, decision_context)
-                decision.recommendations[role] = recommendation
+        # Collect votes from all active boardroom members
+        decision.votes = await self._collect_boardroom_votes(proposal, decision_type)
         
-        # Synthesize final decision using legendary wisdom
-        decision.final_decision = await self._synthesize_decision(decision)
-        decision.confidence = self._calculate_decision_confidence(decision)
+        # Calculate voting results with weighted scoring
+        decision.voting_results = await self._calculate_voting_results(decision.votes)
+        
+        # Make final decision based on voting outcomes
+        decision.final_decision = await self._determine_final_decision(decision.votes, decision.voting_results)
+        
+        # Generate comprehensive rationale based on all votes
+        decision.rationale = await self._generate_voting_rationale(decision.votes, decision.voting_results)
+        
+        # Calculate confidence and consensus scores
+        decision.confidence_score = decision.voting_results.get("confidence_score", 0.0)
+        decision.consensus_score = decision.voting_results.get("consensus_score", 0.0)
+        
+        # Create implementation plan based on decision
+        decision.implementation_plan = await self._create_implementation_plan(
+            decision.final_decision, decision_type
+        )
+        
+        # Determine status based on voting threshold and consensus
+        decision.status = await self._determine_decision_status(decision.voting_results)
         
         # Store decision
         self.active_decisions[decision_id] = decision
         
-        self.logger.info(f"Boardroom decision made: {decision_id} - {decision.final_decision}")
+        self.logger.info(f"Boardroom decision made via voting: {decision_id} - Status: {decision.status}")
         return decision
     
-    async def _get_legendary_recommendation(self, agent: BoardroomAgent, context: Dict[str, Any]) -> str:
-        """Get recommendation from legendary agent using their LoRA adapter"""
-        # This would use the actual LoRA adapter for legendary expertise
-        # For now, simulate based on legendary profile
-        
-        expertise = agent.legendary_expertise
-        legend = expertise.legend_profile
-        
-        # Simulate legendary decision-making patterns
-        legendary_responses = {
-            "Warren Buffett": "Focus on long-term value creation and avoid speculative investments. The fundamentals suggest...",
-            "Steve Jobs": "Think different. This is about creating products that customers don't even know they need yet...",
-            "Jack Welch": "Drive performance and accountability. We need to differentiate our leaders and reward excellence...",
-            "Satya Nadella": "Embrace a growth mindset and focus on empowering others. Technology should enable human potential...",
-            # Add more legendary responses...
-        }
-        
-        base_response = legendary_responses.get(legend, f"Based on {legend}'s approach...")
-        
-        return f"{base_response} In this context: {context.get('context', 'general business decision')}"
+    async def _collect_boardroom_votes(self, proposal: str, decision_type: DecisionType) -> List[BoardroomVote]:
+        """Collect votes from all active boardroom members using LoRA adapter scoring"""
+        try:
+            votes = []
+            
+            # Get all active boardroom agents
+            active_agents = [agent for agent in self.agents.values() if agent.status == "active"]
+            
+            for agent in active_agents:
+                vote = await self._get_agent_vote(agent, proposal, decision_type)
+                if vote:
+                    votes.append(vote)
+            
+            self.logger.info(f"Collected {len(votes)} votes for proposal: {proposal[:50]}...")
+            return votes
+            
+        except Exception as e:
+            self.logger.error(f"Failed to collect boardroom votes: {e}")
+            return []
+    
+    async def _get_agent_vote(self, agent: BoardroomAgent, proposal: str, decision_type: DecisionType) -> Optional[BoardroomVote]:
+        """Get a single agent's vote based on their LoRA adapter scoring and assigned purpose"""
+        try:
+            # Get LoRA adapter score using legendary expertise
+            lora_score = await self._get_lora_adapter_score(agent, proposal, decision_type)
+            
+            # Calculate purpose alignment score
+            purpose_alignment = await self._calculate_purpose_alignment(agent, proposal, decision_type)
+            
+            # Combine scores to determine vote value
+            vote_value = await self._calculate_vote_value(lora_score, purpose_alignment, agent.role)
+            
+            # Calculate confidence based on LoRA adapter performance and purpose clarity
+            confidence = await self._calculate_vote_confidence(lora_score, purpose_alignment, agent)
+            
+            # Generate reasoning using legendary expertise
+            reasoning = await self._generate_vote_reasoning(agent, proposal, lora_score, purpose_alignment)
+            
+            vote = BoardroomVote(
+                voter_id=agent.agent_id,
+                voter_role=agent.role,
+                vote_value=vote_value,
+                confidence=confidence,
+                reasoning=reasoning,
+                lora_adapter_score=lora_score,
+                purpose_alignment=purpose_alignment
+            )
+            
+            self.logger.debug(f"Agent {agent.agent_id} voted {vote_value:.2f} with {confidence:.2f} confidence")
+            return vote
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get vote from agent {agent.agent_id}: {e}")
+            return None
     
     async def _synthesize_decision(self, decision: BoardroomDecision) -> str:
         """Synthesize final decision from all legendary recommendations"""
@@ -749,6 +816,255 @@ class AutonomousBoardroom:
         
         self.state = BoardroomState.PAUSED
         self.logger.info("Autonomous Boardroom shutdown completed")
+
+    # Voting-based Decision Making Methods
+    
+    async def _get_lora_adapter_score(self, agent: BoardroomAgent, proposal: str, decision_type: DecisionType) -> float:
+        """Get LoRA adapter scoring for the proposal based on legendary expertise"""
+        try:
+            if not self.lora_manager:
+                return 0.5  # Neutral score if LoRA manager not available
+            
+            # Load the legendary adapter for this agent
+            adapter_id = await self.lora_manager.load_legendary_adapter(
+                agent.legendary_expertise.legend_profile,
+                agent.legendary_expertise.domain
+            )
+            
+            # Generate legendary response for scoring
+            legendary_context = f"Proposal: {proposal}\nDecision Type: {decision_type.value}\nEvaluate this from your legendary perspective."
+            response = await self.lora_manager.get_legendary_response(adapter_id, legendary_context)
+            
+            # Extract score from response (simplified scoring mechanism)
+            score = await self._extract_score_from_legendary_response(response, agent.legendary_expertise)
+            
+            return max(0.0, min(1.0, score))  # Clamp to [0, 1]
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get LoRA adapter score for {agent.agent_id}: {e}")
+            return 0.5  # Neutral score on error
+    
+    async def _extract_score_from_legendary_response(self, response: str, expertise: LegendaryExpertise) -> float:
+        """Extract scoring from legendary response (simplified implementation)"""
+        try:
+            positive_indicators = ["strongly support", "recommend", "excellent", "valuable", "strategic advantage"]
+            negative_indicators = ["oppose", "risky", "avoid", "problematic", "decline"]
+            
+            response_lower = response.lower()
+            positive_count = sum(1 for indicator in positive_indicators if indicator in response_lower)
+            negative_count = sum(1 for indicator in negative_indicators if indicator in response_lower)
+            
+            # Base score calculation
+            if positive_count > negative_count:
+                base_score = 0.6 + (positive_count - negative_count) * 0.1
+            elif negative_count > positive_count:
+                base_score = 0.4 - (negative_count - positive_count) * 0.1
+            else:
+                base_score = 0.5
+            
+            # Apply expertise performance weighting
+            performance_modifier = expertise.performance_metrics.get("accuracy", 0.8)
+            final_score = base_score * performance_modifier
+            
+            return max(0.0, min(1.0, final_score))
+            
+        except Exception as e:
+            self.logger.error(f"Failed to extract score from legendary response: {e}")
+            return 0.5
+    
+    async def _calculate_purpose_alignment(self, agent: BoardroomAgent, proposal: str, decision_type: DecisionType) -> float:
+        """Calculate how well the proposal aligns with the agent's assigned purpose"""
+        try:
+            # Define role-specific purposes and their alignment with decision types
+            role_purpose_alignment = {
+                BoardroomRole.INVESTOR: {
+                    DecisionType.INVESTMENT: 0.9, DecisionType.FINANCIAL: 0.9, DecisionType.STRATEGIC: 0.8
+                },
+                BoardroomRole.CEO: {
+                    DecisionType.STRATEGIC: 0.9, DecisionType.GOVERNANCE: 0.9, DecisionType.OPERATIONAL: 0.8
+                },
+                BoardroomRole.CFO: {
+                    DecisionType.FINANCIAL: 0.9, DecisionType.INVESTMENT: 0.8, DecisionType.OPERATIONAL: 0.6
+                }
+            }
+            
+            # Get base alignment for role and decision type
+            base_alignment = role_purpose_alignment.get(agent.role, {}).get(decision_type, 0.5)
+            
+            return base_alignment
+            
+        except Exception as e:
+            self.logger.error(f"Failed to calculate purpose alignment for {agent.agent_id}: {e}")
+            return 0.5
+    
+    async def _calculate_vote_value(self, lora_score: float, purpose_alignment: float, role: BoardroomRole) -> float:
+        """Calculate vote value combining LoRA adapter score and purpose alignment"""
+        try:
+            # Weighted combination of LoRA score and purpose alignment
+            lora_weight = 0.7  # 70% weight to legendary expertise
+            purpose_weight = 0.3  # 30% weight to purpose alignment
+            
+            combined_score = (lora_score * lora_weight) + (purpose_alignment * purpose_weight)
+            
+            # Convert to vote value (-1 to 1 range)
+            if combined_score >= 0.6:
+                vote_value = (combined_score - 0.6) / 0.4  # Maps 0.6-1.0 to 0.0-1.0
+            elif combined_score <= 0.4:
+                vote_value = (combined_score - 0.4) / 0.4  # Maps 0.0-0.4 to -1.0-0.0
+            else:
+                vote_value = (combined_score - 0.5) / 0.1 * 0.2  # Neutral zone
+            
+            return max(-1.0, min(1.0, vote_value))
+            
+        except Exception as e:
+            self.logger.error(f"Failed to calculate vote value: {e}")
+            return 0.0
+    
+    async def _calculate_vote_confidence(self, lora_score: float, purpose_alignment: float, agent: BoardroomAgent) -> float:
+        """Calculate confidence in the vote based on various factors"""
+        try:
+            adapter_confidence = agent.legendary_expertise.performance_metrics.get("accuracy", 0.8)
+            alignment_confidence = purpose_alignment
+            historical_confidence = self._calculate_agent_confidence(agent)
+            
+            # Weighted average
+            combined_confidence = (adapter_confidence * 0.4 + alignment_confidence * 0.3 + historical_confidence * 0.3)
+            
+            return max(0.0, min(1.0, combined_confidence))
+            
+        except Exception as e:
+            self.logger.error(f"Failed to calculate vote confidence for {agent.agent_id}: {e}")
+            return 0.5
+    
+    async def _generate_vote_reasoning(self, agent: BoardroomAgent, proposal: str, lora_score: float, purpose_alignment: float) -> str:
+        """Generate reasoning for the vote using legendary expertise"""
+        try:
+            legend_name = agent.legendary_expertise.legend_profile
+            role = agent.role.value
+            
+            reasoning = f"As {legend_name} serving as {role}, I evaluate this proposal with {lora_score:.2f} legendary expertise score and {purpose_alignment:.2f} purpose alignment."
+            
+            if lora_score > 0.6:
+                reasoning += " I support this proposal based on proven strategic principles."
+            elif lora_score < 0.4:
+                reasoning += " I have concerns about this proposal based on historical patterns."
+            else:
+                reasoning += " This requires careful consideration of trade-offs."
+            
+            return reasoning
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate vote reasoning for {agent.agent_id}: {e}")
+            return f"Vote cast by {agent.role.value} based on {agent.legendary_expertise.domain} expertise."
+    
+    async def _calculate_voting_results(self, votes: List[BoardroomVote]) -> Dict[str, Any]:
+        """Calculate comprehensive voting results with weighted scoring"""
+        try:
+            if not votes:
+                return {"error": "No votes collected"}
+            
+            total_weighted_votes = 0.0
+            total_weight = 0.0
+            
+            for vote in votes:
+                agent = next((a for a in self.agents.values() if a.agent_id == vote.voter_id), None)
+                weight = agent.voting_weight if agent else 1.0
+                
+                weighted_vote = vote.vote_value * weight * vote.confidence
+                total_weighted_votes += weighted_vote
+                total_weight += weight
+            
+            # Calculate final score
+            final_score = total_weighted_votes / total_weight if total_weight > 0 else 0.0
+            
+            # Calculate consensus
+            vote_values = [vote.vote_value for vote in votes]
+            consensus_score = 1.0 - (max(vote_values) - min(vote_values)) / 2.0 if vote_values else 0.0
+            
+            # Calculate overall confidence
+            confidence_score = sum(vote.confidence for vote in votes) / len(votes) if votes else 0.0
+            
+            return {
+                "final_score": final_score,
+                "consensus_score": consensus_score,
+                "confidence_score": confidence_score,
+                "total_votes": len(votes),
+                "approval_threshold": final_score > 0.0
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Failed to calculate voting results: {e}")
+            return {"error": str(e)}
+    
+    async def _determine_final_decision(self, votes: List[BoardroomVote], voting_results: Dict[str, Any]) -> str:
+        """Determine final decision based on voting results"""
+        try:
+            final_score = voting_results.get("final_score", 0.0)
+            consensus_score = voting_results.get("consensus_score", 0.0)
+            
+            if voting_results.get("error"):
+                return "Decision deferred due to voting system error"
+            
+            if final_score > 0.6 and consensus_score > 0.7:
+                return "APPROVED - Strong consensus in favor"
+            elif final_score > 0.0:
+                return "APPROVED - Majority support"
+            elif final_score < -0.6:
+                return "REJECTED - Strong opposition"
+            elif consensus_score < 0.4:
+                return "DEFERRED - Lack of consensus"
+            else:
+                return "REVIEW REQUIRED - Mixed signals"
+                
+        except Exception as e:
+            self.logger.error(f"Failed to determine final decision: {e}")
+            return "SYSTEM ERROR - Unable to determine decision"
+    
+    async def _generate_voting_rationale(self, votes: List[BoardroomVote], voting_results: Dict[str, Any]) -> str:
+        """Generate comprehensive rationale based on all votes"""
+        try:
+            if voting_results.get("error"):
+                return "Unable to generate rationale due to voting system error"
+            
+            final_score = voting_results.get("final_score", 0.0)
+            consensus_score = voting_results.get("consensus_score", 0.0)
+            total_votes = voting_results.get("total_votes", 0)
+            
+            rationale = f"Based on {total_votes} votes with final score {final_score:.2f} and consensus {consensus_score:.2f}. "
+            
+            # Add key votes summary
+            supporting_votes = [v for v in votes if v.vote_value > 0.3]
+            opposing_votes = [v for v in votes if v.vote_value < -0.3]
+            
+            if supporting_votes:
+                rationale += f"Support from {len(supporting_votes)} members. "
+            if opposing_votes:
+                rationale += f"Opposition from {len(opposing_votes)} members. "
+            
+            return rationale
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate voting rationale: {e}")
+            return "Unable to generate comprehensive rationale due to system error"
+    
+    async def _determine_decision_status(self, voting_results: Dict[str, Any]) -> str:
+        """Determine decision status based on voting results"""
+        try:
+            if voting_results.get("error"):
+                return "error"
+            
+            final_score = voting_results.get("final_score", 0.0)
+            
+            if final_score > 0.0:
+                return "approved"
+            elif final_score < -0.3:
+                return "rejected"
+            else:
+                return "review_required"
+                
+        except Exception as e:
+            self.logger.error(f"Failed to determine decision status: {e}")
+            return "error"
 
 
 # Factory function
