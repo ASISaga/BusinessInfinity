@@ -1,0 +1,49 @@
+{
+  "name": "mentor-mode-boardroom",
+  "displayName": "Mentor Mode Boardroom LLM Control",
+  "publisher": "your-name",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "id": "boardroom-llm",
+        "displayName": "Boardroom of Agents (AML)",
+        "managementCommand": "boardroom.manage"
+      }
+    ],
+    "commands": [
+      {
+        "command": "boardroom.listAgents",
+        "title": "List Boardroom Agents"
+      },
+      {
+        "command": "boardroom.fineTuneAgent",
+        "title": "Fine Tune Agent LoRA"
+      },
+      {
+        "command": "boardroom.viewTrainingLogs",
+        "title": "View Training Logs"
+      },
+      {
+        "command": "boardroom.deployAdapter",
+        "title": "Deploy LoRA Adapter"
+      },
+      {
+        "command": "boardroom.compareVersions",
+        "title": "Compare LoRA Versions"
+      }
+    ]
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.93.0",
+    "typescript": "^5.2.0"
+  }
+}
