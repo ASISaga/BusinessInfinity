@@ -267,9 +267,8 @@
         "openapi_spec": "https://cloud.businessinfinity.asisaga.com/openapi.json",
         "description": "The frontend communicates with the backend via OpenAPI-defined endpoints on a separate Azure Functions deployment."
       }
-    }
-  },
-    "RealmOfAgents": {
+    },
+  "RealmOfAgents": {
     "name": "RealmOfAgents",
     "functions": [
       {"name": "agent_framework_foundation", "description": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors."}
