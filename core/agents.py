@@ -2,11 +2,8 @@
 Unified Agent Management System for Business Infinity
 
 This module provides the core agent management system that integrates with
-the new C-Suite agents architecture. It provides a unified interface for
-managing and orchestrating all business-specific agents.
-
-The actual agent implementations are in the /agents/ module and inherit
-from LeadershipAgent in AOS (Agent Operating System).
+the new AOS-based business agents architecture. It provides a unified interface for
+managing and orchestrating all business-specific agents built on top of AOS.
 """
 
 import os
@@ -15,31 +12,27 @@ import asyncio
 import logging
 from typing import Dict, Any, List, Optional, Union
 
-
-# Import the new C-Suite agents directly from RealmOfAgents
+# Import the new Business Infinity system
 try:
-    from RealmOfAgents.CEO.ChiefExecutiveOfficer import ChiefExecutiveOfficer
-    from RealmOfAgents.CFO.ChiefFinancialOfficer import ChiefFinancialOfficer
-    from RealmOfAgents.CMO.ChiefMarketingOfficer import ChiefMarketingOfficer
-    from RealmOfAgents.COO.ChiefOperatingOfficer import ChiefOperatingOfficer
-    from RealmOfAgents.CTO.ChiefTechnologyOfficer import ChiefTechnologyOfficer
-    from RealmOfAgents.CHRO.ChiefHumanResourcesOfficer import ChiefHumanResourcesOfficer
-    from RealmOfAgents.Founder.FounderAgent import FounderAgent
-    from RealmOfAgents.Investor.InvestorAgent import InvestorAgent
-    AGENT_REGISTRY = {
-        "CEO": ChiefExecutiveOfficer,
-        "CFO": ChiefFinancialOfficer,
-        "CMO": ChiefMarketingOfficer,
-        "COO": ChiefOperatingOfficer,
-        "CTO": ChiefTechnologyOfficer,
-        "CHRO": ChiefHumanResourcesOfficer,
-        "Founder": FounderAgent,
-        "Investor": InvestorAgent
-    }
-    AGENTS_AVAILABLE = True
+    from ..business_infinity import BusinessInfinity, BusinessInfinityConfig, get_business_infinity
+    from ..business_agents import (
+        BusinessCEO, BusinessCFO, BusinessCTO, 
+        BusinessFounder, BusinessInvestor,
+        create_ceo, create_cfo, create_cto, 
+        create_founder, create_investor
+    )
+    BUSINESS_INFINITY_AVAILABLE = True
 except ImportError:
-    AGENT_REGISTRY = {}
-    AGENTS_AVAILABLE = False
+    BUSINESS_INFINITY_AVAILABLE = False
+    logging.warning("Business Infinity system not available")
+
+# Fallback to MVP agents
+if not BUSINESS_INFINITY_AVAILABLE:
+    try:
+        from ..mvp_agents import AgentManager as MVPAgentManager
+        MVP_AGENTS_AVAILABLE = True
+    except ImportError:
+        MVP_AGENTS_AVAILABLE = False
 
 # Optional imports with fallbacks
 try:
@@ -49,27 +42,13 @@ try:
 except ImportError:
     SEMANTIC_KERNEL_AVAILABLE = False
 
-try:
-    from chromadb import Client as ChromaClient
-    CHROMADB_AVAILABLE = True
-except ImportError:
-    CHROMADB_AVAILABLE = False
-
-
-# Import environment manager from AOS
-try:
-    from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager as env_manager
-except ImportError:
-    env_manager = None
-
-
 logger = logging.getLogger(__name__)
 
 
 class UnifiedAgentManager:
     """
     Unified agent management system that provides:
-    - C-Suite agent instantiation and management
+    - Business Infinity agent instantiation and management
     - Agent orchestration and coordination
     - Backward compatibility with legacy systems
     """
@@ -82,27 +61,47 @@ class UnifiedAgentManager:
             config: Configuration dictionary for agents
         """
         self.config = config or {}
+        self.business_infinity = None
+        self.mvp_manager = None
         self.agents: Dict[str, Any] = {}
         self.initialized = False
         
-        if AGENTS_AVAILABLE:
-            self._initialize_agents()
+        # Initialize appropriate system
+        if BUSINESS_INFINITY_AVAILABLE:
+            self._initialize_business_infinity()
+        elif MVP_AGENTS_AVAILABLE:
+            self._initialize_mvp_agents()
         else:
-            logger.warning("Agent modules not available - running in compatibility mode")
+            logger.error("No agent system available")
     
-    def _initialize_agents(self):
-        """Initialize all available C-Suite agents."""
+    def _initialize_business_infinity(self):
+        """Initialize Business Infinity system"""
         try:
-            for agent_name, agent_class in AGENT_REGISTRY.items():
-                agent_config = self.config.get(agent_name.lower(), {})
-                self.agents[agent_name] = agent_class(config=agent_config)
-                logger.info(f"Initialized {agent_name} agent")
+            bi_config = BusinessInfinityConfig()
             
+            # Apply custom config if provided
+            if self.config:
+                for key, value in self.config.items():
+                    if hasattr(bi_config, key):
+                        setattr(bi_config, key, value)
+            
+            self.business_infinity = BusinessInfinity(bi_config)
             self.initialized = True
-            logger.info(f"Successfully initialized {len(self.agents)} agents")
+            logger.info("Business Infinity system initialized successfully")
             
         except Exception as e:
-            logger.error(f"Failed to initialize agents: {e}")
+            logger.error(f"Failed to initialize Business Infinity system: {e}")
+            self.initialized = False
+    
+    def _initialize_mvp_agents(self):
+        """Initialize MVP agent fallback"""
+        try:
+            self.mvp_manager = MVPAgentManager()
+            self.initialized = True
+            logger.info("MVP agent system initialized successfully")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize MVP agent system: {e}")
             self.initialized = False
     
     def get_agent(self, agent_name: str) -> Optional[Any]:
@@ -115,11 +114,28 @@ class UnifiedAgentManager:
         Returns:
             Agent instance or None if not found
         """
-        return self.agents.get(agent_name.upper())
+        if self.business_infinity:
+            return self.business_infinity.get_agent(agent_name)
+        elif self.mvp_manager:
+            return self.mvp_manager.get_agent(agent_name.lower())
+        
+        return None
     
     def get_all_agents(self) -> Dict[str, Any]:
         """Get all initialized agents."""
-        return self.agents.copy()
+        if self.business_infinity:
+            agents = {}
+            for agent_info in self.business_infinity.list_agents():
+                role = agent_info["role"]
+                agent = self.business_infinity.get_agent(role)
+                if agent:
+                    agents[role] = agent
+            return agents
+        elif self.mvp_manager:
+            return {agent["role"]: self.mvp_manager.get_agent(agent["role"].lower()) 
+                   for agent in self.mvp_manager.list_agents()}
+        
+        return {}
     
     def get_agent_profiles(self) -> str:
         """
@@ -132,24 +148,23 @@ class UnifiedAgentManager:
             return "[]"
         
         profiles = []
-        for agent_name, agent in self.agents.items():
-            try:
-                # Try to get profile from agent if it has the method
-                if hasattr(agent, 'get_profile'):
-                    profile = agent.get_profile()
-                else:
-                    # Create basic profile
-                    profile = {
-                        "agentId": agent_name.lower(),
-                        "name": agent_name,
-                        "role": getattr(agent, 'role', agent_name),
-                        "leadership_style": getattr(agent, 'leadership_style', 'strategic'),
-                        "active": True
-                    }
-                profiles.append(profile)
-            except Exception as e:
-                logger.error(f"Failed to get profile for {agent_name}: {e}")
-                
+        
+        if self.business_infinity:
+            agents_list = self.business_infinity.list_agents()
+            for agent_info in agents_list:
+                role = agent_info["role"]
+                profiles.append({
+                    "agentId": role.lower(),
+                    "name": f"Business Infinity {role}",
+                    "role": role,
+                    "type": agent_info.get("type", "Business"),
+                    "status": agent_info.get("status", "active"),
+                    "leadership_style": "strategic",
+                    "active": agent_info.get("status") == "active"
+                })
+        elif self.mvp_manager:
+            profiles = self.mvp_manager.list_agents()
+            
         return json.dumps(profiles, indent=2)
     
     async def execute_agent_task(self, agent_name: str, task: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -158,221 +173,176 @@ class UnifiedAgentManager:
         
         Args:
             agent_name: Name of the agent
-            task: Task to execute
-            context: Additional context for the task
+            task: Task description
+            context: Optional context
             
         Returns:
-            Result of the task execution
+            Task execution result
         """
-        agent = self.get_agent(agent_name)
-        if not agent:
-            return {"error": f"Agent {agent_name} not found"}
-        
         try:
-            # Map task to appropriate agent method
-            task_method = self._map_task_to_method(task)
-            
-            if hasattr(agent, task_method):
-                method = getattr(agent, task_method)
-                if asyncio.iscoroutinefunction(method):
-                    result = await method(context or {})
-                else:
-                    result = method(context or {})
-                return {"success": True, "result": result}
+            if self.business_infinity:
+                response = await self.business_infinity.ask_agent(agent_name, task, context)
+                return {
+                    "status": "success",
+                    "agent": agent_name,
+                    "task": task,
+                    "response": response,
+                    "system": "business_infinity"
+                }
+            elif self.mvp_manager:
+                response = await self.mvp_manager.ask_agent(agent_name.lower(), task, context)
+                return {
+                    "status": "success",
+                    "agent": agent_name,
+                    "task": task,
+                    "response": response,
+                    "system": "mvp"
+                }
             else:
-                # Try generic decision making if available
-                if hasattr(agent, 'make_decision'):
-                    if asyncio.iscoroutinefunction(agent.make_decision):
-                        result = await agent.make_decision(task, context or {})
-                    else:
-                        result = agent.make_decision(task, context or {})
-                    return {"success": True, "result": result}
-                else:
-                    return {"error": f"Agent {agent_name} does not support task: {task}"}
-                    
+                return {
+                    "status": "error",
+                    "error": "No agent system available"
+                }
+                
         except Exception as e:
-            logger.error(f"Failed to execute task {task} with agent {agent_name}: {e}")
-            return {"error": str(e)}
+            logger.error(f"Failed to execute task for {agent_name}: {e}")
+            return {
+                "status": "error",
+                "agent": agent_name,
+                "task": task,
+                "error": str(e)
+            }
     
-    def _map_task_to_method(self, task: str) -> str:
+    async def orchestrate_leadership_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Map a task description to an agent method name.
+        Orchestrate a leadership decision across multiple agents.
         
         Args:
-            task: Task description
+            decision_context: Context and parameters for the decision
             
         Returns:
-            Method name to call
+            Decision result
         """
-        # Simple mapping - can be enhanced with more sophisticated logic
-        task_lower = task.lower()
-        
-        if "strategy" in task_lower:
-            return "develop_strategy"
-        elif "analysis" in task_lower or "analyze" in task_lower:
-            return "conduct_analysis"
-        elif "plan" in task_lower:
-            return "create_plan"
-        elif "budget" in task_lower:
-            return "manage_budget"
-        elif "performance" in task_lower:
-            return "evaluate_performance"
-        elif "decision" in task_lower:
-            return "make_decision"
-        else:
-            return "execute_task"
-    
-    def get_agent_status(self) -> Dict[str, Any]:
-        """Get status of all agents."""
-        return {
-            "initialized": self.initialized,
-            "agent_count": len(self.agents),
-            "agents": list(self.agents.keys()) if self.initialized else [],
-            "capabilities": {
-                "semantic_kernel": SEMANTIC_KERNEL_AVAILABLE,
-                "chromadb": CHROMADB_AVAILABLE,
-                "c_suite_agents": AGENTS_AVAILABLE
+        try:
+            if self.business_infinity:
+                return await self.business_infinity.make_strategic_decision(decision_context)
+            else:
+                # Fallback implementation
+                return {
+                    "status": "completed",
+                    "decision": "fallback_decision_process",
+                    "system": "fallback",
+                    "context": decision_context
+                }
+                
+        except Exception as e:
+            logger.error(f"Failed to orchestrate leadership decision: {e}")
+            return {
+                "status": "error",
+                "error": str(e)
             }
-        }
-
-
-# Create global agent manager instance
-agent_manager = UnifiedAgentManager()
-
-
-# Legacy compatibility classes and functions
-class BaseAgent:
-    """Legacy base agent class for backward compatibility."""
     
-    def __init__(self, agent_id: str, purpose: str, interval: int = 5):
-        self.agent_id = agent_id
-        self.purpose = purpose
-        self.interval = interval
-        self.active = False
+    async def execute_business_workflow(self, workflow_name: str, workflow_params: Dict[str, Any]) -> str:
+        """
+        Execute a business workflow.
         
-    async def execute_task(self, input_data: str, context: dict = None) -> str:
-        """Legacy execute task method."""
-        return f"Legacy agent {self.agent_id} processing: {input_data}"
+        Args:
+            workflow_name: Name of the workflow to execute
+            workflow_params: Parameters for the workflow
+            
+        Returns:
+            Workflow execution ID
+        """
+        try:
+            if self.business_infinity:
+                return await self.business_infinity.execute_business_workflow(workflow_name, workflow_params)
+            else:
+                # Fallback workflow execution
+                return f"fallback_{workflow_name}_{asyncio.get_event_loop().time()}"
+                
+        except Exception as e:
+            logger.error(f"Failed to execute workflow {workflow_name}: {e}")
+            return f"error_{asyncio.get_event_loop().time()}"
     
-    def get_profile(self) -> Dict[str, Any]:
-        """Get agent profile information."""
-        return {
-            "agentId": self.agent_id,
-            "name": self.agent_id.replace("_", " ").title(),
-            "purpose": self.purpose,
-            "interval": self.interval,
-            "active": self.active
+    def get_system_status(self) -> Dict[str, Any]:
+        """Get comprehensive system status."""
+        base_status = {
+            "initialized": self.initialized,
+            "business_infinity_available": BUSINESS_INFINITY_AVAILABLE,
+            "mvp_agents_available": MVP_AGENTS_AVAILABLE,
+            "semantic_kernel_available": SEMANTIC_KERNEL_AVAILABLE,
+            "system_type": "UnifiedAgentManager"
         }
-
-
-# Legacy agent classes for backward compatibility
-class OperationsAgent(BaseAgent):
-    """Legacy Operations agent - replaced by ChiefOperatingOfficer."""
+        
+        if self.business_infinity:
+            # Get Business Infinity status asynchronously
+            asyncio.create_task(self._get_bi_status_async(base_status))
+        
+        return base_status
     
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Operations Agent - use ChiefOperatingOfficer instead"
-        super().__init__("operations", purpose, interval)
-
-
-class FinanceAgent(BaseAgent):
-    """Legacy Finance agent - replaced by ChiefFinancialOfficer."""
+    async def _get_bi_status_async(self, base_status: Dict[str, Any]):
+        """Get Business Infinity status asynchronously"""
+        try:
+            bi_status = await self.business_infinity.get_business_status()
+            base_status["business_infinity_status"] = bi_status
+        except Exception as e:
+            base_status["business_infinity_error"] = str(e)
     
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Finance Agent - use ChiefFinancialOfficer instead"
-        super().__init__("finance", purpose, interval)
+    async def get_complete_system_status(self) -> Dict[str, Any]:
+        """Get complete system status including async data"""
+        base_status = self.get_system_status()
+        
+        if self.business_infinity:
+            try:
+                bi_status = await self.business_infinity.get_business_status()
+                base_status["business_infinity_status"] = bi_status
+            except Exception as e:
+                base_status["business_infinity_error"] = str(e)
+        
+        return base_status
 
 
-class MarketingAgent(BaseAgent):
-    """Marketing and customer engagement agent"""
-    
-    def __init__(self, interval: int = 5):
-        purpose = """
-        Marketing Strategy: Develop and execute marketing campaigns.
-        Customer Analytics: Analyze customer behavior and market trends.
-        Brand Management: Maintain brand consistency and reputation.
-        """
-        super().__init__("marketing", purpose, interval)
-    
-    async def execute_task(self, input_data: str, context: dict = None) -> str:
-        return f"Marketing Agent processing: {input_data}"
+# Global unified manager instance
+_unified_manager = None
+
+def get_unified_manager(config: Dict[str, Any] = None) -> UnifiedAgentManager:
+    """Get global unified manager instance"""
+    global _unified_manager
+    if _unified_manager is None:
+        _unified_manager = UnifiedAgentManager(config)
+    return _unified_manager
+
+def initialize_unified_manager(config: Dict[str, Any] = None) -> UnifiedAgentManager:
+    """Initialize and return unified manager"""
+    global _unified_manager
+    _unified_manager = UnifiedAgentManager(config)
+    return _unified_manager
 
 
-class HRAgent(BaseAgent):
-    """Human Resources agent"""
-    
-    def __init__(self, interval: int = 5):
-        purpose = """
-        Talent Management: Recruit, develop, and retain talent.
-        Employee Relations: Handle employee concerns and engagement.
-        Policy Management: Maintain HR policies and compliance.
-        """
-        super().__init__("hr", purpose, interval)
+# Backward compatibility functions
+async def ask_agent(agent_name: str, message: str, context: Dict[str, Any] = None) -> Optional[str]:
+    """Ask an agent a question (backward compatibility)"""
+    manager = get_unified_manager()
+    result = await manager.execute_agent_task(agent_name, message, context)
+    return result.get("response") if result.get("status") == "success" else None
+
+def get_agent_profiles_json() -> str:
+    """Get agent profiles JSON (backward compatibility)"""
+    manager = get_unified_manager()
+    return manager.get_agent_profiles()
+
+def get_agent_by_name(agent_name: str):
+    """Get agent by name (backward compatibility)"""
+    manager = get_unified_manager()
+    return manager.get_agent(agent_name)
 
 
-# Additional legacy agent classes for backward compatibility
-class MarketingAgent(BaseAgent):
-    """Legacy Marketing agent - replaced by ChiefMarketingOfficer."""
-    
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Marketing Agent - use ChiefMarketingOfficer instead"
-        super().__init__("marketing", purpose, interval)
-
-
-class HRAgent(BaseAgent):
-    """Legacy HR agent - replaced by ChiefHumanResourcesOfficer."""
-    
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy HR Agent - use ChiefHumanResourcesOfficer instead"
-        super().__init__("hr", purpose, interval)
-
-
-class AccountsAgent(BaseAgent):
-    """Legacy Accounts agent - replaced by ChiefFinancialOfficer."""
-    
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Accounts Agent - use ChiefFinancialOfficer instead"
-        super().__init__("accounts", purpose, interval)
-
-
-class QualityAgent(BaseAgent):
-    """Legacy Quality agent - replaced by ChiefOperatingOfficer."""
-    
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Quality Agent - use ChiefOperatingOfficer instead"
-        super().__init__("quality", purpose, interval)
-
-
-class PurchaseAgent(BaseAgent):
-    """Legacy Purchase agent - replaced by ChiefOperatingOfficer."""
-    
-    def __init__(self, interval: int = 5):
-        purpose = "Legacy Purchase Agent - use ChiefOperatingOfficer instead"
-        super().__init__("purchase", purpose, interval)
-
-
-# Export for backward compatibility
-def get_default_agent_cfg():
-    """Return default agent configuration for backward compatibility."""
-    return {
-        "ceo": {"instructions": "Use ChiefExecutiveOfficer agent instead"},
-        "cfo": {"instructions": "Use ChiefFinancialOfficer agent instead"},
-        "cmo": {"instructions": "Use ChiefMarketingOfficer agent instead"},
-        "coo": {"instructions": "Use ChiefOperatingOfficer agent instead"},
-        "cto": {"instructions": "Use ChiefTechnologyOfficer agent instead"},
-        "chro": {"instructions": "Use ChiefHumanResourcesOfficer agent instead"}
-    }
-
-
+# Export the main functions for backward compatibility
 __all__ = [
     'UnifiedAgentManager',
-    'agent_manager',
-    'BaseAgent',
-    'OperationsAgent',
-    'FinanceAgent',
-    'MarketingAgent',
-    'HRAgent',
-    'AccountsAgent',
-    'QualityAgent',
-    'PurchaseAgent',
-    'get_default_agent_cfg'
+    'get_unified_manager',
+    'initialize_unified_manager',
+    'ask_agent',
+    'get_agent_profiles_json',
+    'get_agent_by_name'
 ]
