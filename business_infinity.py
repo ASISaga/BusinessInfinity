@@ -25,7 +25,7 @@ from datetime import datetime
 try:
     from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
     from RealmOfAgents.AgentOperatingSystem.config import AOSConfig, default_config
-    from .autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
+    from autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
@@ -34,11 +34,19 @@ except ImportError:
 # Import FineTunedLLM for LoRA adapters
 try:
     from RealmOfAgents.FineTunedLLM.lora_manager import LoRAManager
-    from RealmOfAgents.FineTunedLLM.mentor_mode import MentorMode
+    from RealmOfAgents.FineTunedLLM.mentor_mode import MentorMode as ExternalMentorMode
     FINETUNED_LLM_AVAILABLE = True
 except ImportError:
     FINETUNED_LLM_AVAILABLE = False
-    logging.warning("FineTunedLLM not available")
+    logging.warning("FineTunedLLM not available, using local implementation")
+
+# Import local mentor mode implementation
+try:
+    from core.mentor_mode import MentorMode
+    LOCAL_MENTOR_MODE_AVAILABLE = True
+except ImportError:
+    LOCAL_MENTOR_MODE_AVAILABLE = False
+    logging.warning("Local mentor mode not available")
 
 # Azure Service Bus for MCP connectivity
 try:
@@ -73,7 +81,7 @@ except ImportError:
 
 # Fallback imports from MVP implementation
 if not C_SUITE_AVAILABLE or not STAKEHOLDER_AGENTS_AVAILABLE:
-    from .mvp_agents import LeadershipAgent, AgentManager as MVPAgentManager
+    from mvp_agents import LeadershipAgent, AgentManager as MVPAgentManager
 
 
 class BusinessInfinityConfig:
@@ -173,18 +181,23 @@ class BusinessInfinity:
                 self.aos = AgentOperatingSystem(self.config.aos_config)
                 self.logger.info("AOS initialized successfully")
             
-            # Initialize FineTunedLLM LoRA Manager
+            # Initialize FineTunedLLM LoRA Manager and Mentor Mode
             if FINETUNED_LLM_AVAILABLE:
                 self.lora_manager = LoRAManager()
                 await self.lora_manager.initialize()
                 
-                # Initialize Mentor Mode if enabled
+                # Initialize external Mentor Mode if enabled
                 if self.config.mentor_mode_enabled:
-                    self.mentor_mode = MentorMode(self.lora_manager)
+                    self.mentor_mode = ExternalMentorMode(self.lora_manager)
                     await self.mentor_mode.initialize()
-                    self.logger.info("Mentor Mode initialized for LoRA adapter training")
+                    self.logger.info("External Mentor Mode initialized for LoRA adapter training")
                 
                 self.logger.info("FineTunedLLM LoRA Manager initialized")
+            elif LOCAL_MENTOR_MODE_AVAILABLE and self.config.mentor_mode_enabled:
+                # Use local mentor mode implementation
+                self.mentor_mode = MentorMode()
+                await self.mentor_mode.initialize()
+                self.logger.info("Local Mentor Mode initialized")
             
             # Initialize Azure Service Bus for MCP connectivity
             if AZURE_SERVICEBUS_AVAILABLE and self.config.service_bus_connection:

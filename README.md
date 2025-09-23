@@ -89,6 +89,14 @@ Centralized agent management system:
 - Domain expertise sharing
 - Performance monitoring and optimization
 
+### Mentor Mode
+- **Sandboxed Environment**: Safe testing and fine-tuning of business agents
+- **Agent Training**: LoRA fine-tuning with domain-specific datasets
+- **Web Interface**: Intuitive dashboard at `/mentor/ui` endpoint
+- **VS Code Extension**: Developer-focused control surface in `/mentor` directory
+- **Version Management**: Track and compare different agent model versions
+- **Scenario Testing**: Evaluate agent performance against test cases
+
 ### Scalable Architecture
 - Built on AOS foundation for reliability
 - Azure Functions for serverless scaling
