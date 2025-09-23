@@ -27,6 +27,12 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+# Import audit trail system
+from .audit_trail import (
+    AuditTrailManager, AuditEventType, AuditSeverity, 
+    audit_log, get_audit_manager
+)
+
 
 class BusinessInfinityConfigMCPServer:
     """
@@ -43,6 +49,9 @@ class BusinessInfinityConfigMCPServer:
             "Full implementation should be in separate repository."
         )
         
+        # Initialize audit trail manager
+        self.audit_manager = get_audit_manager()
+        
         # Stub data - in real implementation this would be in database
         self._stub_config = {
             "version": "1.0.0",
@@ -52,6 +61,16 @@ class BusinessInfinityConfigMCPServer:
             "boardroom_agents": {},
             "audit_logs": []
         }
+        
+        # Log MCP server initialization
+        self.audit_manager.log_event(
+            event_type=AuditEventType.SYSTEM_STARTUP,
+            subject_id="config_mcp_server",
+            subject_type="system",
+            action="BusinessInfinity Config MCP Server (stub) initialized",
+            context={"version": self._stub_config["version"]},
+            compliance_tags={"system_lifecycle", "mcp_server"}
+        )
     
     def get_user_permissions(self, user_id: str, role: str) -> Dict[str, Any]:
         """
@@ -124,39 +143,111 @@ class BusinessInfinityConfigMCPServer:
     
     def get_audit_logs(self, hours: int = 24) -> List[Dict[str, Any]]:
         """
-        Get audit logs (stub implementation)
-        
-        TODO: Implement comprehensive audit logging
-        - Database queries for audit logs
-        - Filtering and pagination
-        - Log aggregation and analysis
-        - Export functionality
+        Get audit logs using the comprehensive audit trail system
         """
-        return [
-            {
-                "timestamp": datetime.now().isoformat(),
-                "event": "access_denied",
-                "user_id": "user123",
-                "role": "Employee",
-                "mcp_server": "linkedin",
-                "operation": "create",
-                "reason": "Insufficient permissions",
-                "note": "This is stub data. Full implementation needed."
-            }
-        ]
+        from .audit_trail import AuditQuery
+        from datetime import timedelta
+        
+        # Create query for recent audit events
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=hours)
+        
+        query = AuditQuery(
+            start_time=start_time,
+            end_time=end_time,
+            limit=1000
+        )
+        
+        # Get events from audit trail manager
+        events = self.audit_manager.query_events(query)
+        
+        # Convert to legacy format for compatibility
+        legacy_logs = []
+        for event in events:
+            legacy_logs.append({
+                "timestamp": event.timestamp.isoformat(),
+                "event": event.event_type.value,
+                "user_id": event.subject_id,
+                "role": event.subject_role or "Unknown",
+                "mcp_server": event.mcp_server or "N/A",
+                "operation": event.action,
+                "reason": event.rationale or "No reason provided",
+                "severity": event.severity.value,
+                "context": event.context,
+                "metrics": event.metrics,
+                "compliance_tags": list(event.compliance_tags)
+            })
+        
+        # Log audit log access
+        self.audit_manager.log_event(
+            event_type=AuditEventType.BUSINESS_DATA_ACCESS,
+            subject_id="config_mcp_server",
+            subject_type="system",
+            action=f"Retrieved {len(legacy_logs)} audit log entries",
+            context={"hours": hours, "query_period": f"{start_time} to {end_time}"},
+            compliance_tags={"audit_access", "data_retrieval"}
+        )
+        
+        return legacy_logs
     
     def create_audit_log_entry(self, event_data: Dict[str, Any]) -> bool:
         """
-        Create audit log entry (stub implementation)
-        
-        TODO: Implement audit log creation
-        - Validate event data
-        - Store in database
-        - Real-time alerting for violations
-        - Log aggregation for analytics
+        Create audit log entry using the comprehensive audit trail system
         """
-        self.logger.info(f"Stub: Would create audit log entry: {event_data}")
-        return True
+        try:
+            # Extract required fields
+            event_type_str = event_data.get("event_type", "system_event")
+            subject_id = event_data.get("subject_id", "unknown")
+            subject_type = event_data.get("subject_type", "system") 
+            action = event_data.get("action", "Unknown action")
+            
+            # Map legacy event types to new enum values
+            event_type_mapping = {
+                "access_denied": AuditEventType.ACCESS_DENIED,
+                "access_granted": AuditEventType.ACCESS_GRANTED,
+                "mcp_request": AuditEventType.MCP_REQUEST,
+                "mcp_response": AuditEventType.MCP_RESPONSE,
+                "mcp_error": AuditEventType.MCP_ERROR,
+                "agent_vote": AuditEventType.AGENT_VOTE,
+                "boardroom_decision": AuditEventType.BOARDROOM_DECISION,
+                "business_transaction": AuditEventType.BUSINESS_TRANSACTION,
+                "system_event": AuditEventType.SYSTEM_STARTUP
+            }
+            
+            event_type = event_type_mapping.get(event_type_str, AuditEventType.SYSTEM_STARTUP)
+            
+            # Map severity
+            severity_mapping = {
+                "low": AuditSeverity.LOW,
+                "medium": AuditSeverity.MEDIUM,
+                "high": AuditSeverity.HIGH,
+                "critical": AuditSeverity.CRITICAL
+            }
+            severity = severity_mapping.get(event_data.get("severity", "medium"), AuditSeverity.MEDIUM)
+            
+            # Create audit entry
+            self.audit_manager.log_event(
+                event_type=event_type,
+                subject_id=subject_id,
+                subject_type=subject_type,
+                action=action,
+                severity=severity,
+                subject_role=event_data.get("subject_role"),
+                target=event_data.get("target"),
+                mcp_server=event_data.get("mcp_server"),
+                context=event_data.get("context", {}),
+                rationale=event_data.get("rationale"),
+                evidence=event_data.get("evidence", []),
+                metrics=event_data.get("metrics", {}),
+                compliance_tags=set(event_data.get("compliance_tags", []))
+            )
+            
+            self.logger.info(f"Created audit log entry: {event_type_str} for {subject_id}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create audit log entry: {e}")
+            return False
     
     def get_system_configuration(self) -> Dict[str, Any]:
         """

@@ -29,6 +29,12 @@ except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available")
 
+# Import audit trail system
+from core.audit_trail import (
+    AuditTrailManager, AuditEventType, AuditSeverity, 
+    audit_log, get_audit_manager
+)
+
 # Import FineTunedLLM for LoRA adapters
 try:
     from RealmOfAgents.FineTunedLLM.lora_manager import LoRAManager
@@ -150,6 +156,9 @@ class AutonomousBoardroom:
         self.config = aos_config or default_config
         self.logger = logging.getLogger(__name__)
         
+        # Initialize audit trail manager
+        self.audit_manager = get_audit_manager()
+        
         # Core systems
         self.aos = None
         self.lora_manager = None
@@ -173,6 +182,20 @@ class AutonomousBoardroom:
         self.is_running = False
         self.session_frequency = timedelta(hours=1)  # Board sessions every hour
         self.last_session = None
+        
+        # Log boardroom initialization
+        self.audit_manager.log_event(
+            event_type=AuditEventType.SYSTEM_STARTUP,
+            subject_id="autonomous_boardroom",
+            subject_type="system",
+            action="Autonomous Boardroom initialized",
+            severity=AuditSeverity.MEDIUM,
+            context={
+                "session_frequency_hours": self.session_frequency.total_seconds() / 3600,
+                "mcp_servers": list(self.mcp_servers.keys())
+            },
+            compliance_tags={"system_lifecycle", "business_governance"}
+        )
         
         # Initialize systems
         asyncio.create_task(self._initialize_systems())
@@ -523,6 +546,22 @@ class AutonomousBoardroom:
         proposal = decision_context.get("proposal", "")
         decision_type = DecisionType(decision_context["type"])
         
+        # Log decision initiation
+        self.audit_manager.log_event(
+            event_type=AuditEventType.AGENT_PROPOSAL,
+            subject_id=decision_context.get("proposed_by", "system"),
+            subject_type="agent" if decision_context.get("proposed_by", "system") != "system" else "system",
+            action=f"Initiated boardroom decision: {decision_type.value}",
+            context={
+                "decision_id": decision_id,
+                "proposal": proposal,
+                "decision_type": decision_type.value
+            },
+            rationale=f"Decision proposed: {proposal}",
+            severity=AuditSeverity.HIGH,
+            compliance_tags={"business_governance", "decision_making"}
+        )
+        
         decision = BoardroomDecision(
             decision_id=decision_id,
             proposal=proposal,
@@ -556,6 +595,24 @@ class AutonomousBoardroom:
         
         # Store decision
         self.active_decisions[decision_id] = decision
+        
+        # Log comprehensive boardroom decision
+        self.audit_manager.log_boardroom_decision(
+            decision_id=decision_id,
+            decision_type=decision_type.value,
+            proposed_by=decision.proposed_by,
+            final_decision=decision.final_decision,
+            rationale=decision.rationale,
+            votes=[{
+                "voter_id": vote.voter_id,
+                "voter_role": vote.voter_role.value,
+                "vote_value": vote.vote_value,
+                "confidence": vote.confidence,
+                "rationale": vote.rationale
+            } for vote in decision.votes],
+            confidence_score=decision.confidence_score,
+            consensus_score=decision.consensus_score
+        )
         
         self.logger.info(f"Boardroom decision made via voting: {decision_id} - Status: {decision.status}")
         return decision
@@ -608,11 +665,38 @@ class AutonomousBoardroom:
                 purpose_alignment=purpose_alignment
             )
             
+            # Log individual agent vote with comprehensive audit information
+            self.audit_manager.log_agent_vote(
+                voter_id=agent.agent_id,
+                voter_role=agent.role.value,
+                decision_id="",  # Will be set by calling method
+                vote_value=vote_value,
+                rationale=reasoning,
+                evidence=[f"LoRA adapter score: {lora_score}", f"Purpose alignment: {purpose_alignment}"],
+                confidence=confidence
+            )
+            
             self.logger.debug(f"Agent {agent.agent_id} voted {vote_value:.2f} with {confidence:.2f} confidence")
             return vote
             
         except Exception as e:
             self.logger.error(f"Failed to get vote from agent {agent.agent_id}: {e}")
+            
+            # Log voting failure
+            self.audit_manager.log_event(
+                event_type=AuditEventType.SYSTEM_ERROR,
+                subject_id=agent.agent_id,
+                subject_type="agent",
+                subject_role=agent.role.value,
+                action="Failed to cast vote",
+                severity=AuditSeverity.HIGH,
+                context={
+                    "proposal": proposal[:100] + "..." if len(proposal) > 100 else proposal,
+                    "decision_type": decision_type.value,
+                    "error": str(e)
+                },
+                compliance_tags={"business_governance", "system_error"}
+            )
             return None
     
     async def _synthesize_decision(self, decision: BoardroomDecision) -> str:
@@ -637,13 +721,53 @@ class AutonomousBoardroom:
     
     async def _send_mcp_query(self, queue_name: str, message: Dict[str, Any]):
         """Send query to MCP server via Service Bus"""
-        if self.service_bus_client:
-            async with self.service_bus_client:
-                sender = self.service_bus_client.get_queue_sender(queue_name=queue_name)
-                async with sender:
-                    message_body = json.dumps(message)
-                    sb_message = ServiceBusMessage(message_body)
-                    await sender.send_messages(sb_message)
+        # Determine which MCP server based on queue name
+        mcp_server = None
+        for server, queue in self.mcp_servers.items():
+            if queue == queue_name:
+                mcp_server = server
+                break
+        
+        # Log MCP interaction attempt
+        self.audit_manager.log_mcp_interaction(
+            mcp_server=mcp_server or queue_name,
+            operation=message.get("type", "unknown"),
+            subject_id="autonomous_boardroom",
+            subject_type="system",
+            success=False,  # Will update if successful
+            request_data=message
+        )
+        
+        try:
+            if self.service_bus_client:
+                async with self.service_bus_client:
+                    sender = self.service_bus_client.get_queue_sender(queue_name=queue_name)
+                    async with sender:
+                        message_body = json.dumps(message)
+                        sb_message = ServiceBusMessage(message_body)
+                        await sender.send_messages(sb_message)
+                
+                # Log successful MCP interaction
+                self.audit_manager.log_mcp_interaction(
+                    mcp_server=mcp_server or queue_name,
+                    operation=message.get("type", "unknown"),
+                    subject_id="autonomous_boardroom",
+                    subject_type="system",
+                    success=True,
+                    request_data=message
+                )
+        except Exception as e:
+            # Log failed MCP interaction
+            self.audit_manager.log_mcp_interaction(
+                mcp_server=mcp_server or queue_name,
+                operation=message.get("type", "unknown"),
+                subject_id="autonomous_boardroom",
+                subject_type="system",
+                success=False,
+                request_data=message,
+                error_details=str(e)
+            )
+            raise
     
     async def _monitor_business_environment(self):
         """Continuously monitor the business environment"""
@@ -677,6 +801,28 @@ class AutonomousBoardroom:
     
     async def _execute_decision(self, decision: BoardroomDecision):
         """Execute a specific decision"""
+        # Log decision execution start
+        self.audit_manager.log_event(
+            event_type=AuditEventType.BUSINESS_TRANSACTION,
+            subject_id="autonomous_boardroom",
+            subject_type="system",
+            action=f"Executing decision: {decision.decision_type.value}",
+            target=decision.decision_id,
+            severity=AuditSeverity.HIGH,
+            context={
+                "decision_id": decision.decision_id,
+                "decision_type": decision.decision_type.value,
+                "final_decision": decision.final_decision,
+                "implementation_plan": decision.implementation_plan
+            },
+            rationale=decision.rationale,
+            metrics={
+                "confidence_score": decision.confidence_score,
+                "consensus_score": decision.consensus_score
+            },
+            compliance_tags={"business_execution", "decision_implementation"}
+        )
+        
         try:
             # Send execution instructions to relevant MCP servers
             execution_context = {
@@ -689,20 +835,82 @@ class AutonomousBoardroom:
             # Route to appropriate MCP servers based on decision type
             target_servers = self._get_execution_servers(decision.decision_type)
             
+            executed_successfully = []
+            execution_errors = []
+            
             for server in target_servers:
                 if server in self.mcp_servers:
-                    await self._send_mcp_query(self.mcp_servers[server], {
-                        "type": "execute_decision",
-                        "context": execution_context
-                    })
+                    try:
+                        await self._send_mcp_query(self.mcp_servers[server], {
+                            "type": "execute_decision",
+                            "context": execution_context
+                        })
+                        executed_successfully.append(server)
+                        
+                        # Log individual server execution
+                        self.audit_manager.log_business_action(
+                            system=server,
+                            operation="execute_decision",
+                            agent_id="autonomous_boardroom",
+                            business_entity=decision.decision_id,
+                            transaction_data=execution_context
+                        )
+                        
+                    except Exception as server_error:
+                        execution_errors.append({"server": server, "error": str(server_error)})
             
-            decision.execution_status = "completed"
+            # Determine overall execution status
+            if executed_successfully and not execution_errors:
+                decision.execution_status = "completed"
+                execution_success = True
+            elif executed_successfully and execution_errors:
+                decision.execution_status = "partially_completed"
+                execution_success = True
+            else:
+                decision.execution_status = "failed"
+                execution_success = False
+            
             decision.executed_at = datetime.now()
             
-            self.logger.info(f"Executed decision: {decision.decision_id}")
+            # Log execution completion
+            self.audit_manager.log_event(
+                event_type=AuditEventType.BUSINESS_TRANSACTION,
+                subject_id="autonomous_boardroom",
+                subject_type="system",
+                action=f"Decision execution {decision.execution_status}",
+                target=decision.decision_id,
+                severity=AuditSeverity.HIGH if execution_success else AuditSeverity.CRITICAL,
+                context={
+                    "decision_id": decision.decision_id,
+                    "execution_status": decision.execution_status,
+                    "executed_successfully": executed_successfully,
+                    "execution_errors": execution_errors,
+                    "target_servers": target_servers
+                },
+                compliance_tags={"business_execution", "decision_implementation"}
+            )
+            
+            self.logger.info(f"Executed decision: {decision.decision_id} - Status: {decision.execution_status}")
             
         except Exception as e:
             decision.execution_status = "failed"
+            
+            # Log execution failure
+            self.audit_manager.log_event(
+                event_type=AuditEventType.SYSTEM_ERROR,
+                subject_id="autonomous_boardroom",
+                subject_type="system",
+                action="Decision execution failed",
+                target=decision.decision_id,
+                severity=AuditSeverity.CRITICAL,
+                context={
+                    "decision_id": decision.decision_id,
+                    "error": str(e),
+                    "decision_type": decision.decision_type.value
+                },
+                compliance_tags={"business_execution", "system_error"}
+            )
+            
             self.logger.error(f"Failed to execute decision {decision.decision_id}: {e}")
     
     def _get_execution_servers(self, decision_type: DecisionType) -> List[str]:
