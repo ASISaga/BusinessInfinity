@@ -21,14 +21,32 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Import AOS foundation
+# Import AOS foundation and autonomous boardroom
 try:
     from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
     from RealmOfAgents.AgentOperatingSystem.config import AOSConfig, default_config
+    from .autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available, using fallback implementations")
+
+# Import FineTunedLLM for LoRA adapters
+try:
+    from RealmOfAgents.FineTunedLLM.lora_manager import LoRAManager
+    from RealmOfAgents.FineTunedLLM.mentor_mode import MentorMode
+    FINETUNED_LLM_AVAILABLE = True
+except ImportError:
+    FINETUNED_LLM_AVAILABLE = False
+    logging.warning("FineTunedLLM not available")
+
+# Azure Service Bus for MCP connectivity
+try:
+    from azure.servicebus.aio import ServiceBusClient as AsyncServiceBusClient
+    AZURE_SERVICEBUS_AVAILABLE = True
+except ImportError:
+    AZURE_SERVICEBUS_AVAILABLE = False
+    logging.warning("Azure Service Bus not available")
 
 # Import C-Suite agents
 try:
@@ -59,7 +77,7 @@ if not C_SUITE_AVAILABLE or not STAKEHOLDER_AGENTS_AVAILABLE:
 
 
 class BusinessInfinityConfig:
-    """Configuration for Business Infinity application"""
+    """Configuration for Business Infinity autonomous boardroom"""
     
     def __init__(self):
         self.aos_config = default_config if AOS_AVAILABLE else None
@@ -68,76 +86,170 @@ class BusinessInfinityConfig:
         self.stage = os.getenv("BUSINESS_STAGE", "Growth")  # Startup, Growth, Mature
         self.market = os.getenv("TARGET_MARKET", "Global")
         
-        # Business-specific configuration
-        self.enable_c_suite = True
-        self.enable_founder = True
-        self.enable_investor = True
-        self.enable_board = False  # Future feature
+        # Autonomous Boardroom Configuration
+        self.enable_autonomous_boardroom = True
+        self.perpetual_operation = True
+        self.session_frequency_hours = int(os.getenv("BOARDROOM_SESSION_FREQUENCY", "1"))
+        
+        # Legendary Expertise Configuration
+        self.enable_lora_adapters = True
+        self.mentor_mode_enabled = bool(os.getenv("MENTOR_MODE_ENABLED", "false").lower() == "true")
+        self.legendary_profiles_path = os.getenv("LEGENDARY_PROFILES_PATH", "config/legendary_profiles.json")
+        
+        # MCP Server Configuration
+        self.mcp_servers = {
+            "linkedin": os.getenv("LINKEDIN_MCP_QUEUE", "bi-linkedin-mcp"),
+            "reddit": os.getenv("REDDIT_MCP_QUEUE", "bi-reddit-mcp"),
+            "erpnext": os.getenv("ERPNEXT_MCP_QUEUE", "bi-erpnext-mcp")
+        }
+        
+        # Service Bus Configuration
+        self.service_bus_connection = os.getenv("AZURE_SERVICEBUS_CONNECTION_STRING")
         
         # Operational configuration
-        self.decision_threshold = 0.7  # Confidence threshold for decisions
-        self.collaboration_mode = "consensus"  # consensus, delegation, hierarchy
+        self.decision_threshold = float(os.getenv("DECISION_THRESHOLD", "0.7"))
+        self.collaboration_mode = "legendary_consensus"  # legendary_consensus, delegation, hierarchy
         self.reporting_enabled = True
         self.metrics_collection = True
+        self.performance_tracking = True
 
 
 class BusinessInfinity:
     """
-    Business Infinity - The business application layer built on AOS
+    Business Infinity - Perpetual Autonomous Boardroom
     
-    This class orchestrates business operations through C-Suite agents,
-    Founder, and Investor agents, providing strategic decision-making,
-    operational execution, and growth management capabilities.
+    A fully autonomous boardroom of legendary AI agents that operates perpetually,
+    making strategic decisions and executing business operations. Each agent possesses
+    legendary domain knowledge through LoRA adapters from FineTunedLLM AML.
+    
+    Connected to conventional business systems through MCP servers via Azure Service Bus.
     """
     
     def __init__(self, config: BusinessInfinityConfig = None):
         self.config = config or BusinessInfinityConfig()
         self.logger = logging.getLogger(__name__)
         
-        # Initialize AOS foundation
+        # Core systems
         self.aos = None
-        if AOS_AVAILABLE:
-            self.aos = AgentOperatingSystem(self.config.aos_config)
+        self.autonomous_boardroom = None
+        self.lora_manager = None
+        self.mentor_mode = None
+        self.service_bus_client = None
         
-        # Business agents
-        self.c_suite = {}
-        self.founder = None
-        self.investor = None
-        
-        # Business state
+        # Business context with legendary profiles
         self.business_context = {
             "name": self.config.business_name,
             "industry": self.config.industry,
             "stage": self.config.stage,
             "market": self.config.market,
+            "autonomous_boardroom_enabled": self.config.enable_autonomous_boardroom,
+            "legendary_expertise_enabled": self.config.enable_lora_adapters,
             "initialized_at": datetime.now()
         }
         
-        # Fallback MVP manager if agents not available
+        # MCP-UI Dashboard configuration
+        self.mcp_ui_config = {
+            "admin_mode_enabled": True,
+            "aos_monitoring_enabled": True,
+            "mentor_mode_enabled": self.config.mentor_mode_enabled,
+            "boardroom_monitoring_enabled": True
+        }
+        
+        # Fallback MVP manager for degraded operation
         self.mvp_manager = None
-        if not C_SUITE_AVAILABLE:
+        if not AOS_AVAILABLE:
             self.mvp_manager = MVPAgentManager()
         
-        # Initialize business agents
-        asyncio.create_task(self._initialize_business_agents())
+        # Initialize systems
+        asyncio.create_task(self._initialize_systems())
     
-    async def _initialize_business_agents(self):
-        """Initialize all business agents"""
+    async def _initialize_systems(self):
+        """Initialize all core systems for the autonomous boardroom"""
         try:
-            if C_SUITE_AVAILABLE and self.config.enable_c_suite:
-                await self._initialize_c_suite()
+            self.logger.info("Initializing Business Infinity autonomous systems...")
             
-            if STAKEHOLDER_AGENTS_AVAILABLE:
-                if self.config.enable_founder:
-                    await self._initialize_founder()
+            # Initialize AOS foundation
+            if AOS_AVAILABLE:
+                self.aos = AgentOperatingSystem(self.config.aos_config)
+                self.logger.info("AOS initialized successfully")
+            
+            # Initialize FineTunedLLM LoRA Manager
+            if FINETUNED_LLM_AVAILABLE:
+                self.lora_manager = LoRAManager()
+                await self.lora_manager.initialize()
                 
-                if self.config.enable_investor:
-                    await self._initialize_investor()
+                # Initialize Mentor Mode if enabled
+                if self.config.mentor_mode_enabled:
+                    self.mentor_mode = MentorMode(self.lora_manager)
+                    await self.mentor_mode.initialize()
+                    self.logger.info("Mentor Mode initialized for LoRA adapter training")
+                
+                self.logger.info("FineTunedLLM LoRA Manager initialized")
             
-            self.logger.info("Business Infinity agents initialized successfully")
+            # Initialize Azure Service Bus for MCP connectivity
+            if AZURE_SERVICEBUS_AVAILABLE and self.config.service_bus_connection:
+                self.service_bus_client = AsyncServiceBusClient.from_connection_string(
+                    self.config.service_bus_connection
+                )
+                self.logger.info("Azure Service Bus client initialized")
+            
+            # Initialize Autonomous Boardroom
+            if self.config.enable_autonomous_boardroom:
+                self.autonomous_boardroom = create_autonomous_boardroom(self.config.aos_config)
+                
+                # Configure boardroom with LoRA manager
+                if self.lora_manager:
+                    self.autonomous_boardroom.lora_manager = self.lora_manager
+                
+                # Configure Service Bus client
+                if self.service_bus_client:
+                    self.autonomous_boardroom.service_bus_client = self.service_bus_client
+                
+                self.logger.info("Autonomous Boardroom initialized successfully")
+            
+            # Initialize MCP-UI Dashboard connections
+            await self._initialize_mcp_ui_dashboard()
+            
+            self.logger.info("Business Infinity autonomous systems initialized successfully")
             
         except Exception as e:
-            self.logger.error(f"Error initializing business agents: {e}")
+            self.logger.error(f"Failed to initialize Business Infinity systems: {e}")
+            raise
+    
+    async def _initialize_mcp_ui_dashboard(self):
+        """Initialize MCP-UI dashboard for administration and monitoring"""
+        try:
+            # Configure MCP-UI for BI administration
+            mcp_ui_config = {
+                "boardroom_monitoring": {
+                    "enabled": True,
+                    "update_frequency": "real-time",
+                    "metrics": ["agent_performance", "decision_confidence", "execution_status"]
+                },
+                "aos_administration": {
+                    "enabled": True,
+                    "admin_mode": True,
+                    "monitoring_level": "detailed"
+                },
+                "mentor_mode": {
+                    "enabled": self.config.mentor_mode_enabled,
+                    "training_dashboard": True,
+                    "lora_management": True
+                },
+                "mcp_servers": {
+                    "linkedin": {"status": "monitoring", "queue": self.config.mcp_servers["linkedin"]},
+                    "reddit": {"status": "monitoring", "queue": self.config.mcp_servers["reddit"]},
+                    "erpnext": {"status": "monitoring", "queue": self.config.mcp_servers["erpnext"]}
+                }
+            }
+            
+            # Store configuration for MCP-UI integration
+            self.mcp_ui_config.update(mcp_ui_config)
+            
+            self.logger.info("MCP-UI dashboard configuration initialized")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize MCP-UI dashboard: {e}")
     
     async def _initialize_c_suite(self):
         """Initialize C-Suite agents"""
@@ -208,27 +320,122 @@ class BusinessInfinity:
         except Exception as e:
             self.logger.error(f"Failed to initialize Investor: {e}")
     
-    # Business Operations API
+    # Autonomous Boardroom Operations API
     async def make_strategic_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Make a strategic business decision involving relevant stakeholders
+        Make a strategic decision through the autonomous boardroom of legendary agents
         
         Args:
             decision_context: Context and parameters for the decision
             
         Returns:
-            Decision result with recommendations and rationale
+            Decision result with legendary recommendations and rationale
         """
         try:
-            # Use AOS decision orchestration if available
-            if self.aos:
+            if self.autonomous_boardroom:
+                # Route decision through autonomous boardroom
+                return await self.autonomous_boardroom._make_boardroom_decision(decision_context)
+            
+            elif self.aos:
+                # Fallback to AOS decision orchestration
                 return await self.aos.orchestrate_leadership_decision(decision_context)
             
-            # Fallback to collaborative decision making
-            return await self._collaborative_decision(decision_context)
-            
+            else:
+                # Final fallback to collaborative decision
+                return await self._collaborative_decision(decision_context)
+                
         except Exception as e:
             self.logger.error(f"Error in strategic decision making: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def execute_legendary_consultation(self, consultation_request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Execute a consultation with legendary agents for specific expertise
+        
+        Args:
+            consultation_request: Request for legendary expertise consultation
+            
+        Returns:
+            Consultation results from legendary agents
+        """
+        if not self.autonomous_boardroom:
+            return {"status": "error", "error": "Autonomous boardroom not available"}
+        
+        try:
+            # Route consultation through specific legendary agents
+            requested_roles = consultation_request.get("roles", [])
+            expertise_areas = consultation_request.get("expertise", [])
+            context = consultation_request.get("context", {})
+            
+            consultation_results = {}
+            
+            # Get consultation from each requested legendary agent
+            for role_str in requested_roles:
+                try:
+                    from .autonomous_boardroom import BoardroomRole
+                    role = BoardroomRole(role_str)
+                    
+                    if role in self.autonomous_boardroom.agents:
+                        agent = self.autonomous_boardroom.agents[role]
+                        legendary_advice = await self.autonomous_boardroom._get_legendary_recommendation(
+                            agent, context
+                        )
+                        
+                        consultation_results[role_str] = {
+                            "legendary_profile": agent.legendary_expertise.legend_profile,
+                            "domain": agent.legendary_expertise.domain,
+                            "advice": legendary_advice,
+                            "expertise_areas": agent.legendary_expertise.expertise_areas
+                        }
+                        
+                except Exception as e:
+                    consultation_results[role_str] = {"error": str(e)}
+            
+            return {
+                "status": "completed",
+                "consultation_results": consultation_results,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error in legendary consultation: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def train_legendary_expertise(self, training_request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Train LoRA adapters for legendary expertise using Mentor Mode
+        
+        Args:
+            training_request: Training parameters and data
+            
+        Returns:
+            Training results and updated adapter information
+        """
+        if not self.mentor_mode:
+            return {"status": "error", "error": "Mentor Mode not available"}
+        
+        try:
+            legendary_profile = training_request.get("legendary_profile")
+            domain = training_request.get("domain")
+            training_data = training_request.get("training_data")
+            
+            # Start LoRA adapter training
+            training_job = await self.mentor_mode.start_training(
+                legend_name=legendary_profile,
+                domain=domain,
+                training_data=training_data
+            )
+            
+            return {
+                "status": "training_started",
+                "training_job_id": training_job.id,
+                "legendary_profile": legendary_profile,
+                "domain": domain,
+                "estimated_completion": training_job.estimated_completion
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error starting legendary expertise training: {e}")
             return {"status": "error", "error": str(e)}
     
     async def _collaborative_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:

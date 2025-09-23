@@ -1,0 +1,768 @@
+"""
+Business Infinity - Autonomous Boardroom
+
+A perpetual, fully autonomous boardroom of agents comprising Investor, Founder, 
+and C-Suite members. Each agent possesses legendary domain knowledge through 
+LoRA adapters from FineTunedLLM AML, connected to AOS via Azure Service Bus.
+
+The boardroom operates continuously, making strategic decisions, monitoring 
+performance, and executing business operations through integration with 
+conventional business systems via MCP servers.
+"""
+
+import os
+import json
+import asyncio
+import logging
+from typing import Dict, Any, List, Optional, Set
+from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from enum import Enum
+
+# Import AOS foundation
+try:
+    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
+    from RealmOfAgents.AgentOperatingSystem.config import AOSConfig, default_config
+    from RealmOfAgents.AgentOperatingSystem.messaging import Message, MessageBus
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    logging.warning("AOS not available")
+
+# Import FineTunedLLM for LoRA adapters
+try:
+    from RealmOfAgents.FineTunedLLM.lora_manager import LoRAManager
+    from RealmOfAgents.FineTunedLLM.domain_expertise import DomainExpertiseLoader
+    FINETUNED_LLM_AVAILABLE = True
+except ImportError:
+    FINETUNED_LLM_AVAILABLE = False
+    logging.warning("FineTunedLLM not available")
+
+# Azure Service Bus for MCP connectivity
+try:
+    from azure.servicebus import ServiceBusClient, ServiceBusMessage
+    from azure.servicebus.aio import ServiceBusClient as AsyncServiceBusClient
+    AZURE_SERVICEBUS_AVAILABLE = True
+except ImportError:
+    AZURE_SERVICEBUS_AVAILABLE = False
+    logging.warning("Azure Service Bus not available")
+
+
+class BoardroomRole(Enum):
+    """Roles in the autonomous boardroom"""
+    FOUNDER = "Founder"
+    INVESTOR = "Investor"
+    CEO = "CEO"
+    CFO = "CFO" 
+    CTO = "CTO"
+    CMO = "CMO"
+    COO = "COO"
+    CHRO = "CHRO"
+    CSO = "CSO"  # Chief Strategy Officer
+
+
+class DecisionType(Enum):
+    """Types of boardroom decisions"""
+    STRATEGIC = "strategic"
+    FINANCIAL = "financial"
+    OPERATIONAL = "operational"
+    INVESTMENT = "investment"
+    PRODUCT = "product"
+    MARKET = "market"
+    GOVERNANCE = "governance"
+
+
+class BoardroomState(Enum):
+    """States of the autonomous boardroom"""
+    INITIALIZING = "initializing"
+    ACTIVE = "active"
+    IN_SESSION = "in_session"
+    DELIBERATING = "deliberating"
+    EXECUTING = "executing"
+    MONITORING = "monitoring"
+    PAUSED = "paused"
+    ERROR = "error"
+
+
+@dataclass
+class LegendaryExpertise:
+    """Represents legendary domain knowledge loaded via LoRA adapters"""
+    domain: str
+    legend_profile: str  # e.g., "Warren Buffett", "Steve Jobs", etc.
+    lora_adapter_id: str
+    expertise_areas: List[str]
+    performance_metrics: Dict[str, float] = field(default_factory=dict)
+    last_updated: datetime = field(default_factory=datetime.now)
+
+
+@dataclass
+class BoardroomAgent:
+    """Represents a boardroom member with legendary expertise"""
+    role: BoardroomRole
+    agent_id: str
+    legendary_expertise: LegendaryExpertise
+    mcp_connections: List[str] = field(default_factory=list)  # Connected MCP servers
+    performance_history: List[Dict[str, Any]] = field(default_factory=list)
+    current_tasks: List[str] = field(default_factory=list)
+    is_active: bool = True
+
+
+@dataclass
+class BoardroomDecision:
+    """Represents a boardroom decision with full context"""
+    decision_id: str
+    decision_type: DecisionType
+    context: Dict[str, Any]
+    participants: List[BoardroomRole]
+    recommendations: Dict[BoardroomRole, str]
+    final_decision: Optional[str] = None
+    confidence: float = 0.0
+    execution_status: str = "pending"
+    created_at: datetime = field(default_factory=datetime.now)
+    executed_at: Optional[datetime] = None
+
+
+class AutonomousBoardroom:
+    """
+    The core autonomous boardroom that operates perpetually, making strategic
+    decisions and executing business operations through legendary AI agents.
+    """
+    
+    def __init__(self, aos_config: AOSConfig = None):
+        self.config = aos_config or default_config
+        self.logger = logging.getLogger(__name__)
+        
+        # Core systems
+        self.aos = None
+        self.lora_manager = None
+        self.service_bus_client = None
+        self.message_bus = None
+        
+        # Boardroom state
+        self.state = BoardroomState.INITIALIZING
+        self.agents: Dict[BoardroomRole, BoardroomAgent] = {}
+        self.active_decisions: Dict[str, BoardroomDecision] = {}
+        self.decision_history: List[BoardroomDecision] = []
+        
+        # MCP server connections
+        self.mcp_servers = {
+            "linkedin": "bi-linkedin-mcp",
+            "reddit": "bi-reddit-mcp", 
+            "erpnext": "bi-erpnext-mcp"
+        }
+        
+        # Perpetual operation
+        self.is_running = False
+        self.session_frequency = timedelta(hours=1)  # Board sessions every hour
+        self.last_session = None
+        
+        # Initialize systems
+        asyncio.create_task(self._initialize_systems())
+    
+    async def _initialize_systems(self):
+        """Initialize all core systems for the autonomous boardroom"""
+        try:
+            self.logger.info("Initializing Autonomous Boardroom systems...")
+            
+            # Initialize AOS
+            if AOS_AVAILABLE:
+                self.aos = AgentOperatingSystem(self.config)
+                self.message_bus = self.aos.message_bus
+                self.logger.info("AOS initialized successfully")
+            
+            # Initialize FineTunedLLM LoRA Manager
+            if FINETUNED_LLM_AVAILABLE:
+                self.lora_manager = LoRAManager()
+                await self.lora_manager.initialize()
+                self.logger.info("FineTunedLLM LoRA Manager initialized")
+            
+            # Initialize Azure Service Bus
+            if AZURE_SERVICEBUS_AVAILABLE:
+                connection_string = os.getenv("AZURE_SERVICEBUS_CONNECTION_STRING")
+                if connection_string:
+                    self.service_bus_client = AsyncServiceBusClient.from_connection_string(connection_string)
+                    self.logger.info("Azure Service Bus client initialized")
+            
+            # Initialize legendary agents
+            await self._initialize_legendary_agents()
+            
+            # Start perpetual operation
+            self.state = BoardroomState.ACTIVE
+            await self._start_perpetual_operation()
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Autonomous Boardroom: {e}")
+            self.state = BoardroomState.ERROR
+    
+    async def _initialize_legendary_agents(self):
+        """Initialize all boardroom agents with legendary expertise"""
+        # Define legendary profiles for each role
+        legendary_profiles = {
+            BoardroomRole.FOUNDER: {
+                "legend": "Steve Jobs",
+                "domain": "Innovation & Vision",
+                "expertise": ["product_vision", "innovation", "brand_building", "market_disruption"]
+            },
+            BoardroomRole.INVESTOR: {
+                "legend": "Warren Buffett",
+                "domain": "Investment Strategy", 
+                "expertise": ["value_investing", "market_analysis", "risk_assessment", "portfolio_management"]
+            },
+            BoardroomRole.CEO: {
+                "legend": "Jack Welch",
+                "domain": "Executive Leadership",
+                "expertise": ["strategic_leadership", "organizational_transformation", "stakeholder_management"]
+            },
+            BoardroomRole.CFO: {
+                "legend": "Jamie Dimon",
+                "domain": "Financial Leadership",
+                "expertise": ["financial_strategy", "risk_management", "capital_allocation", "governance"]
+            },
+            BoardroomRole.CTO: {
+                "legend": "Satya Nadella",
+                "domain": "Technology Leadership",
+                "expertise": ["technology_strategy", "digital_transformation", "innovation_management"]
+            },
+            BoardroomRole.CMO: {
+                "legend": "Seth Godin",
+                "domain": "Marketing Excellence",
+                "expertise": ["brand_strategy", "customer_engagement", "market_positioning", "growth_hacking"]
+            },
+            BoardroomRole.COO: {
+                "legend": "Sheryl Sandberg",
+                "domain": "Operational Excellence",
+                "expertise": ["operations_optimization", "process_improvement", "scaling", "execution"]
+            },
+            BoardroomRole.CHRO: {
+                "legend": "Patty McCord",
+                "domain": "People Leadership",
+                "expertise": ["talent_strategy", "culture_building", "performance_management", "leadership_development"]
+            },
+            BoardroomRole.CSO: {
+                "legend": "Michael Porter",
+                "domain": "Strategic Planning",
+                "expertise": ["competitive_strategy", "strategic_planning", "market_analysis", "value_creation"]
+            }
+        }
+        
+        # Initialize each agent with legendary expertise
+        for role, profile in legendary_profiles.items():
+            try:
+                # Load LoRA adapter for legendary expertise
+                lora_adapter_id = None
+                if self.lora_manager:
+                    lora_adapter_id = await self.lora_manager.load_legendary_adapter(
+                        legend_name=profile["legend"],
+                        domain=profile["domain"]
+                    )
+                
+                # Create legendary expertise profile
+                expertise = LegendaryExpertise(
+                    domain=profile["domain"],
+                    legend_profile=profile["legend"],
+                    lora_adapter_id=lora_adapter_id or f"fallback_{role.value.lower()}",
+                    expertise_areas=profile["expertise"]
+                )
+                
+                # Create boardroom agent
+                agent = BoardroomAgent(
+                    role=role,
+                    agent_id=f"{role.value.lower()}_agent_{datetime.now().timestamp()}",
+                    legendary_expertise=expertise,
+                    mcp_connections=list(self.mcp_servers.keys())  # Connect to all MCP servers
+                )
+                
+                # Register with AOS if available
+                if self.aos:
+                    await self.aos.register_leadership_agent(role.value, {
+                        "legendary_profile": profile["legend"],
+                        "domain": profile["domain"],
+                        "lora_adapter": lora_adapter_id
+                    })
+                
+                self.agents[role] = agent
+                self.logger.info(f"Initialized {role.value} agent with {profile['legend']} legendary expertise")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to initialize {role.value} agent: {e}")
+    
+    async def _start_perpetual_operation(self):
+        """Start the perpetual autonomous operation"""
+        self.is_running = True
+        self.logger.info("Starting perpetual autonomous boardroom operation")
+        
+        # Start background tasks
+        asyncio.create_task(self._perpetual_session_loop())
+        asyncio.create_task(self._monitor_business_environment())
+        asyncio.create_task(self._execute_decisions())
+        asyncio.create_task(self._maintain_mcp_connections())
+    
+    async def _perpetual_session_loop(self):
+        """Main loop for perpetual boardroom sessions"""
+        while self.is_running:
+            try:
+                current_time = datetime.now()
+                
+                # Check if it's time for a new session
+                if (self.last_session is None or 
+                    current_time - self.last_session >= self.session_frequency):
+                    
+                    await self._conduct_boardroom_session()
+                    self.last_session = current_time
+                
+                # Wait before next check
+                await asyncio.sleep(300)  # Check every 5 minutes
+                
+            except Exception as e:
+                self.logger.error(f"Error in perpetual session loop: {e}")
+                await asyncio.sleep(60)  # Wait 1 minute before retry
+    
+    async def _conduct_boardroom_session(self):
+        """Conduct an autonomous boardroom session"""
+        self.logger.info("Conducting autonomous boardroom session")
+        self.state = BoardroomState.IN_SESSION
+        
+        try:
+            # Gather business intelligence from MCP servers
+            business_intelligence = await self._gather_business_intelligence()
+            
+            # Analyze current business state
+            business_state = await self._analyze_business_state(business_intelligence)
+            
+            # Identify decisions needed
+            required_decisions = await self._identify_required_decisions(business_state)
+            
+            # Make decisions through legendary agent collaboration
+            for decision_context in required_decisions:
+                await self._make_boardroom_decision(decision_context)
+            
+            # Update agent performance metrics
+            await self._update_agent_performance()
+            
+            self.state = BoardroomState.ACTIVE
+            self.logger.info("Boardroom session completed successfully")
+            
+        except Exception as e:
+            self.logger.error(f"Error during boardroom session: {e}")
+            self.state = BoardroomState.ERROR
+    
+    async def _gather_business_intelligence(self) -> Dict[str, Any]:
+        """Gather business intelligence from MCP servers"""
+        intelligence = {}
+        
+        for server_name, queue_name in self.mcp_servers.items():
+            try:
+                # Query MCP server for business data
+                query_message = {
+                    "type": "business_intelligence_query",
+                    "server": server_name,
+                    "timestamp": datetime.now().isoformat(),
+                    "parameters": {
+                        "metrics": ["performance", "engagement", "opportunities", "risks"],
+                        "timeframe": "last_24h"
+                    }
+                }
+                
+                # Send query via Service Bus
+                if self.service_bus_client:
+                    await self._send_mcp_query(queue_name, query_message)
+                
+                # For now, simulate response data
+                intelligence[server_name] = {
+                    "status": "active",
+                    "metrics": self._simulate_business_metrics(server_name),
+                    "alerts": [],
+                    "opportunities": []
+                }
+                
+            except Exception as e:
+                self.logger.error(f"Failed to gather intelligence from {server_name}: {e}")
+                intelligence[server_name] = {"status": "error", "error": str(e)}
+        
+        return intelligence
+    
+    def _simulate_business_metrics(self, server_name: str) -> Dict[str, Any]:
+        """Simulate business metrics from different sources"""
+        import random
+        
+        base_metrics = {
+            "linkedin": {
+                "connections": random.randint(5000, 15000),
+                "engagement_rate": round(random.uniform(2.5, 8.5), 2),
+                "lead_generation": random.randint(10, 50),
+                "brand_mentions": random.randint(100, 500)
+            },
+            "reddit": {
+                "brand_mentions": random.randint(50, 200),
+                "sentiment_score": round(random.uniform(0.3, 0.8), 2),
+                "community_engagement": random.randint(20, 100),
+                "trending_topics": ["ai", "automation", "business"]
+            },
+            "erpnext": {
+                "revenue": round(random.uniform(100000, 1000000), 2),
+                "expenses": round(random.uniform(50000, 500000), 2),
+                "customer_satisfaction": round(random.uniform(4.0, 5.0), 1),
+                "operational_efficiency": round(random.uniform(0.7, 0.95), 2)
+            }
+        }
+        
+        return base_metrics.get(server_name, {})
+    
+    async def _analyze_business_state(self, intelligence: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze current business state using legendary agent expertise"""
+        analysis = {
+            "overall_health": "good",
+            "key_metrics": {},
+            "risks": [],
+            "opportunities": [],
+            "recommendations": {}
+        }
+        
+        # Each agent analyzes from their legendary perspective
+        for role, agent in self.agents.items():
+            if agent.is_active:
+                agent_analysis = await self._get_agent_analysis(agent, intelligence)
+                analysis["recommendations"][role.value] = agent_analysis
+        
+        return analysis
+    
+    async def _get_agent_analysis(self, agent: BoardroomAgent, intelligence: Dict[str, Any]) -> Dict[str, Any]:
+        """Get analysis from a specific legendary agent"""
+        # This would use the LoRA adapter to get legendary expertise
+        # For now, simulate based on role and expertise
+        
+        expertise = agent.legendary_expertise
+        analysis = {
+            "legend_perspective": f"Analysis from {expertise.legend_profile} perspective",
+            "key_insights": [],
+            "recommendations": [],
+            "confidence": 0.85
+        }
+        
+        # Role-specific analysis based on legendary expertise
+        if agent.role == BoardroomRole.INVESTOR:
+            analysis["key_insights"] = [
+                "Market valuation appears strong based on performance metrics",
+                "Risk-adjusted returns show positive trajectory", 
+                "Investment opportunities identified in growth segments"
+            ]
+            analysis["recommendations"] = [
+                "Consider strategic investment in emerging market segments",
+                "Diversify portfolio to reduce concentration risk",
+                "Monitor cash flow patterns for optimization opportunities"
+            ]
+        
+        elif agent.role == BoardroomRole.FOUNDER:
+            analysis["key_insights"] = [
+                "Product-market fit indicators showing positive signals",
+                "Innovation pipeline needs acceleration",
+                "Brand differentiation opportunities exist"
+            ]
+            analysis["recommendations"] = [
+                "Invest in breakthrough innovation projects",
+                "Strengthen brand positioning in key markets",
+                "Build strategic partnerships for market expansion"
+            ]
+        
+        # Add more role-specific analysis...
+        
+        return analysis
+    
+    async def _identify_required_decisions(self, business_state: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Identify decisions that need to be made"""
+        decisions = []
+        
+        # Analyze business state to identify decision points
+        recommendations = business_state.get("recommendations", {})
+        
+        # Strategic decisions from CEO/CSO
+        if "CEO" in recommendations or "CSO" in recommendations:
+            decisions.append({
+                "type": DecisionType.STRATEGIC,
+                "context": "Strategic planning and direction based on current market analysis",
+                "urgency": "medium",
+                "participants": [BoardroomRole.CEO, BoardroomRole.CSO, BoardroomRole.FOUNDER]
+            })
+        
+        # Financial decisions from CFO/Investor
+        if "CFO" in recommendations or "Investor" in recommendations:
+            decisions.append({
+                "type": DecisionType.FINANCIAL,
+                "context": "Financial strategy and investment allocation",
+                "urgency": "high",
+                "participants": [BoardroomRole.CFO, BoardroomRole.INVESTOR, BoardroomRole.CEO]
+            })
+        
+        # Add more decision identification logic...
+        
+        return decisions
+    
+    async def _make_boardroom_decision(self, decision_context: Dict[str, Any]) -> BoardroomDecision:
+        """Make a boardroom decision through legendary agent collaboration"""
+        self.state = BoardroomState.DELIBERATING
+        
+        decision_id = f"decision_{datetime.now().timestamp()}"
+        decision = BoardroomDecision(
+            decision_id=decision_id,
+            decision_type=DecisionType(decision_context["type"]),
+            context=decision_context,
+            participants=decision_context.get("participants", []),
+            recommendations={}
+        )
+        
+        # Get recommendations from each participating agent
+        for role in decision.participants:
+            if role in self.agents and self.agents[role].is_active:
+                agent = self.agents[role]
+                recommendation = await self._get_legendary_recommendation(agent, decision_context)
+                decision.recommendations[role] = recommendation
+        
+        # Synthesize final decision using legendary wisdom
+        decision.final_decision = await self._synthesize_decision(decision)
+        decision.confidence = self._calculate_decision_confidence(decision)
+        
+        # Store decision
+        self.active_decisions[decision_id] = decision
+        
+        self.logger.info(f"Boardroom decision made: {decision_id} - {decision.final_decision}")
+        return decision
+    
+    async def _get_legendary_recommendation(self, agent: BoardroomAgent, context: Dict[str, Any]) -> str:
+        """Get recommendation from legendary agent using their LoRA adapter"""
+        # This would use the actual LoRA adapter for legendary expertise
+        # For now, simulate based on legendary profile
+        
+        expertise = agent.legendary_expertise
+        legend = expertise.legend_profile
+        
+        # Simulate legendary decision-making patterns
+        legendary_responses = {
+            "Warren Buffett": "Focus on long-term value creation and avoid speculative investments. The fundamentals suggest...",
+            "Steve Jobs": "Think different. This is about creating products that customers don't even know they need yet...",
+            "Jack Welch": "Drive performance and accountability. We need to differentiate our leaders and reward excellence...",
+            "Satya Nadella": "Embrace a growth mindset and focus on empowering others. Technology should enable human potential...",
+            # Add more legendary responses...
+        }
+        
+        base_response = legendary_responses.get(legend, f"Based on {legend}'s approach...")
+        
+        return f"{base_response} In this context: {context.get('context', 'general business decision')}"
+    
+    async def _synthesize_decision(self, decision: BoardroomDecision) -> str:
+        """Synthesize final decision from all legendary recommendations"""
+        # Use AOS decision engine if available
+        if self.aos:
+            synthesis_result = await self.aos.make_decision({
+                "type": decision.decision_type.value,
+                "context": decision.context,
+                "recommendations": decision.recommendations
+            })
+            return synthesis_result.get("decision", "No consensus reached")
+        
+        # Fallback synthesis
+        return f"Synthesized decision based on {len(decision.recommendations)} legendary perspectives"
+    
+    def _calculate_decision_confidence(self, decision: BoardroomDecision) -> float:
+        """Calculate confidence score for the decision"""
+        # Simple confidence calculation based on number of participants and consensus
+        base_confidence = len(decision.recommendations) / len(BoardroomRole) * 0.8
+        return min(base_confidence + 0.2, 1.0)
+    
+    async def _send_mcp_query(self, queue_name: str, message: Dict[str, Any]):
+        """Send query to MCP server via Service Bus"""
+        if self.service_bus_client:
+            async with self.service_bus_client:
+                sender = self.service_bus_client.get_queue_sender(queue_name=queue_name)
+                async with sender:
+                    message_body = json.dumps(message)
+                    sb_message = ServiceBusMessage(message_body)
+                    await sender.send_messages(sb_message)
+    
+    async def _monitor_business_environment(self):
+        """Continuously monitor the business environment"""
+        while self.is_running:
+            try:
+                # Monitor for critical business events
+                await self._check_business_alerts()
+                await asyncio.sleep(600)  # Check every 10 minutes
+                
+            except Exception as e:
+                self.logger.error(f"Error monitoring business environment: {e}")
+                await asyncio.sleep(60)
+    
+    async def _execute_decisions(self):
+        """Execute approved boardroom decisions"""
+        while self.is_running:
+            try:
+                self.state = BoardroomState.EXECUTING
+                
+                # Execute pending decisions
+                for decision_id, decision in list(self.active_decisions.items()):
+                    if decision.execution_status == "pending":
+                        await self._execute_decision(decision)
+                
+                self.state = BoardroomState.MONITORING
+                await asyncio.sleep(300)  # Check every 5 minutes
+                
+            except Exception as e:
+                self.logger.error(f"Error executing decisions: {e}")
+                await asyncio.sleep(60)
+    
+    async def _execute_decision(self, decision: BoardroomDecision):
+        """Execute a specific decision"""
+        try:
+            # Send execution instructions to relevant MCP servers
+            execution_context = {
+                "decision_id": decision.decision_id,
+                "type": decision.decision_type.value,
+                "action": decision.final_decision,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Route to appropriate MCP servers based on decision type
+            target_servers = self._get_execution_servers(decision.decision_type)
+            
+            for server in target_servers:
+                if server in self.mcp_servers:
+                    await self._send_mcp_query(self.mcp_servers[server], {
+                        "type": "execute_decision",
+                        "context": execution_context
+                    })
+            
+            decision.execution_status = "completed"
+            decision.executed_at = datetime.now()
+            
+            self.logger.info(f"Executed decision: {decision.decision_id}")
+            
+        except Exception as e:
+            decision.execution_status = "failed"
+            self.logger.error(f"Failed to execute decision {decision.decision_id}: {e}")
+    
+    def _get_execution_servers(self, decision_type: DecisionType) -> List[str]:
+        """Get MCP servers relevant for decision execution"""
+        server_mapping = {
+            DecisionType.FINANCIAL: ["erpnext"],
+            DecisionType.MARKETING: ["linkedin", "reddit"],
+            DecisionType.OPERATIONAL: ["erpnext"],
+            DecisionType.STRATEGIC: ["linkedin", "reddit", "erpnext"],
+            DecisionType.INVESTMENT: ["erpnext"],
+            DecisionType.PRODUCT: ["reddit"],
+            DecisionType.GOVERNANCE: ["erpnext"]
+        }
+        
+        return server_mapping.get(decision_type, ["erpnext"])
+    
+    async def _maintain_mcp_connections(self):
+        """Maintain connections to MCP servers"""
+        while self.is_running:
+            try:
+                # Check health of MCP server connections
+                for server_name, queue_name in self.mcp_servers.items():
+                    await self._check_mcp_server_health(server_name, queue_name)
+                
+                await asyncio.sleep(1800)  # Check every 30 minutes
+                
+            except Exception as e:
+                self.logger.error(f"Error maintaining MCP connections: {e}")
+                await asyncio.sleep(300)
+    
+    async def _check_mcp_server_health(self, server_name: str, queue_name: str):
+        """Check health of an MCP server"""
+        try:
+            health_check = {
+                "type": "health_check",
+                "timestamp": datetime.now().isoformat(),
+                "server": server_name
+            }
+            
+            await self._send_mcp_query(queue_name, health_check)
+            self.logger.debug(f"Health check sent to {server_name}")
+            
+        except Exception as e:
+            self.logger.warning(f"Health check failed for {server_name}: {e}")
+    
+    async def _check_business_alerts(self):
+        """Check for critical business alerts that require immediate attention"""
+        # This would check for critical business conditions
+        # For now, simulate alert checking
+        pass
+    
+    async def _update_agent_performance(self):
+        """Update performance metrics for all agents"""
+        for role, agent in self.agents.items():
+            # Update performance based on recent decisions and outcomes
+            performance_update = {
+                "timestamp": datetime.now().isoformat(),
+                "decisions_participated": len([d for d in self.active_decisions.values() 
+                                             if role in d.participants]),
+                "average_confidence": self._calculate_agent_confidence(agent),
+                "legendary_effectiveness": 0.85  # Would be calculated from actual outcomes
+            }
+            
+            agent.performance_history.append(performance_update)
+            
+            # Keep only recent performance history
+            if len(agent.performance_history) > 100:
+                agent.performance_history = agent.performance_history[-100:]
+    
+    def _calculate_agent_confidence(self, agent: BoardroomAgent) -> float:
+        """Calculate average confidence for an agent's contributions"""
+        # This would analyze actual decision outcomes
+        return 0.85  # Placeholder
+    
+    async def get_boardroom_status(self) -> Dict[str, Any]:
+        """Get comprehensive boardroom status"""
+        return {
+            "state": self.state.value,
+            "is_running": self.is_running,
+            "agents": {
+                role.value: {
+                    "legendary_profile": agent.legendary_expertise.legend_profile,
+                    "domain": agent.legendary_expertise.domain,
+                    "is_active": agent.is_active,
+                    "current_tasks": len(agent.current_tasks),
+                    "performance_score": self._calculate_agent_confidence(agent)
+                }
+                for role, agent in self.agents.items()
+            },
+            "active_decisions": len(self.active_decisions),
+            "total_decisions": len(self.decision_history),
+            "last_session": self.last_session.isoformat() if self.last_session else None,
+            "mcp_servers": list(self.mcp_servers.keys()),
+            "system_health": {
+                "aos_available": AOS_AVAILABLE,
+                "finetuned_llm_available": FINETUNED_LLM_AVAILABLE,
+                "azure_servicebus_available": AZURE_SERVICEBUS_AVAILABLE
+            }
+        }
+    
+    async def shutdown(self):
+        """Graceful shutdown of the autonomous boardroom"""
+        self.logger.info("Shutting down Autonomous Boardroom...")
+        self.is_running = False
+        
+        if self.service_bus_client:
+            await self.service_bus_client.close()
+        
+        if self.aos:
+            await self.aos.shutdown()
+        
+        self.state = BoardroomState.PAUSED
+        self.logger.info("Autonomous Boardroom shutdown completed")
+
+
+# Factory function
+def create_autonomous_boardroom(config: AOSConfig = None) -> AutonomousBoardroom:
+    """Create and initialize the Autonomous Boardroom"""
+    return AutonomousBoardroom(config)
+
+
+# Global instance
+autonomous_boardroom = None
+
+def get_autonomous_boardroom() -> AutonomousBoardroom:
+    """Get global Autonomous Boardroom instance"""
+    global autonomous_boardroom
+    if autonomous_boardroom is None:
+        autonomous_boardroom = create_autonomous_boardroom()
+    return autonomous_boardroom
