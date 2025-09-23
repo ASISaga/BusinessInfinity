@@ -6,12 +6,25 @@ Consolidates functionality from utils/ directory
 import os
 import json
 import logging
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Tuple
 from pathlib import Path
+
+# Import MCP Access Control Manager
+try:
+    from .mcp_access_control import mcp_access_manager, check_mcp_access, get_user_mcp_permissions
+    MCP_ACCESS_CONTROL_AVAILABLE = True
+except ImportError:
+    MCP_ACCESS_CONTROL_AVAILABLE = False
+    logging.warning("MCP Access Control not available")
 
 
 class GovernanceError(Exception):
     """Exception raised when governance validation fails"""
+    pass
+
+
+class MCPAccessDeniedError(GovernanceError):
+    """Exception raised when MCP access is denied"""
     pass
 
 
@@ -33,6 +46,12 @@ class UnifiedUtilsManager:
         # Cached data
         self._ui_schemas: Dict[str, Any] = {}
         self._manifests: Dict[str, Any] = {}
+        
+        # Initialize MCP Access Control if available
+        if MCP_ACCESS_CONTROL_AVAILABLE:
+            self.mcp_access_manager = mcp_access_manager
+        else:
+            self.mcp_access_manager = None
     
     # === Governance Functions ===
     
@@ -378,6 +397,74 @@ class UnifiedUtilsManager:
     
     # === Configuration Validation ===
     
+    # === MCP Access Control Methods ===
+    
+    def check_mcp_access(self, user_id: str, role: str, mcp_server: str, operation: str) -> Tuple[bool, str]:
+        """
+        Check if user has access to MCP server operation
+        
+        Args:
+            user_id: User identifier
+            role: User role (Founder, CEO, CFO, etc.)
+            mcp_server: MCP server name (linkedin, reddit, erpnext, etc.)
+            operation: Operation to perform (read, create, update, delete, admin)
+            
+        Returns:
+            Tuple[bool, str]: (has_access, reason)
+        """
+        if not self.mcp_access_manager:
+            logging.warning("MCP Access Control not available, defaulting to allow")
+            return True, "MCP Access Control not configured"
+        
+        return self.mcp_access_manager.check_access(user_id, role, mcp_server, operation)
+    
+    def validate_mcp_request(self, user_id: str, role: str, mcp_server: str, operation: str) -> None:
+        """
+        Validate MCP request and raise exception if access denied
+        
+        Args:
+            user_id: User identifier  
+            role: User role
+            mcp_server: MCP server name
+            operation: Operation to perform
+            
+        Raises:
+            MCPAccessDeniedError: If access is denied
+        """
+        has_access, reason = self.check_mcp_access(user_id, role, mcp_server, operation)
+        if not has_access:
+            raise MCPAccessDeniedError(f"MCP access denied: {reason}")
+    
+    def get_user_mcp_permissions(self, user_id: str, role: str) -> Dict[str, Any]:
+        """Get comprehensive summary of user's MCP permissions"""
+        if not self.mcp_access_manager:
+            return {"error": "MCP Access Control not available"}
+        
+        return self.mcp_access_manager.get_user_permissions_summary(user_id, role)
+    
+    def get_mcp_access_violations(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """Get recent MCP access violations for auditing"""
+        if not self.mcp_access_manager:
+            return []
+        
+        return self.mcp_access_manager.get_access_violations(hours)
+    
+    def update_user_mcp_access(self, user_id: str, mcp_server: str, access_level: str) -> bool:
+        """Update user's access level for specific MCP server"""
+        if not self.mcp_access_manager:
+            return False
+        
+        return self.mcp_access_manager.update_user_access(user_id, mcp_server, access_level)
+    
+    def bulk_update_role_mcp_access(self, role: str, mcp_access: Dict[str, str]) -> bool:
+        """Update MCP access configuration for entire role"""
+        if not self.mcp_access_manager:
+            return False
+        
+        return self.mcp_access_manager.bulk_update_role_access(role, mcp_access)
+    
+    # === Configuration Validation ===
+    
     def validate_configuration(self) -> Dict[str, Any]:
         """Validate utilities configuration"""
         issues = []
@@ -424,8 +511,21 @@ def get_ui_schema(role: str = None, scope: str = "local") -> Dict[str, Any]:
     """Backward compatibility wrapper"""
     return utils_manager.get_ui_schema(role, scope)
 
+def check_mcp_access(user_id: str, role: str, mcp_server: str, operation: str) -> Tuple[bool, str]:
+    """Backward compatibility wrapper for MCP access control"""
+    return utils_manager.check_mcp_access(user_id, role, mcp_server, operation)
+
+def validate_mcp_request(user_id: str, role: str, mcp_server: str, operation: str) -> None:
+    """Backward compatibility wrapper for MCP request validation"""
+    return utils_manager.validate_mcp_request(user_id, role, mcp_server, operation)
+
+def get_user_mcp_permissions(user_id: str, role: str) -> Dict[str, Any]:
+    """Backward compatibility wrapper for getting user MCP permissions"""
+    return utils_manager.get_user_mcp_permissions(user_id, role)
+
 # Export all
 __all__ = [
-    'utils_manager', 'UnifiedUtilsManager', 'GovernanceError',
-    'validate_request', 'get_ui_schema'
+    'utils_manager', 'UnifiedUtilsManager', 'GovernanceError', 'MCPAccessDeniedError',
+    'validate_request', 'get_ui_schema', 'check_mcp_access', 'validate_mcp_request',
+    'get_user_mcp_permissions'
 ]

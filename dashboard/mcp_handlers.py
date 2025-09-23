@@ -6,6 +6,15 @@ from .prompts import APPROVAL_PROMPT
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 
+# Import MCP Access Control
+try:
+    from ..core.utils import validate_mcp_request, MCPAccessDeniedError
+    ACCESS_CONTROL_AVAILABLE = True
+except ImportError:
+    ACCESS_CONTROL_AVAILABLE = False
+    import logging
+    logging.warning("MCP Access Control not available in dashboard handlers")
+
 kernel = Kernel()
 try:
     api_key = os.getenv("OPENAI_API_KEY")
@@ -20,12 +29,53 @@ async def run_prompt(prompt: str, input_text: str) -> str:
     result = await func.invoke_async(input_text)
     return str(result)
 
-async def handle_mcp(body: dict):
+async def handle_mcp(body: dict, user_context: dict = None):
+    """
+    Handle MCP requests with integrated access control
+    
+    Args:
+        body: MCP request body
+        user_context: User context containing user_id and role for access control
+    """
     method = body.get("method")
     params = body.get("params", {})
     id_ = body.get("id")
 
+    # Extract user information for access control
+    user_id = (user_context or {}).get("user_id", "unknown")
+    user_role = (user_context or {}).get("role", "Employee")
+
     try:
+        # Map MCP methods to servers and operations for access control
+        mcp_method_mapping = {
+            "founder.approvePlan": ("businessinfinity_config", "update"),
+            "cfo.approveBudget": ("erpnext", "update"),
+            "cfo.getLiquidity": ("erpnext", "read"),
+            "cto.getIncidentSummary": ("businessinfinity_config", "read"),
+            "coo.acknowledgeAlert": ("businessinfinity_config", "update"),
+            "investor.getRiskBreakdown": ("erpnext", "read")
+        }
+        
+        # Check access control if available
+        if ACCESS_CONTROL_AVAILABLE and method in mcp_method_mapping:
+            mcp_server, operation = mcp_method_mapping[method]
+            try:
+                validate_mcp_request(user_id, user_role, mcp_server, operation)
+            except MCPAccessDeniedError as e:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": id_,
+                    "error": {
+                        "code": -32001,
+                        "message": "Access Denied",
+                        "data": {
+                            "reason": str(e),
+                            "user_role": user_role,
+                            "required_permission": f"{mcp_server}.{operation}"
+                        }
+                    }
+                }
+
         # CEO/Founder
         if method == "founder.approvePlan":
             plan = founder_state["plans"].get(params["planId"])
