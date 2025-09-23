@@ -15,60 +15,65 @@ This module consolidates:
 """
 
 # Import main components
-from .server import unified_server, app as server_app
-from .agents import agent_manager, UnifiedAgentManager
-from .mcp import mcp_handler, handle_mcp
-from .BusinessInfinityOrchestrator import BusinessInfinityOrchestrator, process_decision, coordinate_agents
+# from .server import unified_server, app as server_app
+# from .agents import agent_manager, UnifiedAgentManager
+# from .mcp import mcp_handler, handle_mcp
+# from .BusinessInfinityOrchestrator import BusinessInfinityOrchestrator, process_decision, coordinate_agents
 
 # Import consolidated modules
-from .auth import auth_handler, UnifiedAuthHandler
-from .triggers import triggers_manager, UnifiedTriggersManager
-from .utils import utils_manager, UnifiedUtilsManager, validate_request, get_ui_schema
-from .azure_functions import consolidated_functions, register_consolidated_functions
+# from .auth import auth_handler, UnifiedAuthHandler
+# from .triggers import triggers_manager, UnifiedTriggersManager
+# from .utils import utils_manager, UnifiedUtilsManager, validate_request, get_ui_schema
+# from .azure_functions import consolidated_functions, register_consolidated_functions
 
 # Import feature modules
-from .features import storage_manager, ml_manager, env_manager, api_orchestrator
+# from .features import storage_manager, ml_manager, env_manager, api_orchestrator
 
 # Export all major components
 __all__ = [
-    # Server components
-    'unified_server',
-    'server_app', 
+    # Audit trail system
+    'audit_trail',
+    'mcp_access_control',
+    'businessinfinity_config_mcp_stub'
     
-    # Agent components
-    'agent_manager',
-    'UnifiedAgentManager',
+    # # Server components
+    # 'unified_server',
+    # 'server_app', 
     
-    # MCP components  
-    'mcp_handler',
-    'handle_mcp',
+    # # Agent components
+    # 'agent_manager',
+    # 'UnifiedAgentManager',
     
-    # Orchestration components
-    'BusinessInfinityOrchestrator',
-    'process_decision',
-    'coordinate_agents',
+    # # MCP components  
+    # 'mcp_handler',
+    # 'handle_mcp',
     
-    # Authentication components
-    'auth_handler',
-    'UnifiedAuthHandler',
+    # # Orchestration components
+    # 'BusinessInfinityOrchestrator',
+    # 'process_decision',
+    # 'coordinate_agents',
     
-    # Triggers and event processing
-    'triggers_manager',
-    'UnifiedTriggersManager',
+    # # Authentication components
+    # 'auth_handler',
+    # 'UnifiedAuthHandler',
     
-    # Azure Functions integration
-    'consolidated_functions',
-    'register_consolidated_functions',
+    # # Triggers and event processing
+    # 'triggers_manager',
+    # 'UnifiedTriggersManager',
     
-    # Utilities and governance
-    'utils_manager',
-    'UnifiedUtilsManager',
-    'validate_request',
-    'get_ui_schema',
+    # # Azure Functions integration
+    # 'consolidated_functions',
+    # 'register_consolidated_functions',
     
-    # Feature modules
-    'storage_manager',
-    'ml_manager', 
-    'env_manager',
-    'api_orchestrator'
+    # # Utilities and governance
+    # 'utils_manager',
+    # 'UnifiedUtilsManager',
+    # 'validate_request',
+    # 'get_ui_schema',
+    
+    # # Feature modules
+    # 'storage_manager',
+    # 'ml_manager', 
+    # 'env_manager',
+    # 'api_orchestrator'
 ]

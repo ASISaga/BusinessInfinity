@@ -13,6 +13,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+# Import audit trail system
+from .audit_trail import (
+    AuditTrailManager, AuditEventType, AuditSeverity, 
+    audit_log, get_audit_manager
+)
+
 
 class AccessLevel(Enum):
     """MCP access levels"""
@@ -82,6 +88,19 @@ class MCPAccessControlManager:
         self.boardroom_agent_profiles: Dict[str, BoardroomAgentProfile] = {}
         self.violations: List[AccessControlViolation] = []
         self.logger = logging.getLogger(__name__)
+        
+        # Initialize audit trail manager
+        self.audit_manager = get_audit_manager()
+        
+        # Log system initialization
+        self.audit_manager.log_event(
+            event_type=AuditEventType.SYSTEM_STARTUP,
+            subject_id="mcp_access_control",
+            subject_type="system",
+            action="MCP Access Control Manager initialized",
+            context={"config_path": self.config_path},
+            compliance_tags={"access_control", "system_lifecycle"}
+        )
         
         # Initialize boardroom agent profiles from config
         self._initialize_boardroom_agents()
@@ -158,11 +177,44 @@ class MCPAccessControlManager:
         if not profile:
             reason = f"Boardroom agent {agent_role} not found"
             self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            
+            # Log agent access denied event
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=agent_role,
+                subject_type="agent",
+                subject_role=agent_role,
+                action=f"Agent not found for {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.HIGH,
+                context={
+                    "operation": operation,
+                    "reason": reason
+                },
+                compliance_tags={"access_control", "agent_security"}
+            )
             return False, reason
         
         if not profile.enabled:
             reason = f"Boardroom agent {agent_role} is not enabled"
             self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            
+            # Log disabled agent access attempt
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=profile.agent_id,
+                subject_type="agent",
+                subject_role=agent_role,
+                action=f"Disabled agent attempted {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.HIGH,
+                context={
+                    "operation": operation,
+                    "reason": reason,
+                    "onboarding_stage": profile.onboarding_stage
+                },
+                compliance_tags={"access_control", "agent_security"}
+            )
             return False, reason
         
         # Update usage statistics
@@ -172,6 +224,23 @@ class MCPAccessControlManager:
         if not self._has_agent_mcp_server_access(profile, mcp_server):
             reason = f"Agent {agent_role} does not have access to MCP server {mcp_server}"
             self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            
+            # Log agent MCP access denied
+            self.audit_manager.log_event(
+                event_type=AuditEventType.MCP_ACCESS_DENIED,
+                subject_id=profile.agent_id,
+                subject_type="agent",
+                subject_role=agent_role,
+                action=f"No MCP server access for {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "operation": operation,
+                    "reason": reason,
+                    "assigned_purpose": profile.assigned_purpose
+                },
+                compliance_tags={"access_control", "mcp_security"}
+            )
             return False, reason
         
         # Get agent's access level for this MCP server
@@ -181,16 +250,68 @@ class MCPAccessControlManager:
         if not self._is_operation_allowed(access_level, operation):
             reason = f"Access level {access_level} does not permit operation {operation}"
             self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            
+            # Log insufficient agent permissions
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=profile.agent_id,
+                subject_type="agent",
+                subject_role=agent_role,
+                action=f"Insufficient permissions for {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "operation": operation,
+                    "access_level": access_level,
+                    "reason": reason
+                },
+                compliance_tags={"access_control", "agent_permissions"}
+            )
             return False, reason
         
         # Check boardroom-specific restrictions
         if not self._check_agent_restrictions(profile, mcp_server, operation):
             reason = "Operation blocked by agent restrictions or decision limits"
             self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            
+            # Log agent restriction violation
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=profile.agent_id,
+                subject_type="agent",
+                subject_role=agent_role,
+                action=f"Blocked by restrictions for {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.HIGH,
+                context={
+                    "operation": operation,
+                    "reason": reason,
+                    "restrictions": profile.restrictions
+                },
+                compliance_tags={"access_control", "agent_restrictions"}
+            )
             return False, reason
         
         # Check if onboarding stage progression is needed
         self._check_agent_onboarding_progression(profile)
+        
+        # Log successful agent access grant
+        self.audit_manager.log_event(
+            event_type=AuditEventType.ACCESS_GRANTED,
+            subject_id=profile.agent_id,
+            subject_type="agent",
+            subject_role=agent_role,
+            action=f"Granted agent access to {mcp_server}.{operation}",
+            mcp_server=mcp_server,
+            severity=AuditSeverity.LOW,
+            context={
+                "operation": operation,
+                "access_level": access_level,
+                "onboarding_stage": profile.onboarding_stage,
+                "assigned_purpose": profile.assigned_purpose
+            },
+            compliance_tags={"access_control", "agent_access"}
+        )
         
         if self.config.get("audit", {}).get("log_all_access", False):
             self.logger.info(f"Agent access granted: {agent_role} -> {mcp_server}.{operation}")
@@ -491,6 +612,23 @@ class MCPAccessControlManager:
         if not self._has_mcp_server_access(profile, mcp_server):
             reason = f"Role {role} does not have access to MCP server {mcp_server}"
             self._log_violation(role, mcp_server, operation, reason)
+            
+            # Log access denied event
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=user_id,
+                subject_type="user",
+                subject_role=role,
+                action=f"Access denied to {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "operation": operation,
+                    "reason": reason,
+                    "onboarding_stage": profile.onboarding_stage
+                },
+                compliance_tags={"access_control", "security"}
+            )
             return False, reason
         
         # Get user's access level for this MCP server
@@ -500,16 +638,67 @@ class MCPAccessControlManager:
         if not self._is_operation_allowed(access_level, operation):
             reason = f"Access level {access_level} does not permit operation {operation}"
             self._log_violation(role, mcp_server, operation, reason)
+            
+            # Log access denied event
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=user_id,
+                subject_type="user",
+                subject_role=role,
+                action=f"Insufficient permissions for {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "operation": operation,
+                    "access_level": access_level,
+                    "reason": reason
+                },
+                compliance_tags={"access_control", "security"}
+            )
             return False, reason
         
         # Check rate limiting and restrictions
         if not self._check_restrictions(profile, mcp_server, operation):
             reason = "Operation blocked by usage restrictions or rate limiting"
             self._log_violation(role, mcp_server, operation, reason)
+            
+            # Log access denied event
+            self.audit_manager.log_event(
+                event_type=AuditEventType.ACCESS_DENIED,
+                subject_id=user_id,
+                subject_type="user",
+                subject_role=role,
+                action=f"Rate limited access to {mcp_server}.{operation}",
+                mcp_server=mcp_server,
+                severity=AuditSeverity.HIGH,
+                context={
+                    "operation": operation,
+                    "reason": reason,
+                    "usage_stats": profile.usage_stats
+                },
+                compliance_tags={"access_control", "rate_limiting"}
+            )
             return False, reason
         
         # Check if onboarding stage progression is needed
         self._check_onboarding_progression(profile)
+        
+        # Log successful access grant
+        self.audit_manager.log_event(
+            event_type=AuditEventType.ACCESS_GRANTED,
+            subject_id=user_id,
+            subject_type="user",
+            subject_role=role,
+            action=f"Granted access to {mcp_server}.{operation}",
+            mcp_server=mcp_server,
+            severity=AuditSeverity.LOW,
+            context={
+                "operation": operation,
+                "access_level": access_level,
+                "onboarding_stage": profile.onboarding_stage
+            },
+            compliance_tags={"access_control", "data_access"}
+        )
         
         if self.config.get("audit", {}).get("log_all_access", False):
             self.logger.info(f"Access granted: user {user_id} ({role}) -> {mcp_server}.{operation}")
