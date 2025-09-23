@@ -2,48 +2,85 @@ import axios from 'axios';
 import { AgentInfo, FineTuneJob } from './types';
 
 export class AMLClient {
-  private baseUrl = process.env.AZURE_FUNCTIONS_URL || '';
+  private baseUrl = process.env.AZURE_FUNCTIONS_URL || 'http://localhost:7071/api';
   private apiKey = process.env.AZURE_API_KEY || '';
 
   private headers() {
-    return { 'Authorization': `Bearer ${this.apiKey}` };
+    return { 
+      'Authorization': `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
   }
 
   async listAgents(): Promise<AgentInfo[]> {
-    const res = await axios.get(`${this.baseUrl}/agents`, { headers: this.headers() });
-    return res.data;
+    try {
+      const res = await axios.get(`${this.baseUrl}/mentor/agents`, { headers: this.headers() });
+      return res.data.agents || [];
+    } catch (error) {
+      console.error('Error listing agents:', error);
+      return [];
+    }
   }
 
   async chatWithAgent(agentId: string, message: string, onChunk: (chunk: string) => void) {
-    const res = await axios.post(`${this.baseUrl}/chat/${agentId}`, { message }, {
-      headers: this.headers(),
-      responseType: 'stream'
-    });
+    try {
+      const res = await axios.post(`${this.baseUrl}/mentor/chat/${agentId}`, 
+        { message }, 
+        { headers: this.headers() }
+      );
 
-    res.data.on('data', (chunk: Buffer) => {
-      onChunk(chunk.toString());
-    });
+      // For non-streaming response, call onChunk with the full response
+      if (res.data.response) {
+        onChunk(res.data.response);
+      }
 
-    return { text: 'Chat complete.' };
+      return { text: res.data.response || 'Chat complete.' };
+    } catch (error) {
+      console.error('Error chatting with agent:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      onChunk(`Error: ${errorMessage}`);
+      return { text: 'Chat failed.' };
+    }
   }
 
   async fineTuneAgent(agentId: string, datasetId: string): Promise<FineTuneJob> {
-    const res = await axios.post(`${this.baseUrl}/fine-tune/${agentId}`, { datasetId }, { headers: this.headers() });
-    return res.data;
+    try {
+      const res = await axios.post(`${this.baseUrl}/mentor/fine-tune/${agentId}`, 
+        { datasetId }, 
+        { headers: this.headers() }
+      );
+      return res.data;
+    } catch (error) {
+      console.error('Error starting fine-tuning:', error);
+      throw error;
+    }
   }
 
   async streamTrainingLogs(jobId: string, onLog: (log: string) => void) {
-    const res = await axios.get(`${this.baseUrl}/logs/${jobId}`, {
-      headers: this.headers(),
-      responseType: 'stream'
-    });
+    try {
+      const res = await axios.get(`${this.baseUrl}/mentor/logs/${jobId}`, {
+        headers: this.headers()
+      });
 
-    res.data.on('data', (chunk: Buffer) => {
-      onLog(chunk.toString());
-    });
+      if (res.data.logs && Array.isArray(res.data.logs)) {
+        res.data.logs.forEach((log: string) => onLog(log));
+      }
+    } catch (error) {
+      console.error('Error streaming logs:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      onLog(`Error retrieving logs: ${errorMessage}`);
+    }
   }
 
   async deployAdapter(agentId: string, version: string) {
-    await axios.post(`${this.baseUrl}/deploy/${agentId}`, { version }, { headers: this.headers() });
+    try {
+      await axios.post(`${this.baseUrl}/mentor/deploy/${agentId}`, 
+        { version }, 
+        { headers: this.headers() }
+      );
+    } catch (error) {
+      console.error('Error deploying adapter:', error);
+      throw error;
+    }
   }
 }

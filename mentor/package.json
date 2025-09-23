@@ -1,49 +1,131 @@
 {
   "name": "mentor-mode-boardroom",
-  "displayName": "Mentor Mode Boardroom LLM Control",
-  "publisher": "your-name",
-  "version": "0.0.1",
+  "displayName": "Business Infinity Mentor Mode",
+  "description": "VS Code extension for managing and fine-tuning Business Infinity AI agents",
+  "publisher": "business-infinity",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.93.0"
   },
-  "activationEvents": ["onStartupFinished"],
+  "categories": [
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "AI",
+    "agents",
+    "fine-tuning",
+    "mentor",
+    "business"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
-    "languageModelChatProviders": [
-      {
-        "id": "boardroom-llm",
-        "displayName": "Boardroom of Agents (AML)",
-        "managementCommand": "boardroom.manage"
-      }
-    ],
     "commands": [
       {
         "command": "boardroom.listAgents",
-        "title": "List Boardroom Agents"
+        "title": "List Business Agents",
+        "category": "Mentor Mode"
+      },
+      {
+        "command": "boardroom.chatWithAgent",
+        "title": "Chat with Agent",
+        "category": "Mentor Mode"
       },
       {
         "command": "boardroom.fineTuneAgent",
-        "title": "Fine Tune Agent LoRA"
+        "title": "Fine Tune Agent LoRA",
+        "category": "Mentor Mode"
       },
       {
         "command": "boardroom.viewTrainingLogs",
-        "title": "View Training Logs"
+        "title": "View Training Logs",
+        "category": "Mentor Mode"
       },
       {
         "command": "boardroom.deployAdapter",
-        "title": "Deploy LoRA Adapter"
+        "title": "Deploy LoRA Adapter",
+        "category": "Mentor Mode"
       },
       {
         "command": "boardroom.compareVersions",
-        "title": "Compare LoRA Versions"
+        "title": "Compare LoRA Versions",
+        "category": "Mentor Mode"
+      },
+      {
+        "command": "boardroom.manage",
+        "title": "Manage Mentor Mode",
+        "category": "Mentor Mode"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "boardroom.listAgents"
+        },
+        {
+          "command": "boardroom.chatWithAgent"
+        },
+        {
+          "command": "boardroom.fineTuneAgent"
+        },
+        {
+          "command": "boardroom.viewTrainingLogs"
+        },
+        {
+          "command": "boardroom.deployAdapter"
+        },
+        {
+          "command": "boardroom.compareVersions"
+        },
+        {
+          "command": "boardroom.manage"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Business Infinity Mentor Mode",
+      "properties": {
+        "mentorMode.azureFunctionsUrl": {
+          "type": "string",
+          "default": "http://localhost:7071/api",
+          "description": "Base URL for Azure Functions API"
+        },
+        "mentorMode.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for authentication (optional)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "echo \"Tests not yet implemented\""
   },
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.12.2"
   },
   "devDependencies": {
+    "@types/node": "^18.19.127",
     "@types/vscode": "^1.93.0",
-    "typescript": "^5.2.0"
-  }
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "@vscode/test-electron": "^2.3.4",
+    "eslint": "^8.47.0",
+    "typescript": "^5.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ASISaga/BusinessInfinity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ASISaga/BusinessInfinity/issues"
+  },
+  "license": "MIT"
 }
