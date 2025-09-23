@@ -23,33 +23,29 @@ from .agents import agent_manager, UnifiedAgentManager
 # Use the new MCPServiceBusClient from AOS for external MCP communication
 from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
 
-# Import decision engine components (business-specific)
+# Import decision engine components from AOS
 try:
-    from ..shared.framework.server.decision_engine import DecisionEngine
+    from RealmOfAgents.AgentOperatingSystem.decision_engine import DecisionEngine, validate_request, GovernanceError
     from ..shared.framework.server.config_loader import load_principles, load_decision_tree, load_adapters
     DECISION_ENGINE_AVAILABLE = True
 except ImportError:
     DECISION_ENGINE_AVAILABLE = False
     DecisionEngine = None
-
-# Import governance utilities (business-specific)
-try:
-    from ..utils.governance import validate_request, GovernanceError
-except ImportError:
     def validate_request(request):
         return True
-    
     class GovernanceError(Exception):
         pass
 
-# Import Business Infinity storage and environment managers (business-specific)
+# Import storage and environment managers from AOS
 try:
-    from ..storage import storage_manager
+    from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
+    storage_manager = UnifiedStorageManager()
 except ImportError:
     storage_manager = None
 
 try:
-    from ..environment import env_manager
+    from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
+    env_manager = UnifiedEnvManager()
 except ImportError:
     env_manager = None
 

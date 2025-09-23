@@ -52,9 +52,9 @@ Startups and scaling businesses face three universal constraints:
 
 ---
 
-## Agent Repository Structure (2025)
+## Agent and Core Feature Architecture (2025)
 
-All C-Suite and leadership agents have been moved to their own dedicated repositories under `RealmOfAgents/`:
+All C-Suite and leadership agents, as well as all core features (storage, environment, ML pipeline, decision engine, governance, service bus, MCP, and authentication), are now implemented and maintained in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`.
 
 - CEO: `RealmOfAgents/CEO/ChiefExecutiveOfficer.py`
 - CFO: `RealmOfAgents/CFO/ChiefFinancialOfficer.py`
@@ -65,85 +65,24 @@ All C-Suite and leadership agents have been moved to their own dedicated reposit
 - Founder: `RealmOfAgents/Founder/FounderAgent.py`
 - Investor: `RealmOfAgents/Investor/InvestorAgent.py`
 
-Each agent inherits from the generic `LeadershipAgent` in AOS and implements business-specific logic. This modular structure enables:
-- Clean separation of business logic and OS functionality
-- Easy extension and maintenance of individual agents
-- Reuse of agent logic across multiple business domains
+Each agent inherits from the generic `LeadershipAgent` in AOS and implements business-specific logic. All agent shims and previous agent files in `BusinessInfinity/agents/` have been removed. All core features (storage, environment, ML pipeline, decision engine, governance, service bus, MCP, and authentication) are now implemented in AOS. BusinessInfinity only contains business-specific logic and orchestrates agents via AOS.
 
-**Note:** All previous agent files in `BusinessInfinity/agents/` have been removed. Update your imports and integrations accordingly.
-
----
-
-## Ideal For
-- **Startups** — Operate beyond enterprise capability from day one.
-- **Scaling Businesses** — Grow without breaking your systems.
-- **Multi‑Enterprise Networks** — Federated decision‑making with shared context.
-
----
-
-## The Promise
-**"A 24/7, real‑time, self‑evolving Boardroom of Agents — each with the mastery of legends in their domain, steered by your vision, plugged into your tools — built to remove the limits of resource, speed, and scale."**
-
----
-
-## Architecture Note: Storage, Environment, and ML/LLM Capabilities
-
-BusinessInfinity is responsible for its own storage and environment management. This includes configuration files, secrets, persistent data, and environment variables. These are application-specific concerns and are implemented within BusinessInfinity, not in the underlying AgentOperatingSystem (AOS).
-
-**ML/LLM Capabilities:**
-- All machine learning and large language model (LLM) capabilities are provided by the shared, cross-domain `FineTunedLLM` module (see RealmOfAgents/FineTunedLLM).
-- BusinessInfinity does not implement its own ML pipeline; instead, it integrates with FineTunedLLM for all domain-specific model training, inference, and LLM-powered features.
-
-**Why?**
-- The AgentOperatingSystem (AOS) is a reusable, domain-agnostic orchestration and agent management layer. It does not include application-specific storage, environment managers, or ML/LLM logic, so it can be used as a foundation for many different domains and applications.
-- BusinessInfinity, as an application built on top of AOS, manages its own configuration, secrets, and persistent data according to its business needs, and leverages FineTunedLLM for advanced ML/LLM features.
-
-**Separation of Concerns:**
-- AOS provides agent orchestration, resource management, and inter-agent communication.
-- FineTunedLLM provides all ML/LLM capabilities for all domains.
-- BI handles business logic, user interface, storage, and environment configuration.
-
-This separation keeps AOS and FineTunedLLM generic and reusable, while BI remains flexible and responsible for its own operational context and leverages shared intelligence.
-
----
-
-## Updated Storage Architecture (2025)
-
-BusinessInfinity now uses the generic, reusable `UnifiedStorageManager` provided by the AgentOperatingSystem (AOS) in `RealmOfAgents/AgentOperatingSystem/storage/manager.py`.
-
-- **Storage logic is no longer implemented directly in BusinessInfinity.**
-- All storage, queue, and blob operations are handled by instantiating the AOS storage manager with Boardroom-specific configuration.
-- This keeps AOS generic and reusable, while BI remains flexible and responsible for its own operational context.
-
-**How to use:**
+**How to use core features:**
+Import all managers and core features from `RealmOfAgents.AgentOperatingSystem`. For example:
 ```python
 from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
-storage = UnifiedStorageManager()
+from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
+from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import MLPipelineManager
+from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
+from RealmOfAgents.AgentOperatingSystem.aos_auth import UnifiedAuthHandler
 ```
 
-See the AOS documentation for more details.
+See the AOS documentation for more details on each feature and API.
 
----
+**Separation of Concerns:**
+- AOS: All agent orchestration, resource management, storage, environment, ML pipeline, MCP, and authentication logic
+- BI: Business logic, user interface, and orchestration of agents via AOS
 
-## MCP Protocol/Client Migration (2025)
+**Note:** All legacy code and local implementations of these features in BusinessInfinity have been removed. Update your imports and integrations accordingly.
 
-All Model Context Protocol (MCP) communication and protocol/client logic is now unified in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`. BusinessInfinity no longer implements or maintains any MCP protocol or handler code. All MCP communication with external services (ERPNext-MCP, linkedin-mcp-server, mcp-reddit, etc.) is handled exclusively via the AOS MCP client and Azure Service Bus.
-
-- **AOS MCP Client:** The reusable client is implemented in `RealmOfAgents/AgentOperatingSystem/mcp_servicebus_client.py`.
-- **Service Bus Management:** Topic/subscription management is handled in AOS, not in BI.
-- **Orchestrator Usage:** The `BusinessInfinityOrchestrator` uses the AOS MCP client for all external MCP calls.
-- **No Legacy Code:** All legacy MCP protocol/handler modules have been removed from BusinessInfinity.
-
-For details, see `AZURE_SERVICE_BUS.md` and `MCP_CLIENT_MIGRATION.md`.
-
----
-
-## Unified Authentication & Authorization (2025)
-
-All authentication and authorization logic—including Azure B2C, JWT validation, and LinkedIn OAuth—is now implemented in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem/aos_auth.py`.
-
-- **AOS UnifiedAuthHandler:** All authentication endpoints and handlers in BusinessInfinity now import and use the unified handler from AOS.
-- **LinkedIn OAuth:** The LinkedIn login and callback endpoints in BI use the AOS handler for all OAuth logic.
-- **No Legacy Code:** All legacy authentication code in BusinessInfinity has been removed or replaced with imports from AOS.
-
-For details, see the AOS documentation and `aos_auth.py`.
+For migration details, see `AZURE_SERVICE_BUS.md` and `MCP_CLIENT_MIGRATION.md`.

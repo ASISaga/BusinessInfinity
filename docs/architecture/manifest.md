@@ -191,3 +191,10 @@ This document is now **visual + narrative + executable** — it contains:
     }
   }
 }
+```
+
+---
+
+## Unified Core Feature Reference
+
+All core features referenced in this manifest (agent orchestration, storage, environment, ML pipeline, MCP, authentication) are now implemented and maintained in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`. For implementation details, API contracts, and usage, refer to the AOS documentation and codebase. BusinessInfinity only defines business-specific contracts and UI schemas.

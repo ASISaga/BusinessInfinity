@@ -15,19 +15,27 @@ import asyncio
 import logging
 from typing import Dict, Any, List, Optional, Union
 
-# Import the new C-Suite agents
+
+# Import the new C-Suite agents directly from RealmOfAgents
 try:
-    from ..agents import AGENT_REGISTRY
-    from ..agents import (
-        ChiefExecutiveOfficer,
-        ChiefFinancialOfficer,
-        ChiefMarketingOfficer,
-        ChiefOperatingOfficer,
-        ChiefTechnologyOfficer,
-        ChiefHumanResourcesOfficer,
-        FounderAgent,
-        InvestorAgent
-    )
+    from RealmOfAgents.CEO.ChiefExecutiveOfficer import ChiefExecutiveOfficer
+    from RealmOfAgents.CFO.ChiefFinancialOfficer import ChiefFinancialOfficer
+    from RealmOfAgents.CMO.ChiefMarketingOfficer import ChiefMarketingOfficer
+    from RealmOfAgents.COO.ChiefOperatingOfficer import ChiefOperatingOfficer
+    from RealmOfAgents.CTO.ChiefTechnologyOfficer import ChiefTechnologyOfficer
+    from RealmOfAgents.CHRO.ChiefHumanResourcesOfficer import ChiefHumanResourcesOfficer
+    from RealmOfAgents.Founder.FounderAgent import FounderAgent
+    from RealmOfAgents.Investor.InvestorAgent import InvestorAgent
+    AGENT_REGISTRY = {
+        "CEO": ChiefExecutiveOfficer,
+        "CFO": ChiefFinancialOfficer,
+        "CMO": ChiefMarketingOfficer,
+        "COO": ChiefOperatingOfficer,
+        "CTO": ChiefTechnologyOfficer,
+        "CHRO": ChiefHumanResourcesOfficer,
+        "Founder": FounderAgent,
+        "Investor": InvestorAgent
+    }
     AGENTS_AVAILABLE = True
 except ImportError:
     AGENT_REGISTRY = {}
@@ -47,11 +55,12 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-# Import environment manager
+
+# Import environment manager from AOS
 try:
-    from ..environment import env_manager as env
+    from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager as env_manager
 except ImportError:
-    env = None
+    env_manager = None
 
 
 logger = logging.getLogger(__name__)

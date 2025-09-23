@@ -66,3 +66,27 @@
  │  • Training pipelines (triggered by host AML Manager)                         │
  │  • Model registry for versioning and binding to agents                        │
  └──────────────────────────────────────────────────────────────────────────────┘
+
+---
+
+## Unified Core Features and Separation of Concerns
+
+All core features (storage, environment, ML pipeline, MCP, authentication) are now implemented and maintained in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`. BusinessInfinity does not implement or maintain any local versions of these features. All previous local implementations have been removed.
+
+**How to use core features:**
+Import all managers and core features from `RealmOfAgents.AgentOperatingSystem`. For example:
+```python
+from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
+from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
+from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import MLPipelineManager
+from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
+from RealmOfAgents.AgentOperatingSystem.aos_auth import UnifiedAuthHandler
+```
+
+See the AOS documentation for more details on each feature and API.
+
+**Separation of Concerns:**
+- AOS: All agent orchestration, resource management, storage, environment, ML pipeline, MCP, and authentication logic
+- BI: Business logic, user interface, and orchestration of agents via AOS
+
+**Note:** All legacy code and local implementations of these features in BusinessInfinity have been removed. Update your imports and integrations accordingly.

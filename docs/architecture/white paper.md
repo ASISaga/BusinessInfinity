@@ -367,3 +367,9 @@ As the AI and startup landscapes accelerate, future work will enhance agent dive
 ---
 
 **Business Infinity builds not just a better AI boardroom, but a new paradigm—one that couples business wisdom, adaptive reasoning, and human transparency, shaping the next era of startup creation and growth.**
+
+---
+
+## Unified Core Feature Implementation
+
+All core features described in this white paper (agent orchestration, storage, environment, ML pipeline, MCP, authentication) are now implemented and maintained in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`. For implementation details, API usage, and developer onboarding, refer to the AOS documentation and codebase. BusinessInfinity focuses on business logic, UI, and orchestration patterns, leveraging AOS for all infrastructure and agent management.
