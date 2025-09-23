@@ -1,5 +1,8 @@
 # Boardroom Manifest Action Legend
 
+---
+**Note:** This legend, along with the manifest schema, now supersedes all previous MVP and migration documentation. See the main architecture and implementation docs for current usage.
+
 This legend maps each numbered arrow in the composite architecture diagram  
 to its corresponding **action / binding** and **manifest or MCP reference**.
 

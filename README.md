@@ -52,7 +52,11 @@ Startups and scaling businesses face three universal constraints:
 
 ---
 
+
 ## Agent and Core Feature Architecture (2025)
+
+---
+**Note:** All MVP, migration, and refactoring documentation has been assimilated into the main documentation. For historical context, see the appendix in [implementation.md](docs/implementation/implementation.md).
 
 All C-Suite and leadership agents, as well as all core features (storage, environment, ML pipeline, decision engine, governance, service bus, MCP, and authentication), are now implemented and maintained in the AgentOperatingSystem (AOS) under `RealmOfAgents/AgentOperatingSystem`.
 

@@ -1,3 +1,90 @@
+# Agent Types, Orchestration Boundaries, and Layered Organization
+
+---
+## Orchestration Boundaries: Shared vs. Business-Specific Code
+BusinessInfinity uses a clear separation between shared orchestration logic (in AOS) and business-specific orchestration (in BI):
+- **Shared code**: Orchestration engine, workflow primitives, agent coordination logic (generic, reusable) in `RealmOfAgents/AgentOperatingSystem/orchestration.py`.
+- **Business-specific code**: Event handling, business process logic, integrations (application/domain-specific) in `BusinessInfinity/core/orchestrator.py`.
+Add new orchestration strategies or primitives in AOS for reuse; add new business processes, event types, or integrations in BI.
+
+---
+
+BusinessInfinity organizes agents into layers and domains:
+- **Operations Agents:** Accounts, Finance, HR, Marketing, Engineering, Sales, IT
+- **Strategy Agents:** Management, BusinessDev
+- **Utility Agents:** Legal, Quality, Logistics
+- **Stakeholder Agents:** PR
+
+Each agent is purpose-driven, leveraging domain knowledge and integrating with business systems (ERP, CRM, financial, communication platforms).
+
+---
+
+# Perpetual Agent Patterns and Daemon Architecture
+
+BusinessInfinity agents operate as perpetual daemons, continuously monitoring, acting, and learning. Key patterns:
+- **Continuous Operational Cycles:** Real-time event processing, proactive issue detection, intelligent alerting, predictive analytics
+- **Asynchronous Processing:** Concurrent business process handling using asyncio
+- **Daemon-Like Operations:** Boot-time initialization, event-driven response, resource management, health monitoring
+- **Always-On Integration:** Persistent Copilot Studio and cloud service integration for collaborative, high-availability automation
+
+**Example:**
+```python
+class BusinessPerpetualAgent(PerpetualAgent):
+  def __init__(self, business_purpose, tools, interval=300):
+    system_message = f"You are a perpetual business agent focused on {business_purpose}. Monitor continuously and respond to business events autonomously."
+    super().__init__(tools=tools, system_message=system_message)
+    self.business_purpose = business_purpose
+    self.interval = interval
+    self.health_status = "active"
+  async def perpetual_work(self):
+    while True:
+      await self.evaluate_business_opportunities()
+      await self.execute_business_actions()
+      await self.monitor_performance_metrics()
+      await self.update_stakeholder_status()
+      await asyncio.sleep(self.interval)
+```
+
+---
+
+# Integration, Security, Monitoring, and Best Practices
+
+---
+## Historical MVP and Migration Documentation (Appendix)
+The following sections summarize the MVP requirements, delivery, and migration history for BusinessInfinity. All features are now consolidated in AOS and the main BI docs above.
+
+### MVP Requirements (2023)
+See [mvp_requirements.md](../../mvp_requirements.md) for the original MVP requirements. The MVP provided standalone C-Suite agents, REST API, web interface, and Azure Functions compatibility. All core features are now in AOS.
+
+### MVP Delivery Summary
+See [MVP_DELIVERY_SUMMARY.md](../../MVP_DELIVERY_SUMMARY.md) for the original MVP delivery and issue creation plan. All enhancements and refactoring have since been completed and assimilated.
+
+### MCP Client Migration
+See [MCP_CLIENT_MIGRATION.md](../../MCP_CLIENT_MIGRATION.md) for details on the migration to the AOS MCP client and Azure Service Bus integration.
+
+### Azure Service Bus Configuration
+See [AZURE_SERVICE_BUS.md](../../AZURE_SERVICE_BUS.md) for environment variables and configuration for MCP communication.
+
+---
+
+## Code Analysis and Suggestions
+All code analysis and improvement suggestions from previous iterations (see [suggestions.md](../../suggestions.md)) have been reviewed and assimilated into the current architecture and implementation. The suggestions file is now superseded by this documentation.
+
+## Integration Patterns
+- ERP (SAP, Oracle, NetSuite), CRM (Salesforce, HubSpot), Financial (QuickBooks, Xero), Communication (Slack, Teams)
+- Real-time data sync, process automation, unified dashboards
+
+## Security and Compliance
+- Multi-factor authentication, RBAC, API key management, Azure AD integration
+- Encryption at rest/in transit, data isolation, audit trails
+
+## Monitoring and Observability
+- Agent performance, business process success, cost optimization, customer satisfaction
+- Real-time dashboards, predictive analytics, operational insights
+
+## Best Practices
+- Measurable outcomes, process mapping, structured logging, automated testing, disaster recovery
+- Continuous health monitoring, documentation, security audits, least privilege, secure comms
 # Technical Architecture Report: Operationalizing Business Infinity as a Multi-Agent Boardroom System
 
 ## Executive Summary
