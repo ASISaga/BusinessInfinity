@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "name": "MCP Access Control Configuration",
+  "description": "Role-based access control configuration for MCP servers and resources",
+  "access_levels": {
+    "none": {
+      "description": "No access to MCP server",
+      "permissions": []
+    },
+    "read_only": {
+      "description": "Read-only access to MCP server resources",
+      "permissions": ["read", "list", "query"]
+    },
+    "limited_write": {
+      "description": "Limited write access with restrictions",
+      "permissions": ["read", "list", "query", "create", "update_own"]
+    },
+    "full_write": {
+      "description": "Full write access to MCP server",
+      "permissions": ["read", "list", "query", "create", "update", "delete"]
+    },
+    "admin": {
+      "description": "Full administrative access including system operations",
+      "permissions": ["read", "list", "query", "create", "update", "delete", "admin", "configure"]
+    }
+  },
+  "progressive_onboarding": {
+    "stages": [
+      {
+        "name": "observer",
+        "description": "Initial stage with read-only access to basic business data",
+        "duration_days": 7,
+        "default_access": "read_only",
+        "allowed_mcps": ["linkedin", "reddit"],
+        "restrictions": {
+          "max_queries_per_hour": 10,
+          "allowed_operations": ["read", "list"]
+        }
+      },
+      {
+        "name": "participant",
+        "description": "Limited write access to non-critical systems",
+        "duration_days": 30,
+        "default_access": "limited_write",
+        "allowed_mcps": ["linkedin", "reddit", "erpnext"],
+        "restrictions": {
+          "max_queries_per_hour": 50,
+          "allowed_operations": ["read", "list", "query", "create", "update_own"]
+        }
+      },
+      {
+        "name": "trusted",
+        "description": "Full access to business operations",
+        "duration_days": -1,
+        "default_access": "full_write",
+        "allowed_mcps": ["linkedin", "reddit", "erpnext"],
+        "restrictions": {
+          "max_queries_per_hour": 200,
+          "allowed_operations": ["read", "list", "query", "create", "update", "delete"]
+        }
+      }
+    ]
+  },
+  "roles": {
+    "Founder": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "admin",
+        "reddit": "full_write",
+        "erpnext": "admin",
+        "businessinfinity_config": "admin"
+      },
+      "override_restrictions": true,
+      "description": "Founder has full access to all systems"
+    },
+    "Investor": {
+      "default_stage": "participant",
+      "mcp_access": {
+        "linkedin": "read_only",
+        "reddit": "read_only", 
+        "erpnext": "read_only",
+        "businessinfinity_config": "read_only"
+      },
+      "progressive_onboarding": true,
+      "description": "Investor starts with limited access, can progress based on trust"
+    },
+    "CEO": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "full_write",
+        "reddit": "full_write",
+        "erpnext": "admin",
+        "businessinfinity_config": "full_write"
+      },
+      "override_restrictions": true,
+      "description": "CEO has broad operational access"
+    },
+    "CFO": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "limited_write",
+        "reddit": "read_only",
+        "erpnext": "admin",
+        "businessinfinity_config": "limited_write"
+      },
+      "progressive_onboarding": false,
+      "description": "CFO has full access to financial systems, limited elsewhere"
+    },
+    "CMO": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "admin",
+        "reddit": "admin",
+        "erpnext": "limited_write",
+        "businessinfinity_config": "limited_write"
+      },
+      "progressive_onboarding": false,
+      "description": "CMO has full access to marketing channels"
+    },
+    "CTO": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "limited_write",
+        "reddit": "limited_write",
+        "erpnext": "full_write",
+        "businessinfinity_config": "admin"
+      },
+      "progressive_onboarding": false,
+      "description": "CTO has technical system access and configuration rights"
+    },
+    "CHRO": {
+      "default_stage": "trusted",
+      "mcp_access": {
+        "linkedin": "full_write",
+        "reddit": "read_only",
+        "erpnext": "full_write",
+        "businessinfinity_config": "limited_write"
+      },
+      "progressive_onboarding": false,
+      "description": "CHRO has HR system access and LinkedIn for talent management"
+    },
+    "Employee": {
+      "default_stage": "observer",
+      "mcp_access": {
+        "linkedin": "none",
+        "reddit": "none",
+        "erpnext": "read_only",
+        "businessinfinity_config": "none"
+      },
+      "progressive_onboarding": true,
+      "description": "Standard employee with limited access, subject to full onboarding"
+    }
+  },
+  "mcp_servers": {
+    "linkedin": {
+      "name": "LinkedIn MCP Server",
+      "description": "Professional networking and talent management",
+      "security_level": "high",
+      "data_sensitivity": "personal",
+      "operations": {
+        "read": ["get_profile", "list_connections", "search_people"],
+        "create": ["post_content", "send_message", "create_event"],
+        "update": ["update_profile", "update_status"],
+        "delete": ["delete_post", "remove_connection"],
+        "admin": ["manage_company_page", "access_analytics"]
+      }
+    },
+    "reddit": {
+      "name": "Reddit MCP Server", 
+      "description": "Social media monitoring and engagement",
+      "security_level": "medium",
+      "data_sensitivity": "public",
+      "operations": {
+        "read": ["get_posts", "list_comments", "search_content"],
+        "create": ["post_content", "create_comment"],
+        "update": ["edit_post", "edit_comment"],
+        "delete": ["delete_post", "delete_comment"],
+        "admin": ["moderate_community", "access_mod_tools"]
+      }
+    },
+    "erpnext": {
+      "name": "ERPNext MCP Server",
+      "description": "Enterprise resource planning and business operations",
+      "security_level": "critical",
+      "data_sensitivity": "confidential",
+      "operations": {
+        "read": ["get_documents", "list_reports", "query_data"],
+        "create": ["create_document", "submit_transaction"],
+        "update": ["update_document", "modify_transaction"],
+        "delete": ["cancel_document", "delete_record"],
+        "admin": ["system_settings", "user_management", "backup_restore"]
+      }
+    },
+    "businessinfinity_config": {
+      "name": "BusinessInfinity Configuration Server",
+      "description": "Internal configuration and access control management",
+      "security_level": "critical",
+      "data_sensitivity": "system",
+      "operations": {
+        "read": ["get_config", "list_permissions", "query_access"],
+        "create": ["create_user", "grant_permission"],
+        "update": ["update_config", "modify_permissions"],
+        "delete": ["revoke_permission", "delete_user"],
+        "admin": ["system_config", "security_settings", "audit_logs"]
+      },
+      "note": "TODO: This MCP server needs to be implemented in separate repository"
+    }
+  },
+  "audit": {
+    "enabled": true,
+    "log_all_access": true,
+    "log_denied_access": true,
+    "retention_days": 90,
+    "alert_on_violations": true
+  }
+}
