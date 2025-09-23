@@ -278,6 +278,188 @@ class TestMCPAccessIntegration:
             validate_mcp_request("user1", "Employee", "linkedin", "admin")
 
 
+class TestBoardroomAgentAccessControl:
+    """Test boardroom agent access control functionality"""
+    
+    def setup_method(self):
+        """Setup test environment for boardroom agents"""
+        # Create test configuration with boardroom agents
+        self.test_config = {
+            "access_levels": {
+                "none": {"permissions": []},
+                "read_only": {"permissions": ["read", "list", "query"]},
+                "limited_write": {"permissions": ["read", "list", "query", "create", "update_own"]},
+                "full_write": {"permissions": ["read", "list", "query", "create", "update", "delete"]},
+                "admin": {"permissions": ["read", "list", "query", "create", "update", "delete", "admin", "configure"]}
+            },
+            "boardroom_agents": {
+                "enabled": True,
+                "agents": {
+                    "CEO": {
+                        "enabled": False,
+                        "onboarding_stage": "observer",
+                        "stage_started": None,
+                        "mcp_access": {"linkedin": "none", "reddit": "none", "erpnext": "none"},
+                        "legendary_profile": "Steve Jobs",
+                        "domain": "innovation_leadership"
+                    },
+                    "Founder": {
+                        "enabled": True,
+                        "onboarding_stage": "trusted",
+                        "stage_started": "2023-01-01T00:00:00Z",
+                        "mcp_access": {"linkedin": "admin", "reddit": "admin", "erpnext": "admin"},
+                        "legendary_profile": "Elon Musk",
+                        "domain": "visionary_leadership"
+                    }
+                },
+                "progressive_stages": {
+                    "observer": {
+                        "duration_days": 14,
+                        "default_access": "read_only",
+                        "allowed_mcps": ["linkedin", "reddit"],
+                        "restrictions": {"max_decisions_per_day": 2}
+                    },
+                    "participant": {
+                        "duration_days": 60,
+                        "default_access": "limited_write",
+                        "allowed_mcps": ["linkedin", "reddit", "erpnext"],
+                        "restrictions": {"max_decisions_per_day": 10}
+                    },
+                    "trusted": {
+                        "duration_days": -1,
+                        "default_access": "admin",
+                        "allowed_mcps": ["linkedin", "reddit", "erpnext"],
+                        "restrictions": {"max_decisions_per_day": -1}
+                    }
+                }
+            },
+            "roles": {},
+            "audit": {"enabled": True}
+        }
+        
+        # Mock the config loading
+        with patch.object(MCPAccessControlManager, '_load_config', return_value=self.test_config):
+            self.manager = MCPAccessControlManager()
+    
+    def test_boardroom_agent_initialization(self):
+        """Test boardroom agent profile initialization"""
+        # Check that agents are initialized
+        ceo_profile = self.manager.get_boardroom_agent_profile("CEO")
+        assert ceo_profile is not None
+        assert ceo_profile.role == "CEO"
+        assert ceo_profile.enabled is False
+        assert ceo_profile.onboarding_stage == "observer"
+        assert ceo_profile.legendary_profile == "Steve Jobs"
+        
+        founder_profile = self.manager.get_boardroom_agent_profile("Founder")
+        assert founder_profile is not None
+        assert founder_profile.enabled is True
+        assert founder_profile.onboarding_stage == "trusted"
+    
+    def test_disabled_agent_access(self):
+        """Test that disabled agents cannot access systems"""
+        # CEO is disabled, should not have access
+        has_access, reason = self.manager.check_boardroom_agent_access("CEO", "linkedin", "read")
+        assert has_access is False
+        assert "is not enabled" in reason
+    
+    def test_enabled_agent_access(self):
+        """Test that enabled agents can access systems according to their stage"""
+        # Founder is enabled and trusted, should have access
+        has_access, reason = self.manager.check_boardroom_agent_access("Founder", "linkedin", "admin")
+        assert has_access is True
+        assert reason == "Access granted"
+    
+    def test_agent_enablement(self):
+        """Test enabling a boardroom agent"""
+        # Enable CEO
+        result = self.manager.enable_boardroom_agent("CEO")
+        assert result is True
+        
+        # Verify CEO is now enabled
+        ceo_profile = self.manager.get_boardroom_agent_profile("CEO")
+        assert ceo_profile.enabled is True
+        assert ceo_profile.stage_started is not None
+    
+    def test_agent_disablement(self):
+        """Test disabling a boardroom agent"""
+        # Disable Founder
+        result = self.manager.disable_boardroom_agent("Founder")
+        assert result is True
+        
+        # Verify Founder is now disabled
+        founder_profile = self.manager.get_boardroom_agent_profile("Founder")
+        assert founder_profile.enabled is False
+    
+    def test_agent_onboarding_progression(self):
+        """Test agent onboarding stage progression"""
+        # Enable CEO and set stage_started to trigger progression
+        self.manager.enable_boardroom_agent("CEO")
+        ceo_profile = self.manager.get_boardroom_agent_profile("CEO")
+        
+        # Simulate time passing for progression (15 days)
+        ceo_profile.stage_started = datetime.now() - timedelta(days=15)
+        
+        # Check access to trigger progression
+        self.manager.check_boardroom_agent_access("CEO", "linkedin", "read")
+        
+        # Profile should have progressed to participant stage
+        assert ceo_profile.onboarding_stage == "participant"
+    
+    def test_agent_decision_limits(self):
+        """Test agent decision limits and restrictions"""
+        # Enable CEO
+        self.manager.enable_boardroom_agent("CEO")
+        ceo_profile = self.manager.get_boardroom_agent_profile("CEO")
+        
+        # Simulate reaching daily decision limit
+        today = datetime.now().date()
+        ceo_profile.decision_history = [
+            {"date": today.isoformat(), "operation": "create", "timestamp": datetime.now().isoformat()},
+            {"date": today.isoformat(), "operation": "update", "timestamp": datetime.now().isoformat()}
+        ]
+        
+        # Next decision should be blocked by limit (observer stage has max 2 decisions)
+        ceo_profile.restrictions = {"max_decisions_per_day": 2}
+        has_access, reason = self.manager.check_boardroom_agent_access("CEO", "linkedin", "create")
+        assert has_access is False
+        assert "decision limits" in reason or "restrictions" in reason
+    
+    def test_agents_summary(self):
+        """Test getting boardroom agents summary"""
+        summary = self.manager.get_boardroom_agents_summary()
+        
+        assert summary["enabled"] is True
+        assert "agents" in summary
+        assert "CEO" in summary["agents"]
+        assert "Founder" in summary["agents"]
+        
+        ceo_summary = summary["agents"]["CEO"]
+        assert ceo_summary["enabled"] is False
+        assert ceo_summary["legendary_profile"] == "Steve Jobs"
+        
+        founder_summary = summary["agents"]["Founder"]
+        assert founder_summary["enabled"] is True
+        assert founder_summary["onboarding_stage"] == "trusted"
+    
+    def test_agent_violation_logging(self):
+        """Test that agent access violations are logged with higher severity"""
+        # Clear existing violations
+        self.manager.violations = []
+        
+        # Generate a violation from disabled CEO
+        self.manager.check_boardroom_agent_access("CEO", "linkedin", "admin")
+        
+        # Check that violation was logged with high severity
+        assert len(self.manager.violations) == 1
+        violation = self.manager.violations[0]
+        assert violation.user_role == "BoardroomAgent:CEO"
+        assert violation.mcp_server == "linkedin"
+        assert violation.operation == "admin"
+        assert violation.severity == "high"
+        assert "is not enabled" in violation.reason
+
+
 class TestMCPHandlerIntegration:
     """Test MCP handler integration with access control"""
     

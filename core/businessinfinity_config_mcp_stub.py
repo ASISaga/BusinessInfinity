@@ -49,6 +49,7 @@ class BusinessInfinityConfigMCPServer:
             "last_updated": datetime.now().isoformat(),
             "users": {},
             "roles": {},
+            "boardroom_agents": {},
             "audit_logs": []
         }
     
@@ -193,6 +194,105 @@ class BusinessInfinityConfigMCPServer:
         """
         self.logger.info(f"Stub: Would update system configuration: {config}")
         return True
+    
+    # === Boardroom Agent Management Methods ===
+    
+    def get_boardroom_agent_config(self, agent_role: str) -> Dict[str, Any]:
+        """
+        Get boardroom agent configuration (stub implementation)
+        
+        TODO: Implement boardroom agent configuration management
+        - Agent onboarding status
+        - Progressive access levels
+        - Decision-making permissions
+        - Performance metrics
+        """
+        return {
+            "agent_role": agent_role,
+            "enabled": False,
+            "onboarding_stage": "observer",
+            "mcp_access": {},
+            "legendary_profile": "Unknown",
+            "restrictions": {},
+            "note": "This is stub data. Full implementation needed."
+        }
+    
+    def update_boardroom_agent_config(self, agent_role: str, config: Dict[str, Any]) -> bool:
+        """
+        Update boardroom agent configuration (stub implementation)
+        
+        TODO: Implement agent configuration updates
+        - Validate agent settings
+        - Update onboarding stage
+        - Modify access permissions
+        - Update restrictions
+        - Audit log entry
+        """
+        self.logger.info(f"Stub: Would update agent {agent_role} configuration: {config}")
+        return True
+    
+    def enable_boardroom_agent(self, agent_role: str) -> bool:
+        """
+        Enable boardroom agent (stub implementation)
+        
+        TODO: Implement agent enablement
+        - Enable agent in boardroom
+        - Initialize onboarding process
+        - Set initial access levels
+        - Create audit log entry
+        """
+        self.logger.info(f"Stub: Would enable boardroom agent: {agent_role}")
+        return True
+    
+    def disable_boardroom_agent(self, agent_role: str) -> bool:
+        """
+        Disable boardroom agent (stub implementation)
+        
+        TODO: Implement agent disablement
+        - Disable agent in boardroom
+        - Revoke all access
+        - Archive agent decisions
+        - Create audit log entry
+        """
+        self.logger.info(f"Stub: Would disable boardroom agent: {agent_role}")
+        return True
+    
+    def get_all_boardroom_agents(self) -> Dict[str, Any]:
+        """
+        Get all boardroom agents configuration (stub implementation)
+        
+        TODO: Implement comprehensive agent listing
+        - All agent configurations
+        - Onboarding status
+        - Access levels
+        - Performance metrics
+        """
+        return {
+            "agents": {
+                "CEO": {"enabled": True, "stage": "trusted"},
+                "CFO": {"enabled": False, "stage": "observer"}, 
+                "CTO": {"enabled": False, "stage": "observer"},
+                "CMO": {"enabled": False, "stage": "observer"},
+                "CHRO": {"enabled": False, "stage": "observer"},
+                "Investor": {"enabled": True, "stage": "participant"},
+                "Founder": {"enabled": True, "stage": "trusted"}
+            },
+            "note": "This is stub data. Full implementation needed."
+        }
+    
+    def progress_agent_onboarding(self, agent_role: str, new_stage: str) -> bool:
+        """
+        Progress agent to next onboarding stage (stub implementation)
+        
+        TODO: Implement agent onboarding progression
+        - Validate stage transition
+        - Update access permissions
+        - Update restrictions
+        - Notify other services
+        - Create audit log entry
+        """
+        self.logger.info(f"Stub: Would progress agent {agent_role} to stage {new_stage}")
+        return True
 
 
 # Stub implementation notes for separate repository:
@@ -211,7 +311,8 @@ BusinessInfinity Configuration MCP Server Implementation Requirements:
    - MCP protocol compliance
    - User permission management
    - Role-based access control
-   - Progressive onboarding system
+   - Boardroom agent onboarding and configuration
+   - Progressive onboarding system for both users and agents
    - Audit logging and compliance
    - Real-time permission updates
    - Integration with BusinessInfinity
@@ -236,6 +337,12 @@ BusinessInfinity Configuration MCP Server Implementation Requirements:
    - PUT /api/users/{user_id}/permissions
    - GET /api/roles/{role}/config
    - PUT /api/roles/{role}/config
+   - GET /api/boardroom/agents
+   - GET /api/boardroom/agents/{agent_role}
+   - PUT /api/boardroom/agents/{agent_role}/config
+   - POST /api/boardroom/agents/{agent_role}/enable
+   - POST /api/boardroom/agents/{agent_role}/disable
+   - POST /api/boardroom/agents/{agent_role}/progress
    - GET /api/audit/logs
    - POST /api/audit/logs
    - GET /api/system/config
@@ -245,7 +352,10 @@ BusinessInfinity Configuration MCP Server Implementation Requirements:
    - users table (user_id, role, created_at, updated_at)
    - permissions table (user_id, mcp_server, access_level, granted_at)
    - roles table (role_name, default_permissions, onboarding_config)
-   - audit_logs table (event_id, timestamp, event_type, user_id, details)
+   - boardroom_agents table (agent_role, enabled, onboarding_stage, config, stage_started)
+   - agent_permissions table (agent_role, mcp_server, access_level, granted_at)
+   - agent_decisions table (agent_role, decision_id, timestamp, mcp_server, operation)
+   - audit_logs table (event_id, timestamp, event_type, subject_id, subject_type, details)
    - system_config table (config_key, config_value, updated_at)
 
 7. Integration Points:

@@ -206,6 +206,167 @@
       "note": "TODO: This MCP server needs to be implemented in separate repository"
     }
   },
+  "boardroom_agents": {
+    "enabled": true,
+    "description": "Progressive onboarding configuration for BoardRoom Agents themselves",
+    "agents": {
+      "CEO": {
+        "enabled": false,
+        "onboarding_stage": "observer",
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none", 
+          "erpnext": "none",
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Steve Jobs",
+        "domain": "innovation_leadership",
+        "assigned_purpose": "drive_strategic_innovation_and_growth",
+        "description": "CEO agent can be progressively onboarded to gain full strategic access"
+      },
+      "CFO": {
+        "enabled": false,
+        "onboarding_stage": "observer",
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none",
+          "erpnext": "none", 
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Mary Barra",
+        "domain": "operational_excellence",
+        "assigned_purpose": "ensure_financial_sustainability_and_efficiency",
+        "description": "CFO agent can be progressively onboarded for financial system access"
+      },
+      "CTO": {
+        "enabled": false,
+        "onboarding_stage": "observer",
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none",
+          "erpnext": "none",
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Alan Kay",
+        "domain": "technology_vision", 
+        "assigned_purpose": "drive_technological_innovation_and_excellence",
+        "description": "CTO agent can be progressively onboarded for technical system access"
+      },
+      "CMO": {
+        "enabled": false,
+        "onboarding_stage": "observer",
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none",
+          "erpnext": "none",
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Philip Kotler",
+        "domain": "marketing_mastery",
+        "assigned_purpose": "build_powerful_brands_and_customer_connections",
+        "description": "CMO agent can be progressively onboarded for marketing channel access"
+      },
+      "CHRO": {
+        "enabled": false,
+        "onboarding_stage": "observer", 
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none",
+          "erpnext": "none",
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Jack Welch",
+        "domain": "organizational_development",
+        "assigned_purpose": "build_exceptional_organizational_capabilities", 
+        "description": "CHRO agent can be progressively onboarded for HR and talent systems"
+      },
+      "COO": {
+        "enabled": false,
+        "onboarding_stage": "observer",
+        "stage_started": null,
+        "mcp_access": {
+          "linkedin": "none",
+          "reddit": "none",
+          "erpnext": "none",
+          "businessinfinity_config": "none"
+        },
+        "legendary_profile": "Tim Cook",
+        "domain": "operational_excellence",
+        "assigned_purpose": "optimize_operations_and_execution",
+        "description": "COO agent can be progressively onboarded for operational system access"
+      },
+      "Investor": {
+        "enabled": true,
+        "onboarding_stage": "participant",
+        "stage_started": "2024-01-01T00:00:00Z",
+        "mcp_access": {
+          "linkedin": "read_only",
+          "reddit": "read_only",
+          "erpnext": "read_only",
+          "businessinfinity_config": "read_only"
+        },
+        "legendary_profile": "Warren Buffett",
+        "domain": "investment_strategy",
+        "assigned_purpose": "maximize_long_term_value_creation",
+        "description": "Investor agent is partially onboarded with limited access"
+      },
+      "Founder": {
+        "enabled": true,
+        "onboarding_stage": "trusted",
+        "stage_started": "2023-01-01T00:00:00Z", 
+        "mcp_access": {
+          "linkedin": "admin",
+          "reddit": "admin",
+          "erpnext": "admin",
+          "businessinfinity_config": "admin"
+        },
+        "legendary_profile": "Elon Musk",
+        "domain": "visionary_leadership",
+        "assigned_purpose": "drive_innovation_and_business_transformation",
+        "description": "Founder agent is fully trusted with complete system access"
+      }
+    },
+    "progressive_stages": {
+      "observer": {
+        "duration_days": 14,
+        "description": "Agent observes boardroom activities with minimal access",
+        "default_access": "read_only",
+        "allowed_mcps": ["linkedin", "reddit"],
+        "restrictions": {
+          "max_decisions_per_day": 2,
+          "requires_approval": true,
+          "allowed_decision_types": ["informational"]
+        }
+      },
+      "participant": {
+        "duration_days": 60,
+        "description": "Agent participates in decisions with limited operational access",
+        "default_access": "limited_write",
+        "allowed_mcps": ["linkedin", "reddit", "erpnext"],
+        "restrictions": {
+          "max_decisions_per_day": 10,
+          "requires_approval": false,
+          "allowed_decision_types": ["operational", "informational"]
+        }
+      },
+      "trusted": {
+        "duration_days": -1,
+        "description": "Agent has full boardroom participation and system access",
+        "default_access": "admin",
+        "allowed_mcps": ["linkedin", "reddit", "erpnext", "businessinfinity_config"],
+        "restrictions": {
+          "max_decisions_per_day": -1,
+          "requires_approval": false,
+          "allowed_decision_types": ["strategic", "financial", "operational", "investment", "product", "market", "governance"]
+        }
+      }
+    }
+  },
   "audit": {
     "enabled": true,
     "log_all_access": true,
