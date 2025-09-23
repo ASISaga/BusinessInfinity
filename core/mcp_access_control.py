@@ -42,6 +42,23 @@ class AccessControlViolation:
 
 
 @dataclass
+class BoardroomAgentProfile:
+    """Represents a Boardroom Agent's access profile and onboarding status"""
+    agent_id: str
+    role: str
+    enabled: bool
+    onboarding_stage: str
+    stage_started: Optional[datetime]
+    mcp_access: Dict[str, str] = field(default_factory=dict)
+    legendary_profile: str = ""
+    domain: str = ""
+    assigned_purpose: str = ""
+    restrictions: Dict[str, Any] = field(default_factory=dict)
+    decision_history: List[Dict[str, Any]] = field(default_factory=list)
+    last_activity: Optional[datetime] = None
+
+
+@dataclass
 class UserAccessProfile:
     """Represents a user's access profile and permissions"""
     role: str
@@ -62,8 +79,12 @@ class MCPAccessControlManager:
         self.config_path = config_path or str(Path(__file__).parent.parent / "config" / "mcp_access_control.json")
         self.config = self._load_config()
         self.user_profiles: Dict[str, UserAccessProfile] = {}
+        self.boardroom_agent_profiles: Dict[str, BoardroomAgentProfile] = {}
         self.violations: List[AccessControlViolation] = []
         self.logger = logging.getLogger(__name__)
+        
+        # Initialize boardroom agent profiles from config
+        self._initialize_boardroom_agents()
         
     def _load_config(self) -> Dict[str, Any]:
         """Load access control configuration"""
@@ -77,7 +98,306 @@ class MCPAccessControlManager:
             self.logger.error(f"Error loading access control config: {e}")
             return self._default_config()
     
-    def _default_config(self) -> Dict[str, Any]:
+    def _initialize_boardroom_agents(self):
+        """Initialize boardroom agent profiles from configuration"""
+        try:
+            boardroom_config = self.config.get("boardroom_agents", {})
+            if not boardroom_config.get("enabled", False):
+                self.logger.info("Boardroom agent onboarding is disabled")
+                return
+            
+            agents_config = boardroom_config.get("agents", {})
+            
+            for agent_role, agent_config in agents_config.items():
+                stage_started = None
+                if agent_config.get("stage_started"):
+                    stage_started_str = agent_config["stage_started"].replace('Z', '+00:00')
+                    stage_started = datetime.fromisoformat(stage_started_str).replace(tzinfo=None)
+                
+                # Get stage restrictions
+                stage_config = self._get_boardroom_agent_stage_config(agent_config.get("onboarding_stage", "observer"))
+                restrictions = stage_config.get("restrictions", {}) if stage_config else {}
+                
+                profile = BoardroomAgentProfile(
+                    agent_id=f"boardroom_{agent_role.lower()}",
+                    role=agent_role,
+                    enabled=agent_config.get("enabled", False),
+                    onboarding_stage=agent_config.get("onboarding_stage", "observer"),
+                    stage_started=stage_started,
+                    mcp_access=agent_config.get("mcp_access", {}).copy(),
+                    legendary_profile=agent_config.get("legendary_profile", ""),
+                    domain=agent_config.get("domain", ""),
+                    assigned_purpose=agent_config.get("assigned_purpose", ""),
+                    restrictions=restrictions.copy()
+                )
+                
+                self.boardroom_agent_profiles[agent_role] = profile
+                self.logger.info(f"Initialized boardroom agent profile: {agent_role} (enabled: {profile.enabled})")
+                
+        except Exception as e:
+            self.logger.error(f"Error initializing boardroom agents: {e}")
+    
+    def _get_boardroom_agent_stage_config(self, stage_name: str) -> Optional[Dict[str, Any]]:
+        """Get configuration for boardroom agent onboarding stage"""
+        stages = self.config.get("boardroom_agents", {}).get("progressive_stages", {})
+        return stages.get(stage_name)
+    
+    def get_boardroom_agent_profile(self, agent_role: str) -> Optional[BoardroomAgentProfile]:
+        """Get boardroom agent profile by role"""
+        return self.boardroom_agent_profiles.get(agent_role)
+    
+    def check_boardroom_agent_access(self, agent_role: str, mcp_server: str, operation: str) -> Tuple[bool, str]:
+        """
+        Check if boardroom agent has access to perform operation on MCP server
+        
+        Returns:
+            Tuple[bool, str]: (has_access, reason)
+        """
+        profile = self.get_boardroom_agent_profile(agent_role)
+        
+        if not profile:
+            reason = f"Boardroom agent {agent_role} not found"
+            self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            return False, reason
+        
+        if not profile.enabled:
+            reason = f"Boardroom agent {agent_role} is not enabled"
+            self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            return False, reason
+        
+        # Update usage statistics
+        self._update_agent_activity(profile, mcp_server, operation)
+        
+        # Check if agent has access to MCP server
+        if not self._has_agent_mcp_server_access(profile, mcp_server):
+            reason = f"Agent {agent_role} does not have access to MCP server {mcp_server}"
+            self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            return False, reason
+        
+        # Get agent's access level for this MCP server
+        access_level = self._get_agent_access_level(profile, mcp_server)
+        
+        # Check if operation is allowed for this access level
+        if not self._is_operation_allowed(access_level, operation):
+            reason = f"Access level {access_level} does not permit operation {operation}"
+            self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            return False, reason
+        
+        # Check boardroom-specific restrictions
+        if not self._check_agent_restrictions(profile, mcp_server, operation):
+            reason = "Operation blocked by agent restrictions or decision limits"
+            self._log_agent_violation(agent_role, mcp_server, operation, reason)
+            return False, reason
+        
+        # Check if onboarding stage progression is needed
+        self._check_agent_onboarding_progression(profile)
+        
+        if self.config.get("audit", {}).get("log_all_access", False):
+            self.logger.info(f"Agent access granted: {agent_role} -> {mcp_server}.{operation}")
+        
+        return True, "Access granted"
+    
+    def _has_agent_mcp_server_access(self, profile: BoardroomAgentProfile, mcp_server: str) -> bool:
+        """Check if agent has any access to MCP server"""
+        # Check explicit access
+        if mcp_server in profile.mcp_access:
+            return profile.mcp_access[mcp_server] != AccessLevel.NONE.value
+        
+        # Check stage-based access
+        stage_config = self._get_boardroom_agent_stage_config(profile.onboarding_stage)
+        if stage_config:
+            allowed_mcps = stage_config.get("allowed_mcps", [])
+            return mcp_server in allowed_mcps
+        
+        return False
+    
+    def _get_agent_access_level(self, profile: BoardroomAgentProfile, mcp_server: str) -> str:
+        """Get agent's access level for specific MCP server"""
+        # Check explicit access first
+        if mcp_server in profile.mcp_access:
+            return profile.mcp_access[mcp_server]
+        
+        # Fall back to stage default access
+        stage_config = self._get_boardroom_agent_stage_config(profile.onboarding_stage)
+        if stage_config:
+            return stage_config.get("default_access", "read_only")
+        
+        return "none"
+    
+    def _check_agent_restrictions(self, profile: BoardroomAgentProfile, mcp_server: str, operation: str) -> bool:
+        """Check agent-specific restrictions"""
+        # Check daily decision limits
+        max_decisions = profile.restrictions.get("max_decisions_per_day", -1)
+        if max_decisions > 0:
+            today = datetime.now().date()
+            decisions_today = sum(
+                1 for decision in profile.decision_history 
+                if decision.get("date") == today.isoformat()
+            )
+            if decisions_today >= max_decisions:
+                return False
+        
+        # Check allowed decision types for strategic operations
+        if operation in ["create", "update", "admin"]:
+            allowed_types = profile.restrictions.get("allowed_decision_types", [])
+            if allowed_types and "strategic" not in allowed_types:
+                # For now, assume these are strategic operations
+                # In real implementation, this would be context-aware
+                pass
+        
+        return True
+    
+    def _update_agent_activity(self, profile: BoardroomAgentProfile, mcp_server: str, operation: str):
+        """Update agent activity tracking"""
+        profile.last_activity = datetime.now()
+        
+        # Log decision if it's a significant operation
+        if operation in ["create", "update", "delete", "admin"]:
+            today = datetime.now().date()
+            profile.decision_history.append({
+                "date": today.isoformat(),
+                "mcp_server": mcp_server,
+                "operation": operation,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            # Clean up old decision history (keep only last 30 days)
+            cutoff_date = (datetime.now() - timedelta(days=30)).date()
+            profile.decision_history = [
+                d for d in profile.decision_history
+                if datetime.fromisoformat(d["date"]).date() >= cutoff_date
+            ]
+    
+    def _check_agent_onboarding_progression(self, profile: BoardroomAgentProfile):
+        """Check if agent should progress to next onboarding stage"""
+        if not profile.stage_started:
+            return
+        
+        current_stage_config = self._get_boardroom_agent_stage_config(profile.onboarding_stage)
+        if not current_stage_config:
+            return
+        
+        duration_days = current_stage_config.get("duration_days", -1)
+        if duration_days <= 0:  # Permanent stage
+            return
+        
+        days_in_stage = (datetime.now() - profile.stage_started).days
+        if days_in_stage >= duration_days:
+            self._progress_agent_to_next_stage(profile)
+    
+    def _progress_agent_to_next_stage(self, profile: BoardroomAgentProfile):
+        """Progress agent to next onboarding stage"""
+        stages = ["observer", "participant", "trusted"]
+        current_idx = stages.index(profile.onboarding_stage) if profile.onboarding_stage in stages else -1
+        
+        if current_idx >= 0 and current_idx < len(stages) - 1:
+            next_stage = stages[current_idx + 1]
+            profile.onboarding_stage = next_stage
+            profile.stage_started = datetime.now()
+            
+            # Update restrictions
+            stage_config = self._get_boardroom_agent_stage_config(next_stage)
+            if stage_config:
+                profile.restrictions = stage_config.get("restrictions", {}).copy()
+            
+            self.logger.info(f"Boardroom agent {profile.role} progressed to stage: {next_stage}")
+            
+            # Update config file
+            self._update_agent_stage_in_config(profile.role, next_stage)
+    
+    def _update_agent_stage_in_config(self, agent_role: str, new_stage: str):
+        """Update agent's stage in configuration file"""
+        try:
+            if "boardroom_agents" in self.config and "agents" in self.config["boardroom_agents"]:
+                if agent_role in self.config["boardroom_agents"]["agents"]:
+                    self.config["boardroom_agents"]["agents"][agent_role]["onboarding_stage"] = new_stage
+                    self.config["boardroom_agents"]["agents"][agent_role]["stage_started"] = datetime.now().isoformat()
+        except Exception as e:
+            self.logger.error(f"Error updating agent stage in config: {e}")
+    
+    def _log_agent_violation(self, agent_role: str, mcp_server: str, operation: str, reason: str):
+        """Log access control violation for boardroom agent"""
+        violation = AccessControlViolation(
+            user_role=f"BoardroomAgent:{agent_role}",
+            mcp_server=mcp_server,
+            operation=operation,
+            reason=reason,
+            severity="high"  # Agent violations are more serious
+        )
+        self.violations.append(violation)
+        
+        if self.config.get("audit", {}).get("log_denied_access", True):
+            self.logger.warning(f"Agent access denied: {agent_role} -> {mcp_server}.{operation} - {reason}")
+    
+    def enable_boardroom_agent(self, agent_role: str) -> bool:
+        """Enable a boardroom agent for onboarding"""
+        profile = self.get_boardroom_agent_profile(agent_role)
+        if not profile:
+            return False
+        
+        if not profile.enabled:
+            profile.enabled = True
+            profile.stage_started = datetime.now()
+            self.logger.info(f"Enabled boardroom agent: {agent_role}")
+            
+            # Update config
+            try:
+                if "boardroom_agents" in self.config and "agents" in self.config["boardroom_agents"]:
+                    if agent_role in self.config["boardroom_agents"]["agents"]:
+                        self.config["boardroom_agents"]["agents"][agent_role]["enabled"] = True
+                        self.config["boardroom_agents"]["agents"][agent_role]["stage_started"] = datetime.now().isoformat()
+            except Exception as e:
+                self.logger.error(f"Error updating agent config: {e}")
+        
+        return True
+    
+    def disable_boardroom_agent(self, agent_role: str) -> bool:
+        """Disable a boardroom agent"""
+        profile = self.get_boardroom_agent_profile(agent_role)
+        if not profile:
+            return False
+        
+        profile.enabled = False
+        self.logger.info(f"Disabled boardroom agent: {agent_role}")
+        
+        # Update config
+        try:
+            if "boardroom_agents" in self.config and "agents" in self.config["boardroom_agents"]:
+                if agent_role in self.config["boardroom_agents"]["agents"]:
+                    self.config["boardroom_agents"]["agents"][agent_role]["enabled"] = False
+        except Exception as e:
+            self.logger.error(f"Error updating agent config: {e}")
+        
+        return True
+    
+    def get_boardroom_agents_summary(self) -> Dict[str, Any]:
+        """Get summary of all boardroom agents and their status"""
+        summary = {
+            "enabled": self.config.get("boardroom_agents", {}).get("enabled", False),
+            "agents": {}
+        }
+        
+        for agent_role, profile in self.boardroom_agent_profiles.items():
+            days_in_stage = 0
+            if profile.stage_started:
+                days_in_stage = (datetime.now() - profile.stage_started).days
+            
+            summary["agents"][agent_role] = {
+                "enabled": profile.enabled,
+                "onboarding_stage": profile.onboarding_stage,
+                "days_in_stage": days_in_stage,
+                "legendary_profile": profile.legendary_profile,
+                "domain": profile.domain,
+                "mcp_access": profile.mcp_access,
+                "restrictions": profile.restrictions,
+                "recent_decisions": len([
+                    d for d in profile.decision_history 
+                    if (datetime.now() - datetime.fromisoformat(d["timestamp"])).days <= 7
+                ]),
+                "last_activity": profile.last_activity.isoformat() if profile.last_activity else None
+            }
+        
+        return summary
         """Return default configuration if config file is not available"""
         return {
             "access_levels": {

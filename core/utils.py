@@ -8,6 +8,7 @@ import json
 import logging
 from typing import Dict, Any, List, Optional, Union, Tuple
 from pathlib import Path
+from datetime import datetime
 
 # Import MCP Access Control Manager
 try:
@@ -463,6 +464,68 @@ class UnifiedUtilsManager:
         
         return self.mcp_access_manager.bulk_update_role_access(role, mcp_access)
     
+    # === Boardroom Agent Access Control Methods ===
+    
+    def check_boardroom_agent_access(self, agent_role: str, mcp_server: str, operation: str) -> Tuple[bool, str]:
+        """Check if boardroom agent has access to MCP server operation"""
+        if not self.mcp_access_manager:
+            logging.warning("MCP Access Control not available, defaulting to allow")
+            return True, "MCP Access Control not configured"
+        
+        return self.mcp_access_manager.check_boardroom_agent_access(agent_role, mcp_server, operation)
+    
+    def enable_boardroom_agent(self, agent_role: str) -> bool:
+        """Enable a boardroom agent for progressive onboarding"""
+        if not self.mcp_access_manager:
+            return False
+        
+        return self.mcp_access_manager.enable_boardroom_agent(agent_role)
+    
+    def disable_boardroom_agent(self, agent_role: str) -> bool:
+        """Disable a boardroom agent"""
+        if not self.mcp_access_manager:
+            return False
+        
+        return self.mcp_access_manager.disable_boardroom_agent(agent_role)
+    
+    def get_boardroom_agents_summary(self) -> Dict[str, Any]:
+        """Get comprehensive summary of all boardroom agents"""
+        if not self.mcp_access_manager:
+            return {"error": "MCP Access Control not available"}
+        
+        return self.mcp_access_manager.get_boardroom_agents_summary()
+    
+    def get_boardroom_agent_profile(self, agent_role: str) -> Optional[Dict[str, Any]]:
+        """Get individual boardroom agent profile"""
+        if not self.mcp_access_manager:
+            return None
+        
+        profile = self.mcp_access_manager.get_boardroom_agent_profile(agent_role)
+        if not profile:
+            return None
+        
+        days_in_stage = 0
+        if profile.stage_started:
+            days_in_stage = (datetime.now() - profile.stage_started).days
+        
+        return {
+            "agent_id": profile.agent_id,
+            "role": profile.role,
+            "enabled": profile.enabled,
+            "onboarding_stage": profile.onboarding_stage,
+            "days_in_stage": days_in_stage,
+            "legendary_profile": profile.legendary_profile,
+            "domain": profile.domain,
+            "assigned_purpose": profile.assigned_purpose,
+            "mcp_access": profile.mcp_access,
+            "restrictions": profile.restrictions,
+            "recent_decisions": len([
+                d for d in profile.decision_history 
+                if (datetime.now() - datetime.fromisoformat(d["timestamp"])).days <= 7
+            ]) if profile.decision_history else 0,
+            "last_activity": profile.last_activity.isoformat() if profile.last_activity else None
+        }
+    
     # === Configuration Validation ===
     
     def validate_configuration(self) -> Dict[str, Any]:
@@ -523,9 +586,26 @@ def get_user_mcp_permissions(user_id: str, role: str) -> Dict[str, Any]:
     """Backward compatibility wrapper for getting user MCP permissions"""
     return utils_manager.get_user_mcp_permissions(user_id, role)
 
+def check_boardroom_agent_access(agent_role: str, mcp_server: str, operation: str) -> Tuple[bool, str]:
+    """Backward compatibility wrapper for boardroom agent access control"""
+    return utils_manager.check_boardroom_agent_access(agent_role, mcp_server, operation)
+
+def enable_boardroom_agent(agent_role: str) -> bool:
+    """Backward compatibility wrapper for enabling boardroom agent"""
+    return utils_manager.enable_boardroom_agent(agent_role)
+
+def disable_boardroom_agent(agent_role: str) -> bool:
+    """Backward compatibility wrapper for disabling boardroom agent"""
+    return utils_manager.disable_boardroom_agent(agent_role)
+
+def get_boardroom_agents_summary() -> Dict[str, Any]:
+    """Backward compatibility wrapper for getting boardroom agents summary"""
+    return utils_manager.get_boardroom_agents_summary()
+
 # Export all
 __all__ = [
     'utils_manager', 'UnifiedUtilsManager', 'GovernanceError', 'MCPAccessDeniedError',
     'validate_request', 'get_ui_schema', 'check_mcp_access', 'validate_mcp_request',
-    'get_user_mcp_permissions'
+    'get_user_mcp_permissions', 'check_boardroom_agent_access', 'enable_boardroom_agent', 
+    'disable_boardroom_agent', 'get_boardroom_agents_summary'
 ]
