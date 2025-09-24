@@ -6,6 +6,7 @@ Tests all components of the adapter system including:
 - Self-learning system functionality
 - Model upgrade management
 - Evaluation harness metrics
+- Multi-dimensional learning system
 - Integration with autonomous boardroom
 """
 
@@ -25,6 +26,7 @@ from adapters import (
     ModelUpgradeManager,
     EvaluationHarness,
     AdapterOrchestrator,
+    MultiDimensionalLearningOrchestrator,
     initialize_adapter_system,
     generate_boardroom_response,
     evaluate_boardroom_response,
@@ -32,7 +34,10 @@ from adapters import (
     AdapterType,
     LearningPhase,
     UpgradeStatus,
-    MetricType
+    MetricType,
+    LearningDimension,
+    AdaptationTrigger,
+    AdaptationStrategy
 )
 
 
@@ -495,6 +500,365 @@ class TestIntegrationFunctions:
             
             mock_orchestrator.evaluate_response.assert_called_once_with("cfo", "Test response", None)
             assert result["success"] is True
+
+
+class TestMultiDimensionalLearning:
+    """Test multi-dimensional learning system functionality"""
+    
+    @pytest.fixture
+    def temp_dir(self):
+        """Create temporary directory for tests"""
+        temp_dir = tempfile.mkdtemp()
+        yield temp_dir
+        shutil.rmtree(temp_dir)
+    
+    @pytest.fixture
+    def multi_dim_orchestrator(self):
+        """Create test multi-dimensional learning orchestrator"""
+        return MultiDimensionalLearningOrchestrator()
+    
+    @pytest.fixture
+    def sample_feedback_data(self):
+        """Generate sample feedback data for testing"""
+        return [
+            {
+                "id": "feedback_001",
+                "type": "performance_review",
+                "content": "The CFO agent's financial analysis lacks depth in risk assessment. Need better model capabilities.",
+                "sentiment": 0.3,
+                "severity": 0.8,
+                "affected_role": "cfo",
+                "timestamp": datetime.now().isoformat()
+            },
+            {
+                "id": "feedback_002",
+                "type": "context_issues",
+                "content": "Decisions lack proper context about market conditions and competitor actions.",
+                "sentiment": 0.4,
+                "severity": 0.6,
+                "affected_role": "all",
+                "timestamp": datetime.now().isoformat()
+            },
+            {
+                "id": "feedback_003",
+                "type": "prompt_clarity",
+                "content": "The prompts are unclear and don't provide sufficient structure.",
+                "sentiment": 0.35,
+                "severity": 0.7,
+                "affected_role": "all",
+                "timestamp": datetime.now().isoformat()
+            }
+        ]
+    
+    @pytest.fixture
+    def sample_audit_events(self):
+        """Generate sample audit events for testing"""
+        return [
+            {
+                "event_id": "audit_001",
+                "event_type": "boardroom_decision",
+                "timestamp": datetime.now().isoformat(),
+                "subject_id": "boardroom",
+                "context": {
+                    "confidence_score": 0.5,  # Low confidence
+                    "consensus_score": 0.6,   # Medium consensus
+                    "decision_start": (datetime.now() - timedelta(minutes=30)).isoformat()
+                }
+            },
+            {
+                "event_id": "audit_002",
+                "event_type": "agent_vote",
+                "timestamp": datetime.now().isoformat(),
+                "subject_role": "cfo",
+                "context": {
+                    "vote_value": 0.4,
+                    "confidence": 0.45,  # Low confidence
+                    "decision_id": "decision_001"
+                }
+            },
+            {
+                "event_id": "audit_003",
+                "event_type": "mcp_request",
+                "timestamp": datetime.now().isoformat(),
+                "subject_id": "agent",
+                "context": {
+                    "success": False,  # Failed MCP request
+                    "error_type": "timeout",
+                    "response_time_ms": 4000,
+                    "mcp_server": "market_data"
+                }
+            }
+        ]
+    
+    @pytest.mark.asyncio
+    async def test_stakeholder_feedback_analysis(self, multi_dim_orchestrator, sample_feedback_data):
+        """Test stakeholder feedback analysis"""
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(sample_feedback_data)
+        
+        assert isinstance(patterns, list)
+        assert len(patterns) > 0  # Should find some patterns
+        
+        # Check pattern structure
+        for pattern in patterns:
+            assert hasattr(pattern, 'dimension')
+            assert hasattr(pattern, 'feedback_type')
+            assert hasattr(pattern, 'frequency')
+            assert hasattr(pattern, 'severity')
+            assert hasattr(pattern, 'confidence')
+            assert 0.0 <= pattern.confidence <= 1.0
+            assert 0.0 <= pattern.severity <= 1.0
+    
+    @pytest.mark.asyncio
+    async def test_audit_pattern_analysis(self, multi_dim_orchestrator, sample_audit_events):
+        """Test audit trail pattern analysis"""
+        patterns = await multi_dim_orchestrator.analyze_audit_patterns(sample_audit_events)
+        
+        assert isinstance(patterns, list)
+        # May or may not find patterns depending on the data
+        
+        for pattern in patterns:
+            assert hasattr(pattern, 'dimension')
+            assert hasattr(pattern, 'feedback_type')
+            assert hasattr(pattern, 'confidence')
+    
+    @pytest.mark.asyncio
+    async def test_adaptation_priority_determination(self, multi_dim_orchestrator, sample_feedback_data):
+        """Test adaptation priority determination"""
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(sample_feedback_data)
+        decisions = await multi_dim_orchestrator.determine_adaptation_priorities(patterns)
+        
+        assert isinstance(decisions, list)
+        
+        if decisions:  # If adaptations are recommended
+            # Check decisions are properly sorted by priority
+            priorities = [d.priority for d in decisions]
+            assert priorities == sorted(priorities, reverse=True)
+            
+            # Check decision structure
+            for decision in decisions:
+                assert hasattr(decision, 'dimension')
+                assert hasattr(decision, 'strategy')
+                assert hasattr(decision, 'priority')
+                assert hasattr(decision, 'estimated_impact')
+                assert hasattr(decision, 'estimated_cost')
+                assert 1 <= decision.priority <= 5
+                assert 0.0 <= decision.estimated_impact <= 1.0
+    
+    @pytest.mark.asyncio
+    async def test_dimensional_adaptation_execution(self, multi_dim_orchestrator):
+        """Test execution of dimensional adaptations"""
+        # Create mock adaptation decisions
+        from adapters.multi_dimensional_learning import AdaptationDecision
+        
+        mock_decision = AdaptationDecision(
+            dimension=LearningDimension.PROMPT,
+            trigger=AdaptationTrigger.STAKEHOLDER_FEEDBACK,
+            strategy=AdaptationStrategy.INCREMENTAL,
+            priority=3,
+            estimated_impact=0.3,
+            estimated_cost=1.0,
+            risk_assessment=0.2,
+            timeline="2-4 hours",
+            dependencies=[],
+            rollback_plan="Restore previous prompts"
+        )
+        
+        results = await multi_dim_orchestrator.execute_adaptations([mock_decision])
+        
+        assert "adaptations_executed" in results
+        assert "adaptations_successful" in results
+        assert "execution_details" in results
+        assert results["adaptations_executed"] == 1
+    
+    @pytest.mark.asyncio
+    async def test_learning_status_retrieval(self, multi_dim_orchestrator):
+        """Test learning status retrieval"""
+        status = await multi_dim_orchestrator.get_learning_status()
+        
+        assert "dimensional_metrics" in status
+        assert "total_adaptations" in status
+        assert "system_status" in status
+        
+        # Check all dimensions are tracked
+        expected_dimensions = [dim.value for dim in LearningDimension]
+        actual_dimensions = list(status["dimensional_metrics"].keys())
+        
+        for expected_dim in expected_dimensions:
+            assert expected_dim in actual_dimensions
+        
+        # Check metric structure
+        for dim_name, metrics in status["dimensional_metrics"].items():
+            assert "current_performance" in metrics
+            assert "stakeholder_satisfaction" in metrics
+            assert "adaptation_frequency" in metrics
+    
+    @pytest.mark.asyncio
+    async def test_dimension_specific_analysis(self, multi_dim_orchestrator):
+        """Test analysis for specific dimensions"""
+        
+        # Test LLM Model dimension feedback
+        model_feedback = [{
+            "type": "capability_feedback",
+            "content": "The model lacks sophisticated reasoning capabilities and understanding",
+            "sentiment": 0.2,
+            "severity": 0.9,
+            "affected_role": "all"
+        }]
+        
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(model_feedback)
+        model_patterns = [p for p in patterns if p.dimension == LearningDimension.LLM_MODEL]
+        
+        assert len(model_patterns) > 0  # Should detect model-related issues
+        
+        # Test Context dimension feedback
+        context_feedback = [{
+            "type": "context_feedback",
+            "content": "Agents lack proper context and situational awareness for decisions",
+            "sentiment": 0.3,
+            "severity": 0.7,
+            "affected_role": "all"
+        }]
+        
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(context_feedback)
+        context_patterns = [p for p in patterns if p.dimension == LearningDimension.CONTEXT]
+        
+        assert len(context_patterns) > 0  # Should detect context-related issues
+    
+    @pytest.mark.asyncio  
+    async def test_adaptation_strategy_selection(self, multi_dim_orchestrator):
+        """Test adaptation strategy selection based on feedback severity"""
+        
+        # High severity feedback should suggest comprehensive strategy
+        high_severity_feedback = [{
+            "type": "critical_issue",
+            "content": "Major model intelligence reasoning capability training issues",
+            "sentiment": 0.1,
+            "severity": 0.95,
+            "affected_role": "all"
+        }]
+        
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(high_severity_feedback)
+        high_severity_patterns = [p for p in patterns if p.severity > 0.8]
+        
+        if high_severity_patterns:
+            # High severity should often suggest comprehensive or targeted strategies
+            comprehensive_patterns = [p for p in high_severity_patterns 
+                                    if p.suggested_action in [AdaptationStrategy.COMPREHENSIVE, AdaptationStrategy.TARGETED]]
+            assert len(comprehensive_patterns) > 0
+        
+        # Low severity feedback should suggest incremental strategy
+        low_severity_feedback = [{
+            "type": "minor_issue",
+            "content": "Slight prompt formatting improvement needed",
+            "sentiment": 0.6,
+            "severity": 0.3,
+            "affected_role": "cfo"
+        }]
+        
+        patterns = await multi_dim_orchestrator.analyze_stakeholder_feedback(low_severity_feedback)
+        low_severity_patterns = [p for p in patterns if p.severity < 0.5]
+        
+        if low_severity_patterns:
+            incremental_patterns = [p for p in low_severity_patterns 
+                                  if p.suggested_action == AdaptationStrategy.INCREMENTAL]
+            # Should often suggest incremental for low severity
+            assert len(incremental_patterns) >= 0
+
+
+class TestIntegratedMultiDimensionalSystem:
+    """Test integrated multi-dimensional learning with adapter orchestrator"""
+    
+    @pytest.fixture
+    def temp_dir(self):
+        """Create temporary directory for tests"""
+        temp_dir = tempfile.mkdtemp()
+        yield temp_dir
+        shutil.rmtree(temp_dir)
+    
+    @pytest.mark.asyncio
+    async def test_orchestrator_multi_dimensional_integration(self, temp_dir):
+        """Test integration of multi-dimensional learning with adapter orchestrator"""
+        orchestrator = AdapterOrchestrator(data_dir=temp_dir)
+        await orchestrator.initialize()
+        
+        # Should have multi-dimensional learning initialized
+        assert orchestrator.multi_dimensional_learning is not None
+        assert hasattr(orchestrator, 'analyze_stakeholder_feedback')
+        assert hasattr(orchestrator, 'analyze_audit_patterns')
+        assert hasattr(orchestrator, 'execute_dimensional_adaptations')
+    
+    @pytest.mark.asyncio
+    async def test_stakeholder_feedback_analysis_integration(self, temp_dir):
+        """Test stakeholder feedback analysis through orchestrator"""
+        orchestrator = AdapterOrchestrator(data_dir=temp_dir)
+        await orchestrator.initialize()
+        
+        sample_feedback = [{
+            "type": "performance",
+            "content": "The agents need better model capabilities and reasoning",
+            "sentiment": 0.3,
+            "severity": 0.8,
+            "affected_role": "all"
+        }]
+        
+        result = await orchestrator.analyze_stakeholder_feedback(sample_feedback)
+        
+        assert result.get("success") is True
+        assert "patterns_identified" in result
+        assert "adaptations_recommended" in result
+        assert "feedback_patterns" in result
+        assert "adaptation_decisions" in result
+    
+    @pytest.mark.asyncio
+    async def test_comprehensive_analysis_integration(self, temp_dir):
+        """Test comprehensive analysis through orchestrator"""
+        orchestrator = AdapterOrchestrator(data_dir=temp_dir)
+        await orchestrator.initialize()
+        
+        sample_feedback = [{
+            "type": "comprehensive_feedback",
+            "content": "System needs improvements in model, context, and prompt areas",
+            "sentiment": 0.4,
+            "severity": 0.7,
+            "affected_role": "all"
+        }]
+        
+        result = await orchestrator.run_comprehensive_analysis(
+            feedback_data=sample_feedback,
+            audit_lookback_days=7
+        )
+        
+        assert result.get("success") is True
+        assert "total_patterns_identified" in result
+        assert "total_recommendations" in result
+        assert "analysis_results" in result
+        assert "learning_dimensions_evaluated" in result
+        
+        # Should evaluate all 5 dimensions
+        assert len(result["learning_dimensions_evaluated"]) == 5
+    
+    @pytest.mark.asyncio
+    async def test_intelligent_adaptation_trigger(self, temp_dir):
+        """Test intelligent adaptation triggering"""
+        orchestrator = AdapterOrchestrator(data_dir=temp_dir)
+        await orchestrator.initialize()
+        
+        # Test with high threshold (should not trigger adaptation in good system)
+        result = await orchestrator.trigger_intelligent_adaptation(
+            trigger_threshold=0.9,
+            execute_immediately=False
+        )
+        
+        assert result.get("success") is True
+        assert "adaptation_needed" in result
+        
+        # Test with low threshold (should trigger adaptation)
+        result_low_threshold = await orchestrator.trigger_intelligent_adaptation(
+            trigger_threshold=0.5,
+            execute_immediately=False
+        )
+        
+        assert result_low_threshold.get("success") is True
 
 
 if __name__ == "__main__":

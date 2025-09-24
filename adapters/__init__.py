@@ -83,6 +83,16 @@ from .adapter_orchestrator import (
     get_system_status
 )
 
+from .multi_dimensional_learning import (
+    MultiDimensionalLearningOrchestrator,
+    LearningDimension,
+    AdaptationTrigger,
+    AdaptationStrategy,
+    FeedbackPattern,
+    DimensionalMetrics,
+    AdaptationDecision
+)
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -121,6 +131,15 @@ __all__ = [
     "EvaluationResult",
     "EvaluationScenario",
     "SystemMetrics",
+    
+    # Multi-dimensional learning
+    "MultiDimensionalLearningOrchestrator",
+    "LearningDimension", 
+    "AdaptationTrigger",
+    "AdaptationStrategy",
+    "FeedbackPattern",
+    "DimensionalMetrics",
+    "AdaptationDecision",
     
     # Global orchestrator
     "adapter_orchestrator",
