@@ -1,0 +1,36 @@
+
+[submodule "Founder"]
+	path = Founder
+	url = https://github.com/ASISaga/Founder
+
+[submodule "Investor"]
+	path = Investor
+	url = https://github.com/ASISaga/Investor
+
+[submodule "CSO"]
+	path = C-Suite/CSO
+	url = https://github.com/ASISaga/CSO
+
+[submodule "CEO"]
+	path = C-Suite/CEO
+	url = https://github.com/ASISaga/CEO
+
+[submodule "CMO"]
+	path = C-Suite/CMO
+	url = https://github.com/ASISaga/CMO
+
+[submodule "CFO"]
+	path = C-Suite/CFO
+	url = https://github.com/ASISaga/CFO
+
+[submodule "COO"]
+	path = C-Suite/COO
+	url = https://github.com/ASISaga/COO
+
+[submodule "CHRO"]
+	path = C-Suite/CHRO
+	url = https://github.com/ASISaga/CHRO
+
+[submodule "CTO"]
+	path = C-Suite/CTO
+	url = https://github.com/ASISaga/CTO
