@@ -27,6 +27,7 @@ from .lora_adapter_manager import LoRAAdapterManager, BoardroomRole, ModelConfig
 from .self_learning_system import SelfLearningSystem, LearningPhase, DatasetType
 from .model_upgrade_manager import ModelUpgradeManager, UpgradeStatus
 from .evaluation_harness import EvaluationHarness, MetricType
+from .multi_dimensional_learning import MultiDimensionalLearningOrchestrator, LearningDimension, AdaptationTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +87,7 @@ class AdapterOrchestrator:
         self.learning_system: Optional[SelfLearningSystem] = None
         self.upgrade_manager: Optional[ModelUpgradeManager] = None
         self.evaluation_harness: Optional[EvaluationHarness] = None
+        self.multi_dimensional_learning: Optional[MultiDimensionalLearningOrchestrator] = None
         
         # Configuration
         self.config: Dict[str, Any] = {}
@@ -132,6 +134,19 @@ class AdapterOrchestrator:
             # Initialize Evaluation Harness
             eval_data_dir = os.path.join(self.data_dir, "evaluation")
             self.evaluation_harness = EvaluationHarness(data_dir=eval_data_dir)
+            
+            # Initialize Multi-Dimensional Learning Orchestrator
+            try:
+                from core.audit_trail import get_audit_manager
+                audit_manager = get_audit_manager()
+            except ImportError:
+                audit_manager = None
+                logger.warning("Audit manager not available for multi-dimensional learning")
+            
+            self.multi_dimensional_learning = MultiDimensionalLearningOrchestrator(
+                adapter_orchestrator=self,
+                audit_manager=audit_manager
+            )
             
             # Start background tasks
             await self._start_background_tasks()
@@ -433,6 +448,360 @@ class AdapterOrchestrator:
             return {"error": "LoRA manager not initialized"}
         
         return await self.lora_manager.list_all_adapters()
+    
+    # Multi-Dimensional Learning Methods
+    
+    async def analyze_stakeholder_feedback(self, feedback_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Analyze stakeholder feedback and determine multi-dimensional adaptations needed.
+        
+        Args:
+            feedback_data: List of stakeholder feedback entries
+            
+        Returns:
+            Analysis results and adaptation recommendations
+        """
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            # Analyze feedback patterns
+            patterns = await self.multi_dimensional_learning.analyze_stakeholder_feedback(feedback_data)
+            
+            # Determine adaptation priorities
+            decisions = await self.multi_dimensional_learning.determine_adaptation_priorities(patterns)
+            
+            return {
+                "success": True,
+                "patterns_identified": len(patterns),
+                "adaptations_recommended": len(decisions),
+                "feedback_patterns": [
+                    {
+                        "dimension": pattern.dimension.value,
+                        "feedback_type": pattern.feedback_type,
+                        "frequency": pattern.frequency,
+                        "severity": pattern.severity,
+                        "trend": pattern.recent_trend,
+                        "confidence": pattern.confidence,
+                        "suggested_action": pattern.suggested_action.value
+                    }
+                    for pattern in patterns
+                ],
+                "adaptation_decisions": [
+                    {
+                        "dimension": decision.dimension.value,
+                        "priority": decision.priority,
+                        "strategy": decision.strategy.value,
+                        "estimated_impact": decision.estimated_impact,
+                        "estimated_cost": decision.estimated_cost,
+                        "timeline": decision.timeline,
+                        "risk_assessment": decision.risk_assessment
+                    }
+                    for decision in decisions
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Stakeholder feedback analysis failed: {e}")
+            return {"error": f"Analysis failed: {str(e)}"}
+    
+    async def analyze_audit_patterns(self, lookback_days: int = 30) -> Dict[str, Any]:
+        """
+        Analyze audit trail patterns to identify learning opportunities.
+        
+        Args:
+            lookback_days: Number of days of audit history to analyze
+            
+        Returns:
+            Audit pattern analysis results
+        """
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            # Get audit events from the last N days
+            audit_events = []
+            if self.multi_dimensional_learning.audit_manager:
+                try:
+                    # Get recent audit events
+                    recent_events = await self.multi_dimensional_learning.audit_manager.query_events(
+                        start_time=datetime.now() - timedelta(days=lookback_days),
+                        end_time=datetime.now()
+                    )
+                    audit_events = [event.__dict__ if hasattr(event, '__dict__') else event for event in recent_events]
+                except Exception as e:
+                    logger.warning(f"Could not retrieve audit events: {e}")
+            
+            # Analyze patterns even with limited data
+            patterns = await self.multi_dimensional_learning.analyze_audit_patterns(audit_events)
+            decisions = await self.multi_dimensional_learning.determine_adaptation_priorities(patterns)
+            
+            return {
+                "success": True,
+                "audit_events_analyzed": len(audit_events),
+                "patterns_identified": len(patterns),
+                "adaptations_recommended": len(decisions),
+                "audit_patterns": [
+                    {
+                        "dimension": pattern.dimension.value,
+                        "pattern_type": pattern.feedback_type,
+                        "frequency": pattern.frequency,
+                        "severity": pattern.severity,
+                        "confidence": pattern.confidence
+                    }
+                    for pattern in patterns
+                ],
+                "adaptation_recommendations": [
+                    {
+                        "dimension": decision.dimension.value,
+                        "priority": decision.priority,
+                        "trigger": decision.trigger.value,
+                        "strategy": decision.strategy.value,
+                        "timeline": decision.timeline
+                    }
+                    for decision in decisions
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Audit pattern analysis failed: {e}")
+            return {"error": f"Analysis failed: {str(e)}"}
+    
+    async def execute_dimensional_adaptations(self, adaptation_requests: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Execute multi-dimensional adaptations based on analysis results.
+        
+        Args:
+            adaptation_requests: List of requested adaptations with priorities
+            
+        Returns:
+            Execution results
+        """
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            # Convert requests to AdaptationDecision objects
+            from .multi_dimensional_learning import AdaptationDecision, LearningDimension, AdaptationTrigger, AdaptationStrategy
+            
+            decisions = []
+            for request in adaptation_requests:
+                try:
+                    decision = AdaptationDecision(
+                        dimension=LearningDimension(request["dimension"]),
+                        trigger=AdaptationTrigger(request.get("trigger", "stakeholder_feedback")),
+                        strategy=AdaptationStrategy(request.get("strategy", "targeted")),
+                        priority=request.get("priority", 3),
+                        estimated_impact=request.get("estimated_impact", 0.5),
+                        estimated_cost=request.get("estimated_cost", 5.0),
+                        risk_assessment=request.get("risk_assessment", 0.3),
+                        timeline=request.get("timeline", "1 week"),
+                        dependencies=[],
+                        rollback_plan=request.get("rollback_plan", "Standard rollback procedure")
+                    )
+                    decisions.append(decision)
+                except (ValueError, KeyError) as e:
+                    logger.warning(f"Invalid adaptation request: {request}, error: {e}")
+            
+            if not decisions:
+                return {"error": "No valid adaptation decisions provided"}
+            
+            # Execute adaptations
+            results = await self.multi_dimensional_learning.execute_adaptations(decisions)
+            
+            return {
+                "success": True,
+                "execution_results": results,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Dimensional adaptation execution failed: {e}")
+            return {"error": f"Execution failed: {str(e)}"}
+    
+    async def get_multi_dimensional_status(self) -> Dict[str, Any]:
+        """Get status of multi-dimensional learning system"""
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            status = await self.multi_dimensional_learning.get_learning_status()
+            
+            return {
+                "success": True,
+                "multi_dimensional_learning": status,
+                "last_updated": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to get multi-dimensional status: {e}")
+            return {"error": f"Status check failed: {str(e)}"}
+    
+    async def run_comprehensive_analysis(self, feedback_data: List[Dict[str, Any]] = None,
+                                       audit_lookback_days: int = 30) -> Dict[str, Any]:
+        """
+        Run comprehensive multi-dimensional analysis combining stakeholder feedback and audit patterns.
+        
+        Args:
+            feedback_data: Optional stakeholder feedback data
+            audit_lookback_days: Days of audit history to analyze
+            
+        Returns:
+            Comprehensive analysis results with prioritized recommendations
+        """
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            logger.info("Starting comprehensive multi-dimensional analysis")
+            
+            all_patterns = []
+            analysis_results = {
+                "stakeholder_analysis": None,
+                "audit_analysis": None,
+                "combined_recommendations": []
+            }
+            
+            # Analyze stakeholder feedback if provided
+            if feedback_data:
+                stakeholder_patterns = await self.multi_dimensional_learning.analyze_stakeholder_feedback(feedback_data)
+                all_patterns.extend(stakeholder_patterns)
+                analysis_results["stakeholder_analysis"] = {
+                    "patterns_found": len(stakeholder_patterns),
+                    "feedback_entries_analyzed": len(feedback_data)
+                }
+            
+            # Analyze audit patterns
+            audit_events = []
+            if self.multi_dimensional_learning.audit_manager:
+                try:
+                    recent_events = await self.multi_dimensional_learning.audit_manager.query_events(
+                        start_time=datetime.now() - timedelta(days=audit_lookback_days),
+                        end_time=datetime.now()
+                    )
+                    audit_events = [event.__dict__ if hasattr(event, '__dict__') else event for event in recent_events]
+                except Exception as e:
+                    logger.warning(f"Audit event retrieval failed: {e}")
+            
+            audit_patterns = await self.multi_dimensional_learning.analyze_audit_patterns(audit_events)
+            all_patterns.extend(audit_patterns)
+            
+            analysis_results["audit_analysis"] = {
+                "patterns_found": len(audit_patterns),
+                "audit_events_analyzed": len(audit_events)
+            }
+            
+            # Generate combined recommendations
+            if all_patterns:
+                decisions = await self.multi_dimensional_learning.determine_adaptation_priorities(all_patterns)
+                analysis_results["combined_recommendations"] = [
+                    {
+                        "dimension": decision.dimension.value,
+                        "priority": decision.priority,
+                        "strategy": decision.strategy.value,
+                        "trigger": decision.trigger.value,
+                        "estimated_impact": decision.estimated_impact,
+                        "estimated_cost": decision.estimated_cost,
+                        "timeline": decision.timeline,
+                        "risk_assessment": decision.risk_assessment,
+                        "dependencies": [dep.value for dep in decision.dependencies]
+                    }
+                    for decision in decisions
+                ]
+            
+            return {
+                "success": True,
+                "analysis_timestamp": datetime.now().isoformat(),
+                "total_patterns_identified": len(all_patterns),
+                "total_recommendations": len(analysis_results["combined_recommendations"]),
+                "analysis_results": analysis_results,
+                "learning_dimensions_evaluated": [dim.value for dim in LearningDimension]
+            }
+            
+        except Exception as e:
+            logger.error(f"Comprehensive analysis failed: {e}")
+            return {"error": f"Analysis failed: {str(e)}"}
+    
+    async def trigger_intelligent_adaptation(self, 
+                                           trigger_threshold: float = 0.7,
+                                           execute_immediately: bool = False) -> Dict[str, Any]:
+        """
+        Trigger intelligent adaptation based on current system performance and patterns.
+        
+        Args:
+            trigger_threshold: Performance threshold below which adaptation is triggered
+            execute_immediately: Whether to execute adaptations immediately or just recommend
+            
+        Returns:
+            Adaptation trigger results
+        """
+        if not self.multi_dimensional_learning:
+            return {"error": "Multi-dimensional learning not initialized"}
+        
+        try:
+            logger.info("Evaluating system for intelligent adaptation triggers")
+            
+            # Check current performance across all dimensions
+            status = await self.multi_dimensional_learning.get_learning_status()
+            dimensional_metrics = status.get("dimensional_metrics", {})
+            
+            underperforming_dimensions = []
+            for dim_name, metrics in dimensional_metrics.items():
+                performance = metrics.get("current_performance", 1.0)
+                satisfaction = metrics.get("stakeholder_satisfaction", 1.0)
+                
+                if performance < trigger_threshold or satisfaction < trigger_threshold:
+                    underperforming_dimensions.append({
+                        "dimension": dim_name,
+                        "performance": performance,
+                        "satisfaction": satisfaction,
+                        "needs_attention": True
+                    })
+            
+            # If no underperforming dimensions, no adaptation needed
+            if not underperforming_dimensions:
+                return {
+                    "success": True,
+                    "adaptation_needed": False,
+                    "message": f"All dimensions performing above threshold ({trigger_threshold})",
+                    "dimensional_status": dimensional_metrics
+                }
+            
+            # Run comprehensive analysis to get specific recommendations
+            analysis_result = await self.run_comprehensive_analysis()
+            
+            if not analysis_result.get("success"):
+                return analysis_result
+            
+            recommendations = analysis_result["analysis_results"]["combined_recommendations"]
+            
+            # Filter recommendations for underperforming dimensions
+            priority_recommendations = [
+                rec for rec in recommendations 
+                if any(rec["dimension"] == dim["dimension"] for dim in underperforming_dimensions)
+            ]
+            
+            result = {
+                "success": True,
+                "adaptation_needed": True,
+                "underperforming_dimensions": underperforming_dimensions,
+                "priority_recommendations": priority_recommendations,
+                "trigger_threshold": trigger_threshold,
+                "analysis_timestamp": datetime.now().isoformat()
+            }
+            
+            # Execute adaptations if requested
+            if execute_immediately and priority_recommendations:
+                execution_result = await self.execute_dimensional_adaptations(priority_recommendations)
+                result["execution_result"] = execution_result
+                
+                logger.info(f"Executed {len(priority_recommendations)} intelligent adaptations")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Intelligent adaptation trigger failed: {e}")
+            return {"error": f"Trigger failed: {str(e)}"}
     
     async def _calculate_system_metrics(self) -> SystemMetrics:
         """Calculate overall system performance metrics"""
