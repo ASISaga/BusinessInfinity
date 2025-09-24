@@ -1,7 +1,3 @@
-Here’s the updated consolidated write‑up as a Markdown file, now including Founder and Investor as domain‑specific LoRA adapters alongside the C‑suite roles, always paired with the Leadership LoRA.
-
-`markdown
-
 🏛️ Boardroom Agents: LLM + LoRA Orchestration Specification
 
 🎯 Purpose
@@ -163,6 +159,6 @@ Step 4: Transition
 - Expand dataset via self‑learning: every situation + mentor correction becomes new training data  
 - Upgrade to 13B when 8B hits reasoning/tone limits: retrain adapters on 13B with original + loop data, optionally distill from 8B  
 - Result: A living, evolving Boardroom Simulation Engine where each role — operational, visionary, or capital — speaks with specialist precision and unified leadership authority
-`
+
 
 ---
