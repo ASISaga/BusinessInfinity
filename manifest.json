@@ -39,6 +39,156 @@
     "config": "config/pythonPackages.json",
     "purpose": "Lists all Python packages and their pyproject.toml locations for the monorepo."
   },
+  "CSO": {
+  "config": "BusinessInfinity/CSO/manifest.json",
+    "purpose": "Chief Strategy Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CSO"
+  },
+  "CEO": {
+  "config": "BusinessInfinity/CEO/manifest.json",
+    "purpose": "Chief Executive Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CEO"
+  },
+  "CMO": {
+  "config": "BusinessInfinity/CMO/manifest.json",
+    "purpose": "Chief Marketing Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CMO"
+  },
+  "CFO": {
+  "config": "BusinessInfinity/CFO/manifest.json",
+    "purpose": "Chief Financial Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CFO"
+  },
+  "COO": {
+  "config": "BusinessInfinity/COO/manifest.json",
+    "purpose": "Chief Operating Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/COO"
+  },
+  "CHRO": {
+  "config": "BusinessInfinity/CHRO/manifest.json",
+    "purpose": "Chief Human Resources Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CHRO"
+  },
+  "CTO": {
+  "config": "BusinessInfinity/CTO/manifest.json",
+    "purpose": "Chief Technology Officer agent submodule.",
+    "remote": "https://github.com/ASISaga/CTO"
+  },
+  "Mentor": {
+  "config": "BusinessInfinity/Mentor/manifest.json",
+    "purpose": "Mentor agent submodule.",
+    "remote": "https://github.com/ASISaga/Mentor"
+  },
+  "FineTunedLLM": {
+  "config": "BusinessInfinity/FineTunedLLM/manifest.json",
+    "purpose": "FineTunedLLM agent submodule.",
+    "remote": "https://github.com/ASISaga/FineTunedLLM"
+  },
+  "SelfLearningAgent": {
+  "config": "BusinessInfinity/SelfLearningAgent/manifest.json",
+    "purpose": "SelfLearningAgent submodule.",
+    "remote": "https://github.com/ASISaga/SelfLearningAgent"
+  },
+  "PurposeDrivenAgent": {
+  "config": "BusinessInfinity/PurposeDrivenAgent/manifest.json",
+    "purpose": "PurposeDrivenAgent submodule.",
+    "remote": "https://github.com/ASISaga/PurposeDrivenAgent"
+  },
+  "GitHubAgent": {
+  "config": "BusinessInfinity/GitHubAgent/manifest.json",
+    "purpose": "GitHubAgent submodule.",
+    "remote": "https://github.com/ASISaga/GitHubAgent"
+  },
+  "AgentOperatingSystem": {
+  "config": "BusinessInfinity/AgentOperatingSystem/manifest.json",
+    "purpose": "AgentOperatingSystem submodule.",
+    "remote": "https://github.com/ASISaga/AgentOperatingSystem"
+  },
+  "LeadershipAgent": {
+  "config": "BusinessInfinity/LeadershipAgent/manifest.json",
+    "purpose": "LeadershipAgent submodule.",
+    "remote": "https://github.com/ASISaga/LeadershipAgent"
+  },
+  "Seeker": {
+  "config": "BusinessInfinity/Seeker/manifest.json",
+    "purpose": "Seeker agent submodule.",
+    "remote": "https://github.com/ASISaga/Seeker"
+  },
+  "Poet": {
+  "config": "BusinessInfinity/Poet/manifest.json",
+    "purpose": "Poet agent submodule.",
+    "remote": "https://github.com/ASISaga/Poet"
+  },
+  "Buddhi": {
+  "config": "BusinessInfinity/Buddhi/manifest.json",
+    "purpose": "Buddhi module.",
+    "remote": "https://github.com/ASISaga/Buddhi"
+  },
+  "Manas": {
+  "config": "BusinessInfinity/Manas/manifest.json",
+    "purpose": "Manas document store submodule.",
+    "remote": "https://github.com/ASISaga/Manas"
+  },
+  "ERPNext-MCP": {
+  "config": "BusinessInfinity/ERPNext-MCP/manifest.json",
+    "purpose": "ERPNext-MCP submodule.",
+    "remote": "https://github.com/ASISaga/ERPNext-MCP"
+  },
+  "spec-kit-mcp": {
+  "config": "BusinessInfinity/spec-kit-mcp/manifest.json",
+    "purpose": "Spec-kit-mcp submodule.",
+    "remote": "https://github.com/ASISaga/spec-kit-mcp"
+  },
+  "linkedin-mcp-server": {
+  "config": "MCP/linkedin-mcp-server/manifest.json",
+    "purpose": "Linkedin-mcp-server submodule.",
+    "remote": "https://github.com/ASISaga/linkedin-mcp-server"
+  },
+  "mcp-reddit": {
+  "config": "MCP/mcp-reddit/manifest.json",
+    "purpose": "Mcp-reddit submodule.",
+    "remote": "https://github.com/ASISaga/mcp-reddit"
+  },
+  "mcp.asisaga.com": {
+  "config": "MCP/mcp.asisaga.com/manifest.json",
+    "purpose": "Mcp.asisaga.com submodule.",
+    "remote": "https://github.com/ASISaga/mcp.asisaga.com"
+  },
+  "Website": {
+    "config": "config/website.json",
+    "purpose": "Website module.",
+    "remote": "https://github.com/ASISaga/Website"
+  },
+  "theme.asisaga.com": {
+  "config": "Website/theme.asisaga.com/manifest.json",
+    "purpose": "Theme.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/theme.asisaga.com"
+  },
+  "www.asisaga.com": {
+  "config": "Website/www.asisaga.com/manifest.json",
+    "purpose": "Www.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/www.asisaga.com"
+  },
+  "realmofagents.asisaga.com": {
+  "config": "Website/realmofagents.asisaga.com/manifest.json",
+    "purpose": "Realmofagents.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/realmofagents.asisaga.com"
+  },
+  "saga.asisaga.com": {
+  "config": "Website/saga.asisaga.com/manifest.json",
+    "purpose": "Saga.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/saga.asisaga.com"
+  },
+  "genesis.asisaga.com": {
+  "config": "Website/genesis.asisaga.com/manifest.json",
+    "purpose": "Genesis.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/genesis.asisaga.com"
+  },
+  "aurelion.asisaga.com": {
+  "config": "Website/aurelion.asisaga.com/manifest.json",
+    "purpose": "Aurelion.asisaga.com website submodule.",
+    "remote": "https://github.com/ASISaga/aurelion.asisaga.com"
+  },
   "globalDependencies": {
     "config": "config/globalDependencies.json",
     "purpose": "Unified dependency graph for all major modules."
