@@ -1,0 +1,77 @@
+{
+  "cfo": [
+    {
+      "id": "ex_sit_20250924_050149_6d84a9_cfo_20250924_050149",
+      "input_prompt": "\n[BOARDROOM SITUATION]\nTitle: Financial financial Analysis\nDecision Type: financial\nYour Role: CFO\n\nContext: {\n  \"company_stage\": \"growth\",\n  \"market_conditions\": \"competitive\",\n  \"timeline\": \"Q4 decision needed\",\n  \"stakeholders\": [\n    \"board\",\n    \"investors\",\n    \"employees\"\n  ],\n  \"complexity_factors\": [\n    \"multiple_stakeholders\",\n    \"some_uncertainty\"\n  ]\n}\n\nSituation: Financial analysis needed for financial with complexity 2.\n\nPlease provide your analysis and recommendation as the CFO.\n",
+      "target_response": "Stub response for cfo\n\n[CORRECTED]: Improve analysis depth for cfo\n\n[IMPROVED]: Add more cfo-specific metrics",
+      "role": "cfo",
+      "situation_context": {
+        "company_stage": "growth",
+        "market_conditions": "competitive",
+        "timeline": "Q4 decision needed",
+        "stakeholders": [
+          "board",
+          "investors",
+          "employees"
+        ],
+        "complexity_factors": [
+          "multiple_stakeholders",
+          "some_uncertainty"
+        ]
+      },
+      "quality_score": 0.75,
+      "source_type": "self_learning",
+      "version": "v2.0",
+      "created_at": "2025-09-24T05:01:49.346111"
+    },
+    {
+      "id": "ex_sit_20250924_050149_254bb1_cfo_20250924_050149",
+      "input_prompt": "\n[BOARDROOM SITUATION]\nTitle: Boardroom investment Decision\nDecision Type: investment\nYour Role: CFO\n\nContext: {\n  \"company_stage\": \"growth\",\n  \"market_conditions\": \"competitive\",\n  \"timeline\": \"Q4 decision needed\",\n  \"stakeholders\": [\n    \"board\",\n    \"investors\",\n    \"employees\"\n  ],\n  \"complexity_factors\": [\n    \"competing_priorities\",\n    \"moderate_risk\"\n  ]\n}\n\nSituation: Board decision required for investment at complexity 3.\n\nPlease provide your analysis and recommendation as the CFO.\n",
+      "target_response": "Stub response for cfo\n\n[CORRECTED]: Improve analysis depth for cfo\n\n[IMPROVED]: Add more cfo-specific metrics",
+      "role": "cfo",
+      "situation_context": {
+        "company_stage": "growth",
+        "market_conditions": "competitive",
+        "timeline": "Q4 decision needed",
+        "stakeholders": [
+          "board",
+          "investors",
+          "employees"
+        ],
+        "complexity_factors": [
+          "competing_priorities",
+          "moderate_risk"
+        ]
+      },
+      "quality_score": 0.75,
+      "source_type": "self_learning",
+      "version": "v2.0",
+      "created_at": "2025-09-24T05:01:49.346142"
+    },
+    {
+      "id": "ex_sit_20250924_050149_b02931_cfo_20250924_050149",
+      "input_prompt": "\n[BOARDROOM SITUATION]\nTitle: Boardroom operational Decision\nDecision Type: operational\nYour Role: CFO\n\nContext: {\n  \"company_stage\": \"growth\",\n  \"market_conditions\": \"competitive\",\n  \"timeline\": \"Q4 decision needed\",\n  \"stakeholders\": [\n    \"board\",\n    \"investors\",\n    \"employees\"\n  ],\n  \"complexity_factors\": [\n    \"high_stakes\",\n    \"time_pressure\",\n    \"regulatory_concerns\"\n  ]\n}\n\nSituation: Board decision required for operational at complexity 4.\n\nPlease provide your analysis and recommendation as the CFO.\n",
+      "target_response": "Stub response for cfo\n\n[CORRECTED]: Improve analysis depth for cfo\n\n[IMPROVED]: Add more cfo-specific metrics",
+      "role": "cfo",
+      "situation_context": {
+        "company_stage": "growth",
+        "market_conditions": "competitive",
+        "timeline": "Q4 decision needed",
+        "stakeholders": [
+          "board",
+          "investors",
+          "employees"
+        ],
+        "complexity_factors": [
+          "high_stakes",
+          "time_pressure",
+          "regulatory_concerns"
+        ]
+      },
+      "quality_score": 0.75,
+      "source_type": "self_learning",
+      "version": "v2.0",
+      "created_at": "2025-09-24T05:01:49.346164"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "sit_20250924_050149_1a5777": [
+    {
+      "situation_id": "sit_20250924_050149_1a5777",
+      "agent_role": "cfo",
+      "original_response": "Mock CFO response",
+      "mentor_rating": 0.8,
+      "corrections": "Add more financial detail",
+      "improvements": "Include risk analysis",
+      "alternative_framing": null,
+      "mentor_id": "system",
+      "feedback_type": "correction",
+      "created_at": "2025-09-24T05:01:49.344048"
+    }
+  ],
+  "sit_20250924_050149_6d84a9": [
+    {
+      "situation_id": "sit_20250924_050149_6d84a9",
+      "agent_role": "cfo",
+      "original_response": "Stub response for cfo",
+      "mentor_rating": 0.75,
+      "corrections": "Improve analysis depth for cfo",
+      "improvements": "Add more cfo-specific metrics",
+      "alternative_framing": null,
+      "mentor_id": "system_mentor",
+      "feedback_type": "correction",
+      "created_at": "2025-09-24T05:01:49.345192"
+    }
+  ],
+  "sit_20250924_050149_254bb1": [
+    {
+      "situation_id": "sit_20250924_050149_254bb1",
+      "agent_role": "cfo",
+      "original_response": "Stub response for cfo",
+      "mentor_rating": 0.75,
+      "corrections": "Improve analysis depth for cfo",
+      "improvements": "Add more cfo-specific metrics",
+      "alternative_framing": null,
+      "mentor_id": "system_mentor",
+      "feedback_type": "correction",
+      "created_at": "2025-09-24T05:01:49.345335"
+    }
+  ],
+  "sit_20250924_050149_b02931": [
+    {
+      "situation_id": "sit_20250924_050149_b02931",
+      "agent_role": "cfo",
+      "original_response": "Stub response for cfo",
+      "mentor_rating": 0.75,
+      "corrections": "Improve analysis depth for cfo",
+      "improvements": "Add more cfo-specific metrics",
+      "alternative_framing": null,
+      "mentor_id": "system_mentor",
+      "feedback_type": "correction",
+      "created_at": "2025-09-24T05:01:49.345580"
+    }
+  ]
+}

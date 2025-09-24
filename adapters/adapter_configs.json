@@ -1,0 +1,108 @@
+{
+  "domain_adapters": {
+    "cfo": {
+      "rank": 48,
+      "alpha": 32,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.78,
+      "path": "./adapters/cfo_domain_lora",
+      "version": "v1.0.0"
+    },
+    "cmo": {
+      "rank": 48,
+      "alpha": 32,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.68,
+      "path": "./adapters/cmo_domain_lora",
+      "version": "v1.0.0"
+    },
+    "coo": {
+      "rank": 48,
+      "alpha": 32,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.74,
+      "path": "./adapters/coo_domain_lora",
+      "version": "v1.0.0"
+    },
+    "cto": {
+      "rank": 48,
+      "alpha": 32,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.72,
+      "path": "./adapters/cto_domain_lora",
+      "version": "v1.0.0"
+    },
+    "founder": {
+      "rank": 36,
+      "alpha": 18,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.70,
+      "path": "./adapters/founder_domain_lora",
+      "version": "v1.0.0"
+    },
+    "investor": {
+      "rank": 40,
+      "alpha": 32,
+      "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "layer_range": [8, 28],
+      "fusion_weight": 0.76,
+      "path": "./adapters/investor_domain_lora",
+      "version": "v1.0.0"
+    }
+  },
+  "leadership_adapter": {
+    "rank": 12,
+    "alpha": 12,
+    "target_modules": ["o_proj", "down_proj"],
+    "layer_range": [24, 32],
+    "path": "./adapters/leadership_lora",
+    "version": "v1.0.0"
+  },
+  "model_config": {
+    "base_model": "meta-llama/Llama-3.1-8B-Instruct",
+    "quantization": "QLoRA-4bit",
+    "device": "auto",
+    "upgrade_target": "meta-llama/Llama-3.1-13B-Instruct"
+  },
+  "self_learning": {
+    "enabled": true,
+    "original_dataset_weight": 0.7,
+    "self_learning_dataset_weight": 0.3,
+    "cycle_frequency_hours": 24,
+    "mentor_feedback_threshold": 0.75,
+    "dataset_versioning": true
+  },
+  "evaluation": {
+    "metrics": {
+      "role_fidelity": {
+        "weight": 0.30,
+        "threshold": 0.70
+      },
+      "leadership_clarity": {
+        "weight": 0.25,
+        "threshold": 0.65
+      },
+      "conflict_index": {
+        "weight": 0.20,
+        "threshold": 0.40,
+        "lower_is_better": true
+      },
+      "guardrail_compliance": {
+        "weight": 0.25,
+        "threshold": 0.80
+      }
+    }
+  },
+  "upgrade_conditions": {
+    "reasoning_depth_threshold": 0.02,
+    "role_fidelity_threshold": 0.70,
+    "leadership_clarity_threshold": 0.65,
+    "improvement_plateau_cycles": 5,
+    "minimum_cycles_before_upgrade": 3
+  }
+}

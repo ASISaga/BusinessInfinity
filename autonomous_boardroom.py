@@ -44,6 +44,21 @@ except ImportError:
     FINETUNED_LLM_AVAILABLE = False
     logging.warning("FineTunedLLM not available")
 
+# Import local adapter system
+try:
+    from adapters import (
+        initialize_adapter_system, 
+        generate_boardroom_response,
+        evaluate_boardroom_response,
+        start_learning_cycle,
+        get_system_status,
+        adapter_orchestrator
+    )
+    LOCAL_ADAPTER_SYSTEM_AVAILABLE = True
+except ImportError:
+    LOCAL_ADAPTER_SYSTEM_AVAILABLE = False
+    logging.warning("Local adapter system not available")
+
 # Azure Service Bus for MCP connectivity
 try:
     from azure.servicebus import ServiceBusClient, ServiceBusMessage
@@ -211,11 +226,22 @@ class AutonomousBoardroom:
                 self.message_bus = self.aos.message_bus
                 self.logger.info("AOS initialized successfully")
             
-            # Initialize FineTunedLLM LoRA Manager
+            # Initialize LoRA Managers (external and/or local)
             if FINETUNED_LLM_AVAILABLE:
                 self.lora_manager = LoRAManager()
                 await self.lora_manager.initialize()
                 self.logger.info("FineTunedLLM LoRA Manager initialized")
+            
+            # Initialize local adapter system
+            if LOCAL_ADAPTER_SYSTEM_AVAILABLE:
+                try:
+                    self.adapter_orchestrator = await initialize_adapter_system()
+                    self.logger.info("Local LoRA Adapter System initialized")
+                except Exception as e:
+                    self.logger.warning(f"Failed to initialize local adapter system: {e}")
+                    self.adapter_orchestrator = None
+            else:
+                self.adapter_orchestrator = None
             
             # Initialize Azure Service Bus
             if AZURE_SERVICEBUS_AVAILABLE:
@@ -1030,27 +1056,101 @@ class AutonomousBoardroom:
     async def _get_lora_adapter_score(self, agent: BoardroomAgent, proposal: str, decision_type: DecisionType) -> float:
         """Get LoRA adapter scoring for the proposal based on legendary expertise"""
         try:
-            if not self.lora_manager:
-                return 0.5  # Neutral score if LoRA manager not available
+            # Try local adapter system first
+            if self.adapter_orchestrator and LOCAL_ADAPTER_SYSTEM_AVAILABLE:
+                try:
+                    # Generate response using local adapter system
+                    role_str = agent.role.value.lower()
+                    if role_str not in ["cfo", "cmo", "coo", "cto", "founder", "investor"]:
+                        role_str = "cfo"  # Default fallback
+                    
+                    prompt = f"Proposal: {proposal}\nDecision Type: {decision_type.value}\nAs a legendary {agent.legendary_expertise.legend_profile} with expertise in {agent.legendary_expertise.domain}, evaluate this proposal and provide your assessment."
+                    
+                    response_result = await generate_boardroom_response(role_str, prompt, max_length=256)
+                    
+                    if response_result.get("success"):
+                        response_text = response_result["response"]
+                        
+                        # Evaluate the response quality
+                        evaluation_result = await evaluate_boardroom_response(role_str, response_text)
+                        
+                        if evaluation_result.get("success"):
+                            eval_data = evaluation_result["evaluation_result"]
+                            # Use overall score as the LoRA adapter score
+                            score = eval_data.get("overall_score", 0.5)
+                            
+                            self.logger.debug(f"Local adapter system scored {agent.role.value}: {score:.3f}")
+                            return max(0.0, min(1.0, score))
+                
+                except Exception as e:
+                    self.logger.warning(f"Local adapter system failed for {agent.agent_id}: {e}")
+                    # Fall back to external LoRA manager
             
-            # Load the legendary adapter for this agent
-            adapter_id = await self.lora_manager.load_legendary_adapter(
-                agent.legendary_expertise.legend_profile,
-                agent.legendary_expertise.domain
-            )
+            # Fall back to external LoRA manager
+            if self.lora_manager and FINETUNED_LLM_AVAILABLE:
+                # Load the legendary adapter for this agent
+                adapter_id = await self.lora_manager.load_legendary_adapter(
+                    agent.legendary_expertise.legend_profile,
+                    agent.legendary_expertise.domain
+                )
+                
+                # Generate legendary response for scoring
+                legendary_context = f"Proposal: {proposal}\nDecision Type: {decision_type.value}\nEvaluate this from your legendary perspective."
+                response = await self.lora_manager.get_legendary_response(adapter_id, legendary_context)
+                
+                # Extract score from response (simplified scoring mechanism)
+                score = await self._extract_score_from_legendary_response(response, agent.legendary_expertise)
+                
+                return max(0.0, min(1.0, score))  # Clamp to [0, 1]
             
-            # Generate legendary response for scoring
-            legendary_context = f"Proposal: {proposal}\nDecision Type: {decision_type.value}\nEvaluate this from your legendary perspective."
-            response = await self.lora_manager.get_legendary_response(adapter_id, legendary_context)
-            
-            # Extract score from response (simplified scoring mechanism)
-            score = await self._extract_score_from_legendary_response(response, agent.legendary_expertise)
-            
-            return max(0.0, min(1.0, score))  # Clamp to [0, 1]
+            # No LoRA systems available - use simplified heuristic scoring
+            return await self._heuristic_proposal_scoring(agent, proposal, decision_type)
             
         except Exception as e:
             self.logger.error(f"Failed to get LoRA adapter score for {agent.agent_id}: {e}")
             return 0.5  # Neutral score on error
+    
+    async def _heuristic_proposal_scoring(self, agent: BoardroomAgent, proposal: str, decision_type: DecisionType) -> float:
+        """Heuristic scoring when LoRA systems are unavailable"""
+        try:
+            # Role-specific keyword scoring
+            role_keywords = {
+                BoardroomRole.CFO: ["financial", "budget", "cost", "revenue", "roi", "investment"],
+                BoardroomRole.CMO: ["marketing", "customer", "brand", "market", "sales", "growth"],
+                BoardroomRole.CTO: ["technology", "technical", "innovation", "development", "platform"],
+                BoardroomRole.COO: ["operations", "process", "efficiency", "execution", "delivery"],
+                BoardroomRole.FOUNDER: ["vision", "strategy", "mission", "future", "opportunity"],
+                BoardroomRole.INVESTOR: ["return", "valuation", "market", "competitive", "exit"]
+            }
+            
+            proposal_lower = proposal.lower()
+            role_score = 0.5  # Base score
+            
+            if agent.role in role_keywords:
+                relevant_keywords = role_keywords[agent.role]
+                keyword_matches = sum(1 for keyword in relevant_keywords if keyword in proposal_lower)
+                
+                # Increase score based on keyword relevance
+                role_score += min(0.3, keyword_matches * 0.05)
+            
+            # Decision type alignment scoring
+            decision_alignment = {
+                DecisionType.FINANCIAL: [BoardroomRole.CFO, BoardroomRole.INVESTOR],
+                DecisionType.STRATEGIC: [BoardroomRole.FOUNDER, BoardroomRole.CEO, BoardroomRole.CSO],
+                DecisionType.OPERATIONAL: [BoardroomRole.COO, BoardroomRole.CTO],
+                DecisionType.MARKET: [BoardroomRole.CMO, BoardroomRole.FOUNDER],
+                DecisionType.PRODUCT: [BoardroomRole.CTO, BoardroomRole.CMO],
+                DecisionType.INVESTMENT: [BoardroomRole.INVESTOR, BoardroomRole.CFO]
+            }
+            
+            if decision_type in decision_alignment and agent.role in decision_alignment[decision_type]:
+                role_score += 0.1  # Bonus for aligned decision type
+            
+            return max(0.2, min(0.8, role_score))  # Keep in reasonable range
+            
+        except Exception as e:
+            self.logger.error(f"Heuristic scoring failed for {agent.agent_id}: {e}")
+            return 0.5
     
     async def _extract_score_from_legendary_response(self, response: str, expertise: LegendaryExpertise) -> float:
         """Extract scoring from legendary response (simplified implementation)"""
