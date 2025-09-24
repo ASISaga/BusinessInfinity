@@ -1,0 +1,8 @@
+{
+  "purpose": "Determine the overarching Possibility for a system or organization; foundational logic for purpose-driven agents.",
+  "name": "PossibilityDrivenAgent",
+  "local-path": "RealmOfAgents/PossibilityDrivenAgent",
+  "description": "PossibilityDrivenAgent is a base agent module that determines the overarching Possibility for a system or organization. It provides foundational logic for agents that derive their Purpose from Possibility, and is inherited by PurposeDrivenAgent and other domain agents.",
+  "repository": "https://github.com/ASISaga/PossibilityDrivenAgent",
+  "relationship": "base for PurposeDrivenAgent and domain agents"
+}

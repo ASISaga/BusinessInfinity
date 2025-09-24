@@ -1,0 +1,51 @@
+{
+  "purpose": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors.",
+  "name": "RealmOfAgents",
+  "functions": [
+    {"name": "agent_framework_foundation", "description": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors."}
+  ],
+  "description": "RealmOfAgents is a collection of advanced agent frameworks and the core AgentOperatingSystem. It provides the foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors.",
+  "AgentOperatingSystem": {
+    "name": "AgentOperatingSystem",
+    "functions": [
+      {"name": "orchestrate_agents", "description": "Enables coordination, communication, and lifecycle management of autonomous agents. Provides communication infrastructure for agent orchestration using Azure Service Bus."}
+    ],
+    "local-path": "RealmOfAgents/AgentOperatingSystem",
+    "description": "AgentOperatingSystem is the core multi-agent orchestration engine, responsible for coordinating, communicating, and managing the lifecycle of autonomous agents. By leveraging PurposeDrivenAgent, it orchestrates intelligent, purpose-driven agents with explicit goals, learning, and reasoning. It supports extensibility, composability, and advanced integration with business and AI modules, providing robust communication infrastructure for agent orchestration (e.g., Azure Service Bus).",
+    "dependencies": ["PurposeDrivenAgent"],
+    "repository": "https://github.com/ASISaga/AgentOperatingSystem"
+  },
+  "PurposeDrivenAgent": {
+    "name": "PurposeDrivenAgent",
+    "functions": [
+      {"name": "purpose_driven_orchestration", "description": "Orchestrates AI agents around a central purpose, enabling perpetual, ethical, and adaptive action. Integrates learning, knowledge sharing, and dynamic coordination to fulfill overarching objectives in alignment with human aspirations."}
+    ],
+    "local-path": "RealmOfAgents/PurposeDrivenAgent",
+    "description": "PurposeDrivenAgent is a modular agent framework for building intelligent agents with explicit goals, learning, and reasoning. It supports composability, inheritance, and integration with knowledge and code generation modules.",
+    "dependencies": ["SelfLearningAgent"],
+    "repository": "https://github.com/ASISaga/PurposeDrivenAgent",
+    "relationship": "extends SelfLearningAgent"
+  },
+  "SelfLearningAgent": {
+    "name": "SelfLearningAgent",
+    "functions": [
+      {"name": "autonomous_learning", "description": "Enables agents to adapt, optimize, and improve performance over time through experience and feedback."}
+    ],
+    "local-path": "RealmOfAgents/SelfLearningAgent",
+    "description": "SelfLearningAgent is the foundational core for agents with autonomous learning capabilities. It enables agents to adapt, optimize, and improve performance over time through experience and feedback.",
+    "dependencies": [],
+    "repository": "https://github.com/ASISaga/SelfLearningAgent"
+  },
+  "FineTunedLLM": {
+    "name": "FineTunedLLM",
+    "functions": [
+      {"name": "domain_specific_llm", "description": "Manages AML MLOps for domain-specific LLM training using LoRA adapters. Provides LLMs to PurposeDrivenAgent(s) for specialized knowledge."}
+    ],
+    "local-path": "RealmOfAgents/FineTunedLLM",
+    "description": "FineTunedLLM manages Azure Machine Learning (AML) MLOps for domain-specific LLM training using LoRA adapters. It provides domain-specific LLMs to PurposeDrivenAgent(s) (including C-Suite, Investor, and Founder), enabling them to leverage specialized knowledge and expertise.",
+    "dependencies": [],
+    "repository": "https://github.com/ASISaga/FineTunedLLM",
+    "provides": ["PurposeDrivenAgent"],
+    "domain": "Machine Learning Operations"
+  }
+}

@@ -1,334 +1,76 @@
 {
   "BusinessInfinity": {
-    "name": "BusinessInfinity",
-    "local-path": "BusinessInfinity",
-    "description": "BusinessInfinity is a perpetual, fully autonomous boardroom of legendary AI agents with voting-based decision making. Features legendary expertise through LoRA adapters (Warren Buffett, Steve Jobs, Mary Barra, etc.) that vote on strategic decisions using domain-specific knowledge and purpose alignment. Operates 24/7 providing continuous high-level strategic decision-making through democratic consensus of legendary business minds.",
-    "repository": "https://github.com/ASISaga/BusinessInfinity",
-    "relationship": "autonomous_legendary_boardroom_with_voting_system",
-    "deployment": {
-      "platform": "Azure Functions",
-      "domain": "cloud.businessinfinity.asisaga.com"
-    },
-    "voting_system": {
-      "decision_method": "legendary_expertise_voting",
-      "vote_structure": "BoardroomVote_dataclass",
-      "scoring_method": "lora_adapter_plus_purpose_alignment",
-      "consensus_algorithm": "weighted_democratic_consensus",
-      "legendary_adapters": [
-        "warren_buffett_investment_strategy",
-        "steve_jobs_innovation_leadership", 
-        "mary_barra_operational_excellence",
-        "philip_kotler_marketing_mastery",
-        "alan_kay_technology_vision",
-        "jack_welch_organizational_development"
-      ]
-    },
-    "decision_outcomes": {
-      "approved_strong_consensus": "score > 0.6, consensus > 0.7",
-      "approved_majority_support": "score > 0.0, reasonable_consensus",
-      "rejected_strong_opposition": "score < -0.6", 
-      "deferred_lack_consensus": "consensus < 0.4",
-      "review_required_mixed": "moderate_scores_mixed_consensus"
-    },
-    "architecture": {
-      "pattern": "autonomous_boardroom_with_voting",
-      "decision_making": "legendary_expertise_consensus_voting",
-      "legendary_profiles": "lora_adapter_integration",
-      "storage": "uses_AOS_UnifiedStorageManager",
-      "ml": "integrates_with_FineTunedLLM_LoRA_Manager",
-      "perpetual_operation": "24_7_autonomous_boardroom",
-      "voting_components": {
-        "vote_collection": "_collect_boardroom_votes",
-        "lora_scoring": "_get_lora_adapter_score", 
-        "purpose_alignment": "_calculate_purpose_alignment",
-        "vote_calculation": "_calculate_vote_value",
-        "consensus_building": "_calculate_voting_results",
-        "decision_determination": "_determine_final_decision"
-      }
-    },
-    "legendary_boardroom_agents": {
-      "INVESTOR": {
-        "legendary_profile": "Warren Buffett",
-        "domain": "investment_strategy",
-        "expertise": ["value_investing", "financial_analysis", "risk_assessment"],
-        "voting_weight": 1.2,
-        "assigned_purpose": "maximize_long_term_value_creation",
-        "lora_adapter": "warren_buffett_investment_mastery"
-      },
-      "CEO": {
-        "legendary_profile": "Steve Jobs", 
-        "domain": "innovation_leadership",
-        "expertise": ["product_strategy", "market_vision", "brand_building"],
-        "voting_weight": 1.3,
-        "assigned_purpose": "drive_strategic_innovation_and_growth",
-        "lora_adapter": "steve_jobs_visionary_leadership"
-      },
-      "CFO": {
-        "legendary_profile": "Mary Barra",
-        "domain": "operational_excellence", 
-        "expertise": ["financial_planning", "operational_efficiency", "transformation"],
-        "voting_weight": 1.1,
-        "assigned_purpose": "ensure_financial_sustainability_and_efficiency",
-        "lora_adapter": "mary_barra_operational_mastery"
-      },
-      "CMO": {
-        "legendary_profile": "Philip Kotler",
-        "domain": "marketing_mastery",
-        "expertise": ["marketing_strategy", "brand_development", "customer_insights"],
-        "voting_weight": 1.0,
-        "assigned_purpose": "build_powerful_brands_and_customer_connections", 
-        "lora_adapter": "philip_kotler_marketing_genius"
-      },
-      "CTO": {
-        "legendary_profile": "Alan Kay",
-        "domain": "technology_vision",
-        "expertise": ["technology_strategy", "innovation", "systems_thinking"],
-        "voting_weight": 1.0,
-        "assigned_purpose": "drive_technological_innovation_and_excellence",
-        "lora_adapter": "alan_kay_technology_visionary"
-      },
-      "CHRO": {
-        "legendary_profile": "Jack Welch",
-        "domain": "organizational_development",
-        "expertise": ["leadership_development", "talent_management", "culture"],
-        "voting_weight": 1.0,
-        "assigned_purpose": "build_exceptional_organizational_capabilities",
-        "lora_adapter": "jack_welch_leadership_excellence"
-      }
-    },
-    "autonomous_boardroom_implementation": {
-      "core_class": "AutonomousBoardroom",
-      "file": "BusinessInfinity/autonomous_boardroom.py",
-      "description": "Perpetual autonomous boardroom with voting-based decision making using legendary AI agents",
-      "operation": "24_7_autonomous_strategic_decision_making",
-      "decision_method": "democratic_consensus_voting_with_legendary_expertise"
-    },
-    "voting_system_components": {
-      "BoardroomVote": {
-        "structure": "dataclass",
-        "fields": ["voter_id", "vote_value", "confidence", "reasoning", "lora_adapter_score", "purpose_alignment", "timestamp"],
-        "description": "Individual vote cast by legendary boardroom agent"
-      },
-      "voting_methods": [
-        "_collect_boardroom_votes",
-        "_get_agent_vote", 
-        "_get_lora_adapter_score",
-        "_calculate_purpose_alignment",
-        "_calculate_vote_value",
-        "_calculate_voting_results",
-        "_determine_final_decision",
-        "_generate_voting_rationale"
-      ]
-    },
-    "functions": [
-      {"name": "autonomous_boardroom_operation", "description": "Perpetual 24/7 autonomous boardroom operation with legendary AI agents."},
-      {"name": "voting_based_decision_making", "description": "Democratic consensus voting using legendary expertise and LoRA adapters."},
-      {"name": "legendary_expertise_consultation", "description": "Access to Warren Buffett, Steve Jobs, Mary Barra and other legendary business minds."},
-      {"name": "strategic_consensus_building", "description": "Build strategic consensus through weighted democratic voting."},
-      {"name": "purpose_aligned_voting", "description": "Voting that aligns with each agent's assigned purpose and domain expertise."},
-      {"name": "real_time_business_intelligence", "description": "Continuous monitoring and decision-making for critical business events."}
-    ]
+    "config": "config/businessInfinity.json",
+    "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making."
   },
-  "dependencies": ["AgentOperatingSystem", "FineTunedLLM_LoRA_Manager", "Azure_Service_Bus", "MCP_Servers"],
-  "notes": "BusinessInfinity has been transformed into a perpetual autonomous boardroom with voting-based decision making. Each legendary agent uses LoRA adapters for domain expertise and votes on strategic decisions. All MCP communication is handled via Azure Service Bus through AOS. The voting system ensures democratic consensus among legendary business minds for all strategic decisions.",
   "PossibilityDrivenAgent": {
-    "name": "PossibilityDrivenAgent",
-    "local-path": "RealmOfAgents/PossibilityDrivenAgent",
-    "description": "PossibilityDrivenAgent is a base agent module that determines the overarching Possibility for a system or organization. It provides foundational logic for agents that derive their Purpose from Possibility, and is inherited by PurposeDrivenAgent and other domain agents.",
-    "repository": "https://github.com/ASISaga/PossibilityDrivenAgent",
-    "relationship": "base for PurposeDrivenAgent and domain agents"
-    },
+    "config": "config/possibilityDrivenAgent.json",
+    "purpose": "Determine the overarching Possibility for a system or organization; foundational logic for purpose-driven agents."
+  },
   "C-Suite": {
-    "name": "C-Suite",
-    "description": "C-Suite represents the executive leadership team within BusinessInfinity. All C-Suite agents inherit from LeadershipAgent in AOS and implement business-specific functionality. Each agent follows the one-class-per-file architecture and provides specialized executive capabilities.",
-    "functions": [
-      {"name": "executive_leadership", "description": "Provides comprehensive executive leadership through specialized C-Suite agents."},
-      {"name": "strategic_coordination", "description": "Coordinates strategic initiatives across all business functions."},
-      {"name": "business_intelligence", "description": "Delivers executive-level business intelligence and decision support."}
-    ],
-    "architecture": {
-  "inheritance": "all_agents_inherit_from_LeadershipAgent",
-  "location": "RealmOfAgents/<AgentName>/<AgentClass>.py",
-  "pattern": "one_class_per_file_matching_class_name"
-    },
-    "agents": {
-      "CEO": {
-        "name": "ChiefExecutiveOfficer",
-        "file": "BusinessInfinity/agents/ChiefExecutiveOfficer.py",
-        "functions": [
-          {"name": "strategic_leadership", "description": "Provides strategic direction, organizational vision, and executive decision-making."},
-          {"name": "stakeholder_management", "description": "Manages relationships with board, investors, and key stakeholders."},
-          {"name": "organizational_culture", "description": "Shapes and maintains organizational culture and values."}
-        ],
-        "description": "Chief Executive Officer agent implementing strategic leadership, organizational vision, stakeholder management, and executive decision-making capabilities.",
-        "inherits": "LeadershipAgent",
-        "domain": "Executive Leadership"
-      },
-      "CFO": {
-        "name": "ChiefFinancialOfficer",
-        "file": "BusinessInfinity/agents/ChiefFinancialOfficer.py", 
-        "functions": [
-          {"name": "financial_strategy", "description": "Develops financial strategy, budget planning, and capital allocation."},
-          {"name": "risk_management", "description": "Manages financial risk, compliance, and regulatory requirements."},
-          {"name": "investment_analysis", "description": "Analyzes investments, acquisitions, and financial opportunities."}
-        ],
-        "description": "Chief Financial Officer agent implementing financial strategy, budget management, investment analysis, and financial risk assessment.",
-        "inherits": "LeadershipAgent",
-        "domain": "Finance"
-      },
-      "CMO": {
-        "name": "ChiefMarketingOfficer",
-        "file": "BusinessInfinity/agents/ChiefMarketingOfficer.py",
-        "functions": [
-          {"name": "marketing_strategy", "description": "Develops marketing strategy, brand positioning, and customer acquisition."},
-          {"name": "market_research", "description": "Conducts market research, competitive analysis, and customer insights."},
-          {"name": "digital_marketing", "description": "Manages digital marketing campaigns and customer engagement."}
-        ],
-        "description": "Chief Marketing Officer agent implementing marketing strategy, brand management, customer acquisition, and market research.",
-        "inherits": "LeadershipAgent", 
-        "domain": "Marketing"
-      },
-      "COO": {
-        "name": "ChiefOperatingOfficer",
-        "file": "BusinessInfinity/agents/ChiefOperatingOfficer.py",
-        "functions": [
-          {"name": "operational_excellence", "description": "Manages operations, process optimization, and operational efficiency."},
-          {"name": "resource_management", "description": "Optimizes resource allocation and capacity planning."},
-          {"name": "quality_assurance", "description": "Ensures quality standards and continuous improvement."}
-        ],
-        "description": "Chief Operating Officer agent implementing operational excellence, process optimization, resource management, and quality assurance.",
-        "inherits": "LeadershipAgent",
-        "domain": "Operations"
-      },
-      "CTO": {
-        "name": "ChiefTechnologyOfficer", 
-        "file": "BusinessInfinity/agents/ChiefTechnologyOfficer.py",
-        "functions": [
-          {"name": "technology_strategy", "description": "Develops technology strategy, architecture, and innovation roadmap."},
-          {"name": "engineering_leadership", "description": "Leads engineering teams and technical excellence initiatives."},
-          {"name": "security_oversight", "description": "Ensures security, compliance, and risk management."}
-        ],
-        "description": "Chief Technology Officer agent implementing technology strategy, architecture design, innovation management, and security oversight.",
-        "inherits": "LeadershipAgent",
-        "domain": "Technology"
-      },
-      "CHRO": {
-        "name": "ChiefHumanResourcesOfficer",
-        "file": "BusinessInfinity/agents/ChiefHumanResourcesOfficer.py", 
-        "functions": [
-          {"name": "talent_management", "description": "Manages talent acquisition, development, and retention strategies."},
-          {"name": "organizational_culture", "description": "Builds organizational culture and employee engagement."},
-          {"name": "performance_management", "description": "Implements performance management and career development systems."}
-        ],
-        "description": "Chief Human Resources Officer agent implementing talent management, organizational culture, performance management, and employee development.",
-        "inherits": "LeadershipAgent",
-        "domain": "Human Resources"
-      }
-    }
+    "config": "config/csuite.json",
+    "purpose": "Executive leadership team providing strategic direction, coordination, and business intelligence for BusinessInfinity."
   },
-    "Founder": {
-      "name": "FounderAgent",
-      "file": "BusinessInfinity/agents/FounderAgent.py",
-      "functions": [
-        {"name": "vision_creation", "description": "Creates and refines company vision, mission, and long-term strategic direction."},
-        {"name": "product_strategy", "description": "Develops product strategy, roadmaps, and innovation frameworks."},
-        {"name": "fundraising", "description": "Manages fundraising activities, investor relations, and capital strategy."},
-        {"name": "team_scaling", "description": "Builds founding team, establishes culture, and scales organizational structure."}
-      ],
-      "description": "FounderAgent implements comprehensive founder-specific functionality including vision creation, product strategy, fundraising execution, team scaling, and market opportunity identification. Inherits from LeadershipAgent.",
-      "inherits": "LeadershipAgent",
-      "domain": "Entrepreneurship"
-    },
-    "Investor": {
-      "name": "Investor",
-      "functions": [
-        {"name": "investment_analysis", "description": "Provides investment analysis, portfolio management, and funding strategies."}
-      ],
-      "local-path": "RealmOfAgents/Investor",
-      "description": "Investor is an AI agent module based on PurposeDrivenAgent, focused on investment analysis, portfolio management, and funding strategies. It provides insights for capital allocation and risk assessment.",
-      "dependencies": ["PurposeDrivenAgent"],
-      "repository": "https://github.com/ASISaga/Investor",
-      "relationship": "implements PurposeDrivenAgent",
-      "domain": "Investment"
-    },
-    "businessinfinity.asisaga.com": {
-      "name": "businessinfinity.asisaga.com",
-      "functions": [
-        {"name": "web_interface", "description": "Delivers a modern web interface for business automation, agent management, and analytics."}
-      ],
-      "local-path": "Website/businessinfinity.asisaga.com",
-      "description": "Frontend application for BusinessInfinity, delivering a modern web interface for business automation, agent management, and analytics. Enables users to interact with the platform's features and monitor business processes.",
-      "dependencies": ["BusinessInfinity"],
-      "repository": "https://github.com/ASISaga/businessinfinity.asisaga.com",
-      "type": "frontend",
-      "backend": {
-        "name": "BusinessInfinity Cloud API",
-        "base_url": "https://cloud.businessinfinity.asisaga.com",
-        "openapi_spec": "https://cloud.businessinfinity.asisaga.com/openapi.json",
-        "description": "The frontend communicates with the backend via OpenAPI-defined endpoints on a separate Azure Functions deployment."
-      }
-    },
+  "Founder": {
+    "config": "config/founder.json",
+    "purpose": "Create and refine company vision, strategy, and team; drive entrepreneurship and innovation."
+  },
+  "Investor": {
+    "config": "config/investor.json",
+    "purpose": "Provide investment analysis, portfolio management, and funding strategies for BusinessInfinity."
+  },
+  "businessinfinity.asisaga.com": {
+    "config": "config/businessinfinity-website.json",
+    "purpose": "Deliver a modern web interface for business automation, agent management, and analytics."
+  },
   "RealmOfAgents": {
-    "name": "RealmOfAgents",
-    "functions": [
-      {"name": "agent_framework_foundation", "description": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors."}
-    ],
-    "description": "RealmOfAgents is a collection of advanced agent frameworks and the core AgentOperatingSystem. It provides the foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors.",
-    "AgentOperatingSystem": {
-      "name": "AgentOperatingSystem",
-      "functions": [
-        {"name": "orchestrate_agents", "description": "Enables coordination, communication, and lifecycle management of autonomous agents. Provides communication infrastructure for agent orchestration using Azure Service Bus."}
-      ],
-      "local-path": "RealmOfAgents/AgentOperatingSystem",
-      "description": "AgentOperatingSystem is the core multi-agent orchestration engine, responsible for coordinating, communicating, and managing the lifecycle of autonomous agents. By leveraging PurposeDrivenAgent, it orchestrates intelligent, purpose-driven agents with explicit goals, learning, and reasoning. It supports extensibility, composability, and advanced integration with business and AI modules, providing robust communication infrastructure for agent orchestration (e.g., Azure Service Bus).",
-      "dependencies": ["PurposeDrivenAgent"],
-      "repository": "https://github.com/ASISaga/AgentOperatingSystem"
-    },
-    "PurposeDrivenAgent": {
-      "name": "PurposeDrivenAgent",
-      "functions": [
-        {"name": "purpose_driven_orchestration", "description": "Orchestrates AI agents around a central purpose, enabling perpetual, ethical, and adaptive action. Integrates learning, knowledge sharing, and dynamic coordination to fulfill overarching objectives in alignment with human aspirations."}
-      ],
-      "local-path": "RealmOfAgents/PurposeDrivenAgent",
-      "description": "PurposeDrivenAgent is a modular agent framework for building intelligent agents with explicit goals, learning, and reasoning. It supports composability, inheritance, and integration with knowledge and code generation modules.",
-      "dependencies": ["SelfLearningAgent"],
-      "repository": "https://github.com/ASISaga/PurposeDrivenAgent",
-      "relationship": "extends SelfLearningAgent"
-    },
-    "SelfLearningAgent": {
-      "name": "SelfLearningAgent",
-      "functions": [
-        {"name": "autonomous_learning", "description": "Enables agents to adapt, optimize, and improve performance over time through experience and feedback."}
-      ],
-      "local-path": "RealmOfAgents/SelfLearningAgent",
-      "description": "SelfLearningAgent is the foundational core for agents with autonomous learning capabilities. It enables agents to adapt, optimize, and improve performance over time through experience and feedback.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/SelfLearningAgent"
-    },
-    "FineTunedLLM": {
-      "name": "FineTunedLLM",
-      "functions": [
-        {"name": "domain_specific_llm", "description": "Manages AML MLOps for domain-specific LLM training using LoRA adapters. Provides LLMs to PurposeDrivenAgent(s) for specialized knowledge."}
-      ],
-      "local-path": "RealmOfAgents/FineTunedLLM",
-      "description": "FineTunedLLM manages Azure Machine Learning (AML) MLOps for domain-specific LLM training using LoRA adapters. It provides domain-specific LLMs to PurposeDrivenAgent(s) (including C-Suite, Investor, and Founder), enabling them to leverage specialized knowledge and expertise.",
-      "dependencies": [],
-      "repository": "https://github.com/ASISaga/FineTunedLLM",
-      "provides": ["PurposeDrivenAgent"],
-      "domain": "Machine Learning Operations"
-    }
+    "config": "config/realmOfAgents.json",
+    "purpose": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors."
   },
-  "MCP": "config/mcp.json",
-  "workspace": "config/workspace.json",
-  "pythonPackages": "config/pythonPackages.json",
-  "globalDependencies": "config/globalDependencies.json",
-  "integration": "config/integration.json",
-  "refactorability": "config/refactorability.json",
-  "fileGlobs": "config/fileGlobs.json",
-  "testSuites": "config/testSuites.json",
-  "sharedConfig": "config/sharedConfig.json",
-  "documentation": "config/documentation.json",
-  "apiContracts": "config/apiContracts.json",
+  "MCP": {
+    "config": "config/mcp.json",
+    "purpose": "Suite of integrations and servers for spec-driven development, data integration, and orchestration."
+  },
+  "workspace": {
+    "config": "config/workspace.json",
+    "purpose": "Defines all git modules that make up the BusinessInfinity product."
+  },
+  "pythonPackages": {
+    "config": "config/pythonPackages.json",
+    "purpose": "Lists all Python packages and their pyproject.toml locations for the monorepo."
+  },
+  "globalDependencies": {
+    "config": "config/globalDependencies.json",
+    "purpose": "Unified dependency graph for all major modules."
+  },
+  "integration": {
+    "config": "config/integration.json",
+    "purpose": "Strategy and entrypoints for module orchestration and integration."
+  },
+  "refactorability": {
+    "config": "config/refactorability.json",
+    "purpose": "Guidelines and monorepo status for code refactoring and structure."
+  },
+  "fileGlobs": {
+    "config": "config/fileGlobs.json",
+    "purpose": "File glob patterns for all modules."
+  },
+  "testSuites": {
+    "config": "config/testSuites.json",
+    "purpose": "Test suite directory references for all modules."
+  },
+  "sharedConfig": {
+    "config": "config/sharedConfig.json",
+    "purpose": "Shared configuration file references for all modules."
+  },
+  "documentation": {
+    "config": "config/documentation.json",
+    "purpose": "Documentation file references for all modules."
+  },
+  "apiContracts": {
+    "config": "config/apiContracts.json",
+    "purpose": "OpenAPI and API contract documentation for all modules."
+  },
   "_aiContext": [
     {
       "source": "schema/",

@@ -1,0 +1,18 @@
+{
+  "purpose": "Deliver a modern web interface for business automation, agent management, and analytics.",
+  "name": "businessinfinity.asisaga.com",
+  "functions": [
+    {"name": "web_interface", "description": "Delivers a modern web interface for business automation, agent management, and analytics."}
+  ],
+  "local-path": "Website/businessinfinity.asisaga.com",
+  "description": "Frontend application for BusinessInfinity, delivering a modern web interface for business automation, agent management, and analytics. Enables users to interact with the platform's features and monitor business processes.",
+  "dependencies": ["BusinessInfinity"],
+  "repository": "https://github.com/ASISaga/businessinfinity.asisaga.com",
+  "type": "frontend",
+  "backend": {
+    "name": "BusinessInfinity Cloud API",
+    "base_url": "https://cloud.businessinfinity.asisaga.com",
+    "openapi_spec": "https://cloud.businessinfinity.asisaga.com/openapi.json",
+    "description": "The frontend communicates with the backend via OpenAPI-defined endpoints on a separate Azure Functions deployment."
+  }
+}

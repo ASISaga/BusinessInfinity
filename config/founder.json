@@ -1,0 +1,14 @@
+{
+  "purpose": "Create and refine company vision, strategy, and team; drive entrepreneurship and innovation.",
+  "name": "FounderAgent",
+  "file": "BusinessInfinity/agents/FounderAgent.py",
+  "functions": [
+    {"name": "vision_creation", "description": "Creates and refines company vision, mission, and long-term strategic direction."},
+    {"name": "product_strategy", "description": "Develops product strategy, roadmaps, and innovation frameworks."},
+    {"name": "fundraising", "description": "Manages fundraising activities, investor relations, and capital strategy."},
+    {"name": "team_scaling", "description": "Builds founding team, establishes culture, and scales organizational structure."}
+  ],
+  "description": "FounderAgent implements comprehensive founder-specific functionality including vision creation, product strategy, fundraising execution, team scaling, and market opportunity identification. Inherits from LeadershipAgent.",
+  "inherits": "LeadershipAgent",
+  "domain": "Entrepreneurship"
+}

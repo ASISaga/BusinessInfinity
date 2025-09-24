@@ -1,0 +1,13 @@
+{
+  "purpose": "Provide investment analysis, portfolio management, and funding strategies for BusinessInfinity.",
+  "name": "Investor",
+  "functions": [
+    {"name": "investment_analysis", "description": "Provides investment analysis, portfolio management, and funding strategies."}
+  ],
+  "local-path": "RealmOfAgents/Investor",
+  "description": "Investor is an AI agent module based on PurposeDrivenAgent, focused on investment analysis, portfolio management, and funding strategies. It provides insights for capital allocation and risk assessment.",
+  "dependencies": ["PurposeDrivenAgent"],
+  "repository": "https://github.com/ASISaga/Investor",
+  "relationship": "implements PurposeDrivenAgent",
+  "domain": "Investment"
+}
