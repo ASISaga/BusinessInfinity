@@ -1,0 +1,62 @@
+[
+  {
+    "source": "schema/",
+    "purpose": "Contains JSON Schema files for all configuration types. Used for validation and editor support."
+  },
+  {
+    "source": "docs/",
+    "purpose": "Contains markdown documentation for all configuration files and the configuration changelog. Used for onboarding, reference, and AI context."
+  },
+  {
+    "source": "docs/examples/",
+    "purpose": "Contains example workflows and sample input files for the system. Used for demonstration and testing."
+  },
+  {
+    "source": "config/secrets.example.json",
+    "purpose": "Template for required secrets and environment variables. Used for documentation and onboarding."
+  },
+  {
+    "source": "config/workspace.json",
+    "purpose": "Provides additional documentation and module structure for AI assistants and tools. Not merged into the manifest at runtime."
+  },
+  {
+    "source": "config/apiContracts.json",
+    "purpose": "Contains OpenAPI and API contract documentation for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/documentation.json",
+    "purpose": "Contains documentation file references for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/testSuites.json",
+    "purpose": "Contains test suite directory references for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/sharedConfig.json",
+    "purpose": "Contains shared configuration file references for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/pythonPackages.json",
+    "purpose": "Contains Python package metadata for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/globalDependencies.json",
+    "purpose": "Contains the unified dependency graph for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/integration.json",
+    "purpose": "Contains integration strategy and entrypoints for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/refactorability.json",
+    "purpose": "Contains refactorability guidelines and monorepo status. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/fileGlobs.json",
+    "purpose": "Contains file glob patterns for all modules. Used for AI and tooling context only."
+  },
+  {
+    "source": "config/mcp.json",
+    "purpose": "Contains the MCP (Model Context Protocol) module and all MCP submodules. Used for AI and tooling context only."
+  }
+]

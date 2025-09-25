@@ -1,286 +1,45 @@
 {
-  "BusinessInfinity": {
-    "config": "config/businessInfinity.json",
-    "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making."
-  },
-  "PossibilityDrivenAgent": {
-    "config": "config/possibilityDrivenAgent.json",
-    "purpose": "Determine the overarching Possibility for a system or organization; foundational logic for purpose-driven agents."
-  },
-  "C-Suite": {
-    "config": "config/csuite.json",
-    "purpose": "Executive leadership team providing strategic direction, coordination, and business intelligence for BusinessInfinity."
-  },
-  "Founder": {
-    "config": "config/founder.json",
-    "purpose": "Create and refine company vision, strategy, and team; drive entrepreneurship and innovation."
-  },
-  "Investor": {
-    "config": "config/investor.json",
-    "purpose": "Provide investment analysis, portfolio management, and funding strategies for BusinessInfinity."
-  },
-  "businessinfinity.asisaga.com": {
-    "config": "config/businessinfinity-website.json",
-    "purpose": "Deliver a modern web interface for business automation, agent management, and analytics."
-  },
-  "RealmOfAgents": {
-    "config": "config/realmOfAgents.json",
-    "purpose": "Foundation for building, composing, and orchestrating intelligent agents with learning, reasoning, and goal-driven behaviors."
-  },
-  "MCP": {
-    "config": "config/mcp.json",
-    "purpose": "Suite of integrations and servers for spec-driven development, data integration, and orchestration."
-  },
-  "workspace": {
-    "config": "config/workspace.json",
-    "purpose": "Defines all git modules that make up the BusinessInfinity product."
-  },
-  "pythonPackages": {
-    "config": "config/pythonPackages.json",
-    "purpose": "Lists all Python packages and their pyproject.toml locations for the monorepo."
-  },
-  "CSO": {
-  "config": "BusinessInfinity/CSO/manifest.json",
-    "purpose": "Chief Strategy Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CSO"
-  },
-  "CEO": {
-  "config": "BusinessInfinity/CEO/manifest.json",
-    "purpose": "Chief Executive Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CEO"
-  },
-  "CMO": {
-  "config": "BusinessInfinity/CMO/manifest.json",
-    "purpose": "Chief Marketing Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CMO"
-  },
-  "CFO": {
-  "config": "BusinessInfinity/CFO/manifest.json",
-    "purpose": "Chief Financial Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CFO"
-  },
-  "COO": {
-  "config": "BusinessInfinity/COO/manifest.json",
-    "purpose": "Chief Operating Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/COO"
-  },
-  "CHRO": {
-  "config": "BusinessInfinity/CHRO/manifest.json",
-    "purpose": "Chief Human Resources Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CHRO"
-  },
-  "CTO": {
-  "config": "BusinessInfinity/CTO/manifest.json",
-    "purpose": "Chief Technology Officer agent submodule.",
-    "remote": "https://github.com/ASISaga/CTO"
-  },
-  "Mentor": {
-  "config": "BusinessInfinity/Mentor/manifest.json",
-    "purpose": "Mentor agent submodule.",
-    "remote": "https://github.com/ASISaga/Mentor"
-  },
-  "FineTunedLLM": {
-  "config": "BusinessInfinity/FineTunedLLM/manifest.json",
-    "purpose": "FineTunedLLM agent submodule.",
-    "remote": "https://github.com/ASISaga/FineTunedLLM"
-  },
-  "SelfLearningAgent": {
-  "config": "BusinessInfinity/SelfLearningAgent/manifest.json",
-    "purpose": "SelfLearningAgent submodule.",
-    "remote": "https://github.com/ASISaga/SelfLearningAgent"
-  },
-  "PurposeDrivenAgent": {
-  "config": "BusinessInfinity/PurposeDrivenAgent/manifest.json",
-    "purpose": "PurposeDrivenAgent submodule.",
-    "remote": "https://github.com/ASISaga/PurposeDrivenAgent"
-  },
-  "GitHubAgent": {
-  "config": "BusinessInfinity/GitHubAgent/manifest.json",
-    "purpose": "GitHubAgent submodule.",
-    "remote": "https://github.com/ASISaga/GitHubAgent"
-  },
-  "AgentOperatingSystem": {
-  "config": "BusinessInfinity/AgentOperatingSystem/manifest.json",
-    "purpose": "AgentOperatingSystem submodule.",
-    "remote": "https://github.com/ASISaga/AgentOperatingSystem"
-  },
-  "LeadershipAgent": {
-  "config": "BusinessInfinity/LeadershipAgent/manifest.json",
-    "purpose": "LeadershipAgent submodule.",
-    "remote": "https://github.com/ASISaga/LeadershipAgent"
-  },
-  "Seeker": {
-  "config": "BusinessInfinity/Seeker/manifest.json",
-    "purpose": "Seeker agent submodule.",
-    "remote": "https://github.com/ASISaga/Seeker"
-  },
-  "Poet": {
-  "config": "BusinessInfinity/Poet/manifest.json",
-    "purpose": "Poet agent submodule.",
-    "remote": "https://github.com/ASISaga/Poet"
-  },
-  "Buddhi": {
-  "config": "BusinessInfinity/Buddhi/manifest.json",
-    "purpose": "Buddhi module.",
-    "remote": "https://github.com/ASISaga/Buddhi"
-  },
-  "Manas": {
-  "config": "BusinessInfinity/Manas/manifest.json",
-    "purpose": "Manas document store submodule.",
-    "remote": "https://github.com/ASISaga/Manas"
-  },
-  "ERPNext-MCP": {
-  "config": "BusinessInfinity/ERPNext-MCP/manifest.json",
-    "purpose": "ERPNext-MCP submodule.",
-    "remote": "https://github.com/ASISaga/ERPNext-MCP"
-  },
-  "spec-kit-mcp": {
-  "config": "BusinessInfinity/spec-kit-mcp/manifest.json",
-    "purpose": "Spec-kit-mcp submodule.",
-    "remote": "https://github.com/ASISaga/spec-kit-mcp"
-  },
-  "linkedin-mcp-server": {
-  "config": "MCP/linkedin-mcp-server/manifest.json",
-    "purpose": "Linkedin-mcp-server submodule.",
-    "remote": "https://github.com/ASISaga/linkedin-mcp-server"
-  },
-  "mcp-reddit": {
-  "config": "MCP/mcp-reddit/manifest.json",
-    "purpose": "Mcp-reddit submodule.",
-    "remote": "https://github.com/ASISaga/mcp-reddit"
-  },
-  "mcp.asisaga.com": {
-  "config": "MCP/mcp.asisaga.com/manifest.json",
-    "purpose": "Mcp.asisaga.com submodule.",
-    "remote": "https://github.com/ASISaga/mcp.asisaga.com"
+  "name": "BusinessInfinity",
+  "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making.",
+  "Boardroom": {
+    "Founder": { "manifest": "Boardroom/Founder/manifest.json", "purpose": "Create and refine company vision, strategy and team; drive entrepreneurship and innovation.", "remote": "https://github.com/ASISaga/Founder" },
+    "Investor": { "manifest": "Boardroom/Investor/manifest.json", "purpose": "Provide investment analysis, portfolio management, and funding strategies for BusinessInfinity.", "remote": "https://github.com/ASISaga/Investor" },
+    "Mentor": { "manifest": "Boardroom/Mentor/manifest.json", "purpose": "Mentor agent submodule.", "remote": "https://github.com/ASISaga/Mentor.git" },
+    "C-Suite": {
+      "CSO": { "manifest": "Boardroom/C-Suite/CSO/manifest.json", "purpose": "Chief Strategy Officer agent submodule.", "remote": "https://github.com/ASISaga/CSO" },
+      "CEO": { "manifest": "Boardroom/C-Suite/CEO/manifest.json", "purpose": "Chief Executive Officer agent submodule.", "remote": "https://github.com/ASISaga/CEO" },
+      "CMO": { "manifest": "Boardroom/C-Suite/CMO/manifest.json", "purpose": "Chief Marketing Officer agent submodule.", "remote": "https://github.com/ASISaga/CMO" },
+      "CFO": { "manifest": "Boardroom/C-Suite/CFO/manifest.json", "purpose": "Chief Financial Officer agent submodule.", "remote": "https://github.com/ASISaga/CFO" },
+      "COO": { "manifest": "Boardroom/C-Suite/COO/manifest.json", "purpose": "Chief Operating Officer agent submodule.", "remote": "https://github.com/ASISaga/COO" },
+      "CHRO": { "manifest": "Boardroom/C-Suite/CHRO/manifest.json", "purpose": "Chief Human Resources Officer agent submodule.", "remote": "https://github.com/ASISaga/CHRO" },
+      "CTO": { "manifest": "Boardroom/C-Suite/CTO/manifest.json", "purpose": "Chief Technology Officer agent submodule.", "remote": "https://github.com/ASISaga/CTO" }
+    }
   },
   "Website": {
-    "config": "config/website.json",
-    "purpose": "Website module.",
-    "remote": "https://github.com/ASISaga/Website"
+    "businessinfinity.asisaga.com": { "manifest": "Website/businessinfinity.asisaga.com/manifest.json", "purpose": "Deliver a modern web interface for business automation, agent management, and analytics.", "remote": "https://github.com/ASISaga/businessinfinity.asisaga.com" },
+    "theme.asisaga.com": { "manifest": "Website/theme.asisaga.com/manifest.json", "purpose": "Theme.asisaga.com website submodule.", "remote": "https://github.com/ASISaga/theme.asisaga.com" },
+    "www.asisaga.com": { "manifest": "Website/www.asisaga.com/manifest.json", "purpose": "Www.asisaga.com website submodule.", "remote": "https://github.com/ASISaga/www.asisaga.com"}
   },
-  "theme.asisaga.com": {
-  "config": "Website/theme.asisaga.com/manifest.json",
-    "purpose": "Theme.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/theme.asisaga.com"
+  "RealmOfAgents": {
+    "PossibilityDrivenAgent": { "manifest": "RealmOfAgents/PossibilityDrivenAgent/manifest.json", "purpose": "Determine the overarching Possibility for a system or organization; foundational logic for purpose-driven agents.", "remote": "https://github.com/ASISaga/PossibilityDrivenAgent" },
+    "FineTunedLLM": { "manifest": "RealmOfAgents/FineTunedLLM/manifest.json", "purpose": "FineTunedLLM agent submodule.", "remote": "https://github.com/ASISaga/FineTunedLLM" },
+    "SelfLearningAgent": { "manifest": "RealmOfAgents/SelfLearningAgent/manifest.json", "purpose": "SelfLearningAgent submodule.", "remote": "https://github.com/ASISaga/SelfLearningAgent" },
+    "PurposeDrivenAgent": { "manifest": "RealmOfAgents/PurposeDrivenAgent/manifest.json", "purpose": "PurposeDrivenAgent submodule.", "remote": "https://github.com/ASISaga/PurposeDrivenAgent" },
+    "GitHubAgent": { "manifest": "RealmOfAgents/GitHubAgent/manifest.json", "purpose": "GitHubAgent submodule.", "remote": "https://github.com/ASISaga/GitHubAgent" },
+    "AgentOperatingSystem": { "manifest": "RealmOfAgents/AgentOperatingSystem/manifest.json", "purpose": "AgentOperatingSystem submodule.", "remote": "https://github.com/ASISaga/AgentOperatingSystem" },
+    "LeadershipAgent": { "manifest": "RealmOfAgents/LeadershipAgent/manifest.json", "purpose": "LeadershipAgent submodule.", "remote": "https://github.com/ASISaga/LeadershipAgent" },
+    "Seeker": { "manifest": "RealmOfAgents/Seeker/manifest.json", "purpose": "Seeker agent submodule.", "remote": "https://github.com/ASISaga/Seeker" },
+    "Poet": { "manifest": "RealmOfAgents/Poet/manifest.json", "purpose": "Poet agent submodule.", "remote": "https://github.com/ASISaga/Poet" },
+    "Buddhi": { "manifest": "RealmOfAgents/Buddhi/manifest.json", "purpose": "Buddhi module.", "remote": "https://github.com/ASISaga/Buddhi" },
+    "Manas": { "manifest": "RealmOfAgents/Manas/manifest.json", "purpose": "Manas document store submodule.", "remote": "https://github.com/ASISaga/Manas.git" }
   },
-  "www.asisaga.com": {
-  "config": "Website/www.asisaga.com/manifest.json",
-    "purpose": "Www.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/www.asisaga.com"
+  "MCP": {
+    "ERPNext-MCP": { "manifest": "MCP/ERPNext-MCP/manifest.json", "purpose": "ERPNext-MCP submodule.", "remote": "https://github.com/ASISaga/ERPNext-MCP" },
+    "spec-kit-mcp": { "manifest": "MCP/spec-kit-mcp/manifest.json", "purpose": "Spec-kit-mcp submodule.", "remote": "https://github.com/ASISaga/spec-kit-mcp" },
+    "linkedin-mcp-server": { "manifest": "MCP/linkedin-mcp-server/manifest.json", "purpose": "Linkedin-mcp-server submodule.", "remote": "https://github.com/ASISaga/linkedin-mcp-server" },
+    "mcp-reddit": { "manifest": "MCP/mcp-reddit/manifest.json", "purpose": "Mcp-reddit submodule.", "remote": "https://github.com/ASISaga/mcp-reddit" },
+    "mcp.asisaga.com": { "manifest": "MCP/mcp.asisaga.com/manifest.json", "purpose": "Mcp.asisaga.com submodule.", "remote": "https://github.com/ASISaga/mcp.asisaga.com" }
   },
-  "realmofagents.asisaga.com": {
-  "config": "Website/realmofagents.asisaga.com/manifest.json",
-    "purpose": "Realmofagents.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/realmofagents.asisaga.com"
-  },
-  "saga.asisaga.com": {
-  "config": "Website/saga.asisaga.com/manifest.json",
-    "purpose": "Saga.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/saga.asisaga.com"
-  },
-  "genesis.asisaga.com": {
-  "config": "Website/genesis.asisaga.com/manifest.json",
-    "purpose": "Genesis.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/genesis.asisaga.com"
-  },
-  "aurelion.asisaga.com": {
-  "config": "Website/aurelion.asisaga.com/manifest.json",
-    "purpose": "Aurelion.asisaga.com website submodule.",
-    "remote": "https://github.com/ASISaga/aurelion.asisaga.com"
-  },
-  "globalDependencies": {
-    "config": "config/globalDependencies.json",
-    "purpose": "Unified dependency graph for all major modules."
-  },
-  "integration": {
-    "config": "config/integration.json",
-    "purpose": "Strategy and entrypoints for module orchestration and integration."
-  },
-  "refactorability": {
-    "config": "config/refactorability.json",
-    "purpose": "Guidelines and monorepo status for code refactoring and structure."
-  },
-  "fileGlobs": {
-    "config": "config/fileGlobs.json",
-    "purpose": "File glob patterns for all modules."
-  },
-  "testSuites": {
-    "config": "config/testSuites.json",
-    "purpose": "Test suite directory references for all modules."
-  },
-  "sharedConfig": {
-    "config": "config/sharedConfig.json",
-    "purpose": "Shared configuration file references for all modules."
-  },
-  "documentation": {
-    "config": "config/documentation.json",
-    "purpose": "Documentation file references for all modules."
-  },
-  "apiContracts": {
-    "config": "config/apiContracts.json",
-    "purpose": "OpenAPI and API contract documentation for all modules."
-  },
-  "_aiContext": [
-    {
-      "source": "schema/",
-      "purpose": "Contains JSON Schema files for all configuration types. Used for validation and editor support."
-    },
-    {
-      "source": "docs/",
-      "purpose": "Contains markdown documentation for all configuration files and the configuration changelog. Used for onboarding, reference, and AI context."
-    },
-    {
-      "source": "docs/examples/",
-      "purpose": "Contains example workflows and sample input files for the system. Used for demonstration and testing."
-    },
-    {
-      "source": "config/secrets.example.json",
-      "purpose": "Template for required secrets and environment variables. Used for documentation and onboarding."
-    },
-    {
-      "source": "config/workspace.json",
-      "purpose": "Provides additional documentation and module structure for AI assistants and tools. Not merged into the manifest at runtime."
-    },
-    {
-      "source": "config/apiContracts.json",
-      "purpose": "Contains OpenAPI and API contract documentation for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/documentation.json",
-      "purpose": "Contains documentation file references for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/testSuites.json",
-      "purpose": "Contains test suite directory references for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/sharedConfig.json",
-      "purpose": "Contains shared configuration file references for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/pythonPackages.json",
-      "purpose": "Contains Python package metadata for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/globalDependencies.json",
-      "purpose": "Contains the unified dependency graph for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/integration.json",
-      "purpose": "Contains integration strategy and entrypoints for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/refactorability.json",
-      "purpose": "Contains refactorability guidelines and monorepo status. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/fileGlobs.json",
-      "purpose": "Contains file glob patterns for all modules. Used for AI and tooling context only."
-    },
-    {
-      "source": "config/mcp.json",
-      "purpose": "Contains the MCP (Model Context Protocol) module and all MCP submodules. Used for AI and tooling context only."
-    }
-  ]
+  "meta": "config/meta.json",
+  "_aiContext": "config/aiContext.json"
 }

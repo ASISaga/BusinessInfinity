@@ -1,0 +1,34 @@
+{
+      "globalDependencies": {
+  "config": "config/globalDependencies.json",
+    "purpose": "Unified dependency graph for all major modules."
+  },
+  "integration": {
+  "config": "config/integration.json",
+    "purpose": "Strategy and entrypoints for module orchestration and integration."
+  },
+  "refactorability": {
+  "config": "config/refactorability.json",
+    "purpose": "Guidelines and monorepo status for code refactoring and structure."
+  },
+  "fileGlobs": {
+  "config": "config/fileGlobs.json",
+    "purpose": "File glob patterns for all modules."
+  },
+  "testSuites": {
+  "config": "config/testSuites.json",
+    "purpose": "Test suite directory references for all modules."
+  },
+  "sharedConfig": {
+  "config": "config/sharedConfig.json",
+    "purpose": "Shared configuration file references for all modules."
+  },
+  "documentation": {
+  "config": "config/documentation.json",
+    "purpose": "Documentation file references for all modules."
+  },
+  "apiContracts": {
+  "config": "config/apiContracts.json",
+    "purpose": "OpenAPI and API contract documentation for all modules."
+  }
+}
