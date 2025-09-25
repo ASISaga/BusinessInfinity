@@ -1,44 +1,137 @@
 {
   "name": "BusinessInfinity",
+  "alias": "BI",
   "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making.",
   "Boardroom": {
-    "Founder": { "manifest": "Boardroom/Founder/manifest.json", "purpose": "Create and refine company vision, strategy and team; drive entrepreneurship and innovation.", "remote": "https://github.com/ASISaga/Founder" },
-    "Investor": { "manifest": "Boardroom/Investor/manifest.json", "purpose": "Provide investment analysis, portfolio management, and funding strategies for BusinessInfinity.", "remote": "https://github.com/ASISaga/Investor" },
-    "Mentor": { "manifest": "Boardroom/Mentor/manifest.json", "purpose": "Mentor agent submodule.", "remote": "https://github.com/ASISaga/Mentor.git" },
+    "Founder": {
+      "manifest": "Boardroom/Founder/manifest.json",
+  "purpose": "Entrepreneurial agent inspired by Paul Graham et al; responsible for vision, strategy, team creation, and driving innovation in the boardroom ecosystem. In BI, Founder initiates and evolves the core business vision and strategic direction for all agents and modules. ",
+      "remote": "https://github.com/ASISaga/Founder"
+    },
+    "Investor": {
+      "manifest": "Boardroom/Investor/manifest.json",
+  "purpose": "Investment and portfolio management agent inspired by Warren Buffett et al; delivers funding strategies, risk analysis, and financial guidance for the boardroom. In BI, Investor ensures optimal resource allocation and financial sustainability for autonomous agent operations.",
+      "remote": "https://github.com/ASISaga/Investor"
+    },
+    "Mentor": {
+      "manifest": "Boardroom/Mentor/manifest.json",
+  "purpose": "Mentor Mode: VS Code extension for unified control, fine-tuning, monitoring, and deployment of agent LoRA adapters via Azure ML and Azure Functions; enables real-time chat, training, and deployment for all boardroom agents. In BI, Mentor provides adaptive learning and model management for agent improvement and governance.",
+      "remote": "https://github.com/ASISaga/Mentor.git"
+    },
     "C-Suite": {
-      "CSO": { "manifest": "Boardroom/C-Suite/CSO/manifest.json", "purpose": "Chief Strategy Officer agent submodule.", "remote": "https://github.com/ASISaga/CSO" },
-      "CEO": { "manifest": "Boardroom/C-Suite/CEO/manifest.json", "purpose": "Chief Executive Officer agent submodule.", "remote": "https://github.com/ASISaga/CEO" },
-      "CMO": { "manifest": "Boardroom/C-Suite/CMO/manifest.json", "purpose": "Chief Marketing Officer agent submodule.", "remote": "https://github.com/ASISaga/CMO" },
-      "CFO": { "manifest": "Boardroom/C-Suite/CFO/manifest.json", "purpose": "Chief Financial Officer agent submodule.", "remote": "https://github.com/ASISaga/CFO" },
-      "COO": { "manifest": "Boardroom/C-Suite/COO/manifest.json", "purpose": "Chief Operating Officer agent submodule.", "remote": "https://github.com/ASISaga/COO" },
-      "CHRO": { "manifest": "Boardroom/C-Suite/CHRO/manifest.json", "purpose": "Chief Human Resources Officer agent submodule.", "remote": "https://github.com/ASISaga/CHRO" },
-      "CTO": { "manifest": "Boardroom/C-Suite/CTO/manifest.json", "purpose": "Chief Technology Officer agent submodule.", "remote": "https://github.com/ASISaga/CTO" }
+      "CSO": {
+        "manifest": "Boardroom/C-Suite/CSO/manifest.json",
+  "purpose": "Strategist agent for high-level business and organizational planning. In BI, CSO crafts and refines strategic initiatives and coordinates cross-agent alignment.",
+        "remote": "https://github.com/ASISaga/CSO"
+      },
+      "CEO": {
+        "manifest": "Boardroom/C-Suite/CEO/manifest.json",
+  "purpose": "Executive agent responsible for overall leadership, vision, and decision-making in the boardroom. In BI, CEO orchestrates agent collaboration and ensures execution of boardroom decisions.",
+        "remote": "https://github.com/ASISaga/CEO"
+      },
+      "CMO": {
+        "manifest": "Boardroom/C-Suite/CMO/manifest.json",
+  "purpose": "Marketeer agent inspired by Seth Godin et al; drives marketing strategy, brand, and outreach for the organization. In BI, CMO amplifies the reach and impact of agent-driven initiatives and business outcomes.",
+        "remote": "https://github.com/ASISaga/CMO"
+      },
+      "CFO": {
+        "manifest": "Boardroom/C-Suite/CFO/manifest.json",
+  "purpose": "Financial executive agent responsible for fiscal management, reporting, and strategic financial planning. In BI, CFO manages the economic health and reporting for all autonomous business processes.",
+        "remote": "https://github.com/ASISaga/CFO"
+      },
+      "COO": {
+        "manifest": "Boardroom/C-Suite/COO/manifest.json",
+  "purpose": "Operations executive agent; manages audit-tight, repeatable SOP fine-tuning and operational excellence for the boardroom. In BI, COO ensures operational efficiency and continuous process improvement across all agents.",
+        "remote": "https://github.com/ASISaga/COO"
+      },
+      "CHRO": {
+        "manifest": "Boardroom/C-Suite/CHRO/manifest.json",
+  "purpose": "Chief Human Resources Officer agent; manages people, culture, and HR strategy. In BI, CHRO oversees agent onboarding, collaboration, and well-being within the autonomous boardroom.",
+        "remote": "https://github.com/ASISaga/CHRO"
+      },
+      "CTO": {
+        "manifest": "Boardroom/C-Suite/CTO/manifest.json",
+  "purpose": "Chief Technology Officer agent; leads technology strategy and innovation. In BI, CTO drives technical integration, platform evolution, and innovation for all business agents.",
+        "remote": "https://github.com/ASISaga/CTO"
+      }
     }
   },
   "Website": {
-    "businessinfinity.asisaga.com": { "manifest": "Website/businessinfinity.asisaga.com/manifest.json", "purpose": "Deliver a modern web interface for business automation, agent management, and analytics.", "remote": "https://github.com/ASISaga/businessinfinity.asisaga.com" },
-    "theme.asisaga.com": { "manifest": "Website/theme.asisaga.com/manifest.json", "purpose": "Theme.asisaga.com website submodule.", "remote": "https://github.com/ASISaga/theme.asisaga.com" },
-    "www.asisaga.com": { "manifest": "Website/www.asisaga.com/manifest.json", "purpose": "Www.asisaga.com website submodule.", "remote": "https://github.com/ASISaga/www.asisaga.com"}
+    "businessinfinity.asisaga.com": {
+      "manifest": "Website/businessinfinity.asisaga.com/manifest.json",
+  "purpose": "Modern web interface for business automation, agent management, and analytics for BusinessInfinity. In BI, this module provides the primary user interface for interacting with and visualizing agent operations.",
+      "remote": "https://github.com/ASISaga/businessinfinity.asisaga.com"
+    },
+    "theme.asisaga.com": {
+      "manifest": "Website/theme.asisaga.com/manifest.json",
+  "purpose": "Common theme and UI/UX component library for all ASISaga web properties. In BI, it ensures a consistent and branded user experience across all business interfaces.",
+      "remote": "https://github.com/ASISaga/theme.asisaga.com"
+    }
   },
   "RealmOfAgents": {
-    "PossibilityDrivenAgent": { "manifest": "RealmOfAgents/PossibilityDrivenAgent/manifest.json", "purpose": "Determine the overarching Possibility for a system or organization; foundational logic for purpose-driven agents.", "remote": "https://github.com/ASISaga/PossibilityDrivenAgent" },
-    "FineTunedLLM": { "manifest": "RealmOfAgents/FineTunedLLM/manifest.json", "purpose": "FineTunedLLM agent submodule.", "remote": "https://github.com/ASISaga/FineTunedLLM" },
-    "SelfLearningAgent": { "manifest": "RealmOfAgents/SelfLearningAgent/manifest.json", "purpose": "SelfLearningAgent submodule.", "remote": "https://github.com/ASISaga/SelfLearningAgent" },
-    "PurposeDrivenAgent": { "manifest": "RealmOfAgents/PurposeDrivenAgent/manifest.json", "purpose": "PurposeDrivenAgent submodule.", "remote": "https://github.com/ASISaga/PurposeDrivenAgent" },
-    "GitHubAgent": { "manifest": "RealmOfAgents/GitHubAgent/manifest.json", "purpose": "GitHubAgent submodule.", "remote": "https://github.com/ASISaga/GitHubAgent" },
-    "AgentOperatingSystem": { "manifest": "RealmOfAgents/AgentOperatingSystem/manifest.json", "purpose": "AgentOperatingSystem submodule.", "remote": "https://github.com/ASISaga/AgentOperatingSystem" },
-    "LeadershipAgent": { "manifest": "RealmOfAgents/LeadershipAgent/manifest.json", "purpose": "LeadershipAgent submodule.", "remote": "https://github.com/ASISaga/LeadershipAgent" },
-    "Seeker": { "manifest": "RealmOfAgents/Seeker/manifest.json", "purpose": "Seeker agent submodule.", "remote": "https://github.com/ASISaga/Seeker" },
-    "Poet": { "manifest": "RealmOfAgents/Poet/manifest.json", "purpose": "Poet agent submodule.", "remote": "https://github.com/ASISaga/Poet" },
-    "Buddhi": { "manifest": "RealmOfAgents/Buddhi/manifest.json", "purpose": "Buddhi module.", "remote": "https://github.com/ASISaga/Buddhi" },
-    "Manas": { "manifest": "RealmOfAgents/Manas/manifest.json", "purpose": "Manas document store submodule.", "remote": "https://github.com/ASISaga/Manas.git" }
+    "PossibilityDrivenAgent": {
+      "manifest": "RealmOfAgents/PossibilityDrivenAgent/manifest.json",
+  "purpose": "Agent framework for creative, language-based possibility declaration; enables breakthrough solutions by creating new operational contexts beyond reactive problem-solving. In BI, PossibilityDrivenAgent empowers agents to generate novel business opportunities and strategies.",
+      "remote": "https://github.com/ASISaga/PossibilityDrivenAgent"
+    },
+    "FineTunedLLM": {
+      "manifest": "RealmOfAgents/FineTunedLLM/manifest.json",
+  "purpose": "Centralized, cross-domain ML/LLM pipeline for all ASISaga modules; provides scalable, domain-specific model training, inference, and LLM-powered features using hybrid cloud architecture. In BI, FineTunedLLM delivers advanced language and learning capabilities to all business agents.",
+      "remote": "https://github.com/ASISaga/FineTunedLLM"
+    },
+    "SelfLearningAgent": {
+      "manifest": "RealmOfAgents/SelfLearningAgent/manifest.json",
+  "purpose": "Multi-agent orchestration system with agent-to-agent (A2A) communication, self-learning, and unified orchestration for collaboration across domains. In BI, SelfLearningAgent enables agents to learn from each other and adapt to evolving business contexts.",
+      "remote": "https://github.com/ASISaga/SelfLearningAgent"
+    },
+    "PurposeDrivenAgent": {
+      "manifest": "RealmOfAgents/PurposeDrivenAgent/manifest.json",
+  "purpose": "AI agent model built on the paradigm of integral purpose; operates with continuous learning, ethical alignment, and seamless integration to achieve overarching objectives. In BI, PurposeDrivenAgent ensures all agent actions are aligned with the core mission and values of the business.",
+      "remote": "https://github.com/ASISaga/PurposeDrivenAgent"
+    },
+    "GitHubAgent": {
+      "manifest": "RealmOfAgents/GitHubAgent/manifest.json",
+  "purpose": "Smart assistant for automating GitHub project management: issue handling, PR review, CI/CD, code analysis, documentation, notifications, and dependency management. In BI, GitHubAgent automates code and workflow management for agent-driven business logic.",
+      "remote": "https://github.com/ASISaga/GitHubAgent"
+    },
+    "AgentOperatingSystem": {
+      "manifest": "RealmOfAgents/AgentOperatingSystem/manifest.json",
+  "purpose": "Unified, domain-agnostic orchestration and agent management layer; provides all core agent orchestration, resource management, storage, environment, ML pipeline, MCP, and authentication features for all business and leadership agents. In BI, AOS is the foundational infrastructure enabling all agent operations, communication, and lifecycle management.",
+      "remote": "https://github.com/ASISaga/AgentOperatingSystem",
+      "alias": "AOS"
+    },
+    "LeadershipAgent": {
+      "manifest": "RealmOfAgents/LeadershipAgent/manifest.json",
+  "purpose": "Base class for all business and leadership agents, ensuring consistent interface and orchestration pattern across the boardroom ecosystem. In BI, LeadershipAgent standardizes agent behavior and integration for seamless boardroom orchestration.",
+      "remote": "https://github.com/ASISaga/LeadershipAgent"
+    }
   },
   "MCP": {
-    "ERPNext-MCP": { "manifest": "MCP/ERPNext-MCP/manifest.json", "purpose": "ERPNext-MCP submodule.", "remote": "https://github.com/ASISaga/ERPNext-MCP" },
-    "spec-kit-mcp": { "manifest": "MCP/spec-kit-mcp/manifest.json", "purpose": "Spec-kit-mcp submodule.", "remote": "https://github.com/ASISaga/spec-kit-mcp" },
-    "linkedin-mcp-server": { "manifest": "MCP/linkedin-mcp-server/manifest.json", "purpose": "Linkedin-mcp-server submodule.", "remote": "https://github.com/ASISaga/linkedin-mcp-server" },
-    "mcp-reddit": { "manifest": "MCP/mcp-reddit/manifest.json", "purpose": "Mcp-reddit submodule.", "remote": "https://github.com/ASISaga/mcp-reddit" },
-    "mcp.asisaga.com": { "manifest": "MCP/mcp.asisaga.com/manifest.json", "purpose": "Mcp.asisaga.com submodule.", "remote": "https://github.com/ASISaga/mcp.asisaga.com" }
+    "ERPNext-MCP": {
+      "manifest": "MCP/ERPNext-MCP/manifest.json",
+  "purpose": "Comprehensive Python MCP server exposing all major ERPNext operations in business-friendly terms, organized by domain modules for seamless business integration. In BI, ERPNext-MCP provides business agents with direct access to ERP workflows and data.",
+      "remote": "https://github.com/ASISaga/ERPNext-MCP"
+    },
+    "spec-kit-mcp": {
+      "manifest": "MCP/spec-kit-mcp/manifest.json",
+  "purpose": "Protocol-first architecture for Spec-Driven Development; enables executable specifications, composable workflows, and persistent, interoperable services across the MCP ecosystem. In BI, spec-kit-mcp enables agents to generate, execute, and manage business specifications and workflows.",
+      "remote": "https://github.com/ASISaga/spec-kit-mcp"
+    },
+    "linkedin-mcp-server": {
+      "manifest": "MCP/linkedin-mcp-server/manifest.json",
+  "purpose": "LinkedIn MCP server using the official LinkedIn API with OAuth 2.0; enables compliant, enterprise-grade integration for AI assistants and business automation. In BI, linkedin-mcp-server connects business agents to LinkedIn data and automation capabilities.",
+      "remote": "https://github.com/ASISaga/linkedin-mcp-server"
+    },
+    "mcp-reddit": {
+      "manifest": "MCP/mcp-reddit/manifest.json",
+  "purpose": "Model Context Protocol (MCP) server for fetching and analyzing Reddit content; provides tools for content retrieval, analysis, and integration with LLM workflows. In BI, mcp-reddit enables agents to leverage Reddit insights for business intelligence and trend analysis.",
+      "remote": "https://github.com/ASISaga/mcp-reddit"
+    },
+    "mcp.asisaga.com": {
+      "manifest": "MCP/mcp.asisaga.com/manifest.json",
+  "purpose": "Web interface and endpoint for MCP services and integrations in the ASISaga ecosystem. In BI, mcp.asisaga.com provides a unified access point for all MCP-powered business integrations.",
+      "remote": "https://github.com/ASISaga/mcp.asisaga.com"
+    }
   },
   "meta": "config/meta.json",
   "_aiContext": "config/aiContext.json"

@@ -15,6 +15,8 @@ from datetime import datetime, timedelta
 try:
     from RealmOfAgents.AgentOperatingSystem.LeadershipAgent import LeadershipAgent
     from RealmOfAgents.AgentOperatingSystem.aos_core import BaseAgent
+    from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
+    from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
     AOS_AGENTS_AVAILABLE = True
 except ImportError:
     # Fallback to local implementations
@@ -27,20 +29,28 @@ class BusinessAgent(LeadershipAgent):
     Base business agent with business-specific capabilities
     
     Extends LeadershipAgent with business intelligence, KPI tracking,
-    and integration with Business Infinity systems.
+    and integration with Business Infinity systems via AOS infrastructure.
     """
     
     def __init__(self, role: str, domain: str, config: Dict[str, Any] = None):
         super().__init__(
             agent_id=f"bi_{role.lower()}",
             name=f"Business Infinity {role}",
-            role=role
+            role=role,
+            config=config
         )
         
         self.domain = domain
-        self.config = config or {}
         
-        # Business-specific attributes
+        # Initialize AOS-managed resources
+        if AOS_AGENTS_AVAILABLE:
+            self.storage_manager = UnifiedStorageManager()
+            self.env_manager = UnifiedEnvManager()
+        else:
+            self.storage_manager = None
+            self.env_manager = None
+        
+        # Business-specific attributes (stored via AOS storage)
         self.kpis = {}
         self.business_metrics = {}
         self.decision_history = []

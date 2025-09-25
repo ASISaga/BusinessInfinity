@@ -21,24 +21,20 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Import AOS foundation and autonomous boardroom
+# Import AOS foundation - use AOS as the core infrastructure layer
 try:
     from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
     from RealmOfAgents.AgentOperatingSystem.config import AOSConfig, default_config
+    from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
+    from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
+    from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
+    from RealmOfAgents.AgentOperatingSystem.aos_auth import UnifiedAuthHandler
+    from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import trigger_lora_training, aml_infer
     from autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available, using fallback implementations")
-
-# Import FineTunedLLM for LoRA adapters
-try:
-    from RealmOfAgents.FineTunedLLM.lora_manager import LoRAManager
-    from RealmOfAgents.FineTunedLLM.mentor_mode import MentorMode as ExternalMentorMode
-    FINETUNED_LLM_AVAILABLE = True
-except ImportError:
-    FINETUNED_LLM_AVAILABLE = False
-    logging.warning("FineTunedLLM not available, using local implementation")
 
 # Import local mentor mode implementation
 try:
@@ -48,13 +44,8 @@ except ImportError:
     LOCAL_MENTOR_MODE_AVAILABLE = False
     logging.warning("Local mentor mode not available")
 
-# Azure Service Bus for MCP connectivity
-try:
-    from azure.servicebus.aio import ServiceBusClient as AsyncServiceBusClient
-    AZURE_SERVICEBUS_AVAILABLE = True
-except ImportError:
-    AZURE_SERVICEBUS_AVAILABLE = False
-    logging.warning("Azure Service Bus not available")
+# MCP connectivity managed through AOS
+# No direct Azure Service Bus imports needed - use AOS MCPServiceBusClient
 
 # Import C-Suite agents
 try:
@@ -179,32 +170,26 @@ class BusinessInfinity:
             # Initialize AOS foundation
             if AOS_AVAILABLE:
                 self.aos = AgentOperatingSystem(self.config.aos_config)
-                self.logger.info("AOS initialized successfully")
-            
-            # Initialize FineTunedLLM LoRA Manager and Mentor Mode
-            if FINETUNED_LLM_AVAILABLE:
-                self.lora_manager = LoRAManager()
-                await self.lora_manager.initialize()
+                # Use AOS ML pipeline instead of direct FineTunedLLM
+                self.storage_manager = UnifiedStorageManager()
+                self.auth_handler = UnifiedAuthHandler()
                 
-                # Initialize external Mentor Mode if enabled
+                # Initialize mentor mode through AOS if enabled
                 if self.config.mentor_mode_enabled:
-                    self.mentor_mode = ExternalMentorMode(self.lora_manager)
-                    await self.mentor_mode.initialize()
-                    self.logger.info("External Mentor Mode initialized for LoRA adapter training")
+                    if LOCAL_MENTOR_MODE_AVAILABLE:
+                        self.mentor_mode = MentorMode()
+                        await self.mentor_mode.initialize()
+                        self.logger.info("Local Mentor Mode initialized")
                 
-                self.logger.info("FineTunedLLM LoRA Manager initialized")
-            elif LOCAL_MENTOR_MODE_AVAILABLE and self.config.mentor_mode_enabled:
-                # Use local mentor mode implementation
-                self.mentor_mode = MentorMode()
-                await self.mentor_mode.initialize()
-                self.logger.info("Local Mentor Mode initialized")
-            
-            # Initialize Azure Service Bus for MCP connectivity
-            if AZURE_SERVICEBUS_AVAILABLE and self.config.service_bus_connection:
-                self.service_bus_client = AsyncServiceBusClient.from_connection_string(
-                    self.config.service_bus_connection
-                )
-                self.logger.info("Azure Service Bus client initialized")
+                # Initialize MCP Service Bus through AOS
+                if self.config.service_bus_connection:
+                    self.service_bus_client = MCPServiceBusClient(
+                        self.config.service_bus_connection,
+                        self.config.service_bus_topic or "business-infinity"
+                    )
+                    self.logger.info("MCP Service Bus client initialized through AOS")
+                
+                self.logger.info("AOS initialized successfully")
             
             # Initialize Autonomous Boardroom
             if self.config.enable_autonomous_boardroom:
@@ -635,6 +620,42 @@ class BusinessInfinity:
             status["aos_status"] = aos_status
         
         return status
+
+    async def train_agent_adapter(self, agent_role: str, training_data: Dict[str, Any]) -> str:
+        """Train LoRA adapter for an agent using AOS ML pipeline"""
+        if not AOS_AVAILABLE:
+            return "AOS not available for agent training"
+            
+        try:
+            # Use AOS ML pipeline for training
+            training_params = {
+                "model_name": training_data.get("model_name", "gpt-4"),
+                "data_path": training_data.get("data_path"),
+                "output_dir": f"/models/{agent_role}_lora",
+                "agent_role": agent_role
+            }
+            
+            adapters = training_data.get("adapters", [])
+            result = await trigger_lora_training(training_params, adapters)
+            
+            self.logger.info(f"Agent {agent_role} training initiated: {result}")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to train agent {agent_role}: {e}")
+            return f"Training failed: {str(e)}"
+    
+    async def infer_with_agent(self, agent_role: str, prompt: str) -> Any:
+        """Perform inference with an agent using AOS ML pipeline"""
+        if not AOS_AVAILABLE:
+            return "AOS not available for agent inference"
+            
+        try:
+            result = await aml_infer(agent_role, prompt)
+            return result
+        except Exception as e:
+            self.logger.error(f"Failed to infer with agent {agent_role}: {e}")
+            return f"Inference failed: {str(e)}"
     
     async def shutdown(self):
         """Graceful shutdown of Business Infinity"""

@@ -22,41 +22,54 @@ from .environment import UnifiedEnvManager
 
 class UnifiedStorageManager:
     """
-    Unified storage management that consolidates:
-    - Azure Tables operations (conversations, messages)
-    - Azure Blob Storage operations (training data, profiles)
-    - Azure Queue operations (agent events, requests)
+    Business Infinity Storage Manager - extends AOS storage with business-specific operations:
+    - Boardroom decision storage
+    - Business metrics and KPI storage
+    - Agent collaboration history
+    - Business workflow state management
     """
 
-    def __init__(self):
-        # Initialize environment variables using unified env manager
-        env = UnifiedEnvManager()
+    def __init__(self, env=None):
+        # Initialize AOS storage manager with business-specific configuration
+        super().__init__(env)
         
+        # Business-specific storage configuration
+        env_manager = env or UnifiedEnvManager()
+        self.boardroom_table = env_manager.get("BOARDROOM_TABLE_NAME", "BoardroomDecisions")
+        self.metrics_table = env_manager.get("METRICS_TABLE_NAME", "BusinessMetrics")
+        self.collaboration_table = env_manager.get("COLLABORATION_TABLE_NAME", "AgentCollaboration")
+        
+    async def store_boardroom_decision(self, decision_data: Dict[str, Any]) -> bool:
+        """Store boardroom decision with audit trail"""
         try:
-            self.storage_conn = env.get_azure_connection_string("storage")
-            self.table_conn = env.get_azure_connection_string("tables")
-            self.queue_conn = env.get_azure_connection_string("queues")
-        except EnvironmentError:
-            self.storage_conn = None
-            self.table_conn = None
-            self.queue_conn = None
-        
-        self.cosmos_endpoint = env.get_optional("COSMOS_ENDPOINT")
-        self.cosmos_key = env.get_optional("COSMOS_KEY")
-        self.profiles_blob = env.get_optional("AGENTPROFILESBLOB")
-        self.directives_blob = env.get_optional("AGENTDIRECTIVESBLOB")
-        self.knowledge_blob = env.get_optional("DOMAINKNOWLEDGEBLOB")
-
-        # Configuration
-        self.table_name = env.get("TABLE_NAME", "BoardroomMessages")
-        self.cosmos_container = env.get("COSMOS_CONTAINER", "conversations")
-        self.req_queue = env.get("QUEUE_AGENT_REQUESTS", "agent-requests")
-        self.evt_queue = env.get("QUEUE_AGENT_EVENTS", "agent-events")
-
-        # Clients (lazy initialization)
-        self._table_client = None
-        self._cosmos_table_client = None
-        self._service_client = None
+            decision_data["timestamp"] = datetime.now().isoformat()
+            decision_data["source"] = "business_infinity_boardroom"
+            return await self.store_entity(self.boardroom_table, decision_data)
+        except Exception as e:
+            self.logger.error(f"Failed to store boardroom decision: {e}")
+            return False
+            
+    async def store_business_metrics(self, metrics: Dict[str, Any], agent_id: str) -> bool:
+        """Store business metrics for an agent"""
+        try:
+            metrics_data = {
+                "agent_id": agent_id,
+                "metrics": metrics,
+                "timestamp": datetime.now().isoformat(),
+                "source": "business_infinity"
+            }
+            return await self.store_entity(self.metrics_table, metrics_data)
+        except Exception as e:
+            self.logger.error(f"Failed to store business metrics: {e}")
+            return False
+            
+    async def get_boardroom_history(self, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get recent boardroom decisions"""
+        try:
+            return await self.get_entities(self.boardroom_table, limit=limit)
+        except Exception as e:
+            self.logger.error(f"Failed to get boardroom history: {e}")
+            return []
 
         # Load agent data
         self.agent_dirs = None
