@@ -30,11 +30,18 @@ try:
     from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
     from RealmOfAgents.AgentOperatingSystem.aos_auth import UnifiedAuthHandler
     from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import trigger_lora_training, aml_infer
-    from autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available, using fallback implementations")
+
+# Import autonomous boardroom
+try:
+    from autonomous_boardroom import AutonomousBoardroom, create_autonomous_boardroom
+    AUTONOMOUS_BOARDROOM_AVAILABLE = True
+except ImportError:
+    AUTONOMOUS_BOARDROOM_AVAILABLE = False
+    logging.warning("Autonomous boardroom not available")
 
 # Import local mentor mode implementation
 try:
@@ -193,17 +200,21 @@ class BusinessInfinity:
             
             # Initialize Autonomous Boardroom
             if self.config.enable_autonomous_boardroom:
-                self.autonomous_boardroom = create_autonomous_boardroom(self.config.aos_config)
-                
-                # Configure boardroom with LoRA manager
-                if self.lora_manager:
-                    self.autonomous_boardroom.lora_manager = self.lora_manager
-                
-                # Configure Service Bus client
-                if self.service_bus_client:
-                    self.autonomous_boardroom.service_bus_client = self.service_bus_client
-                
-                self.logger.info("Autonomous Boardroom initialized successfully")
+                if AUTONOMOUS_BOARDROOM_AVAILABLE:
+                    self.autonomous_boardroom = create_autonomous_boardroom(self.config.aos_config)
+                    
+                    # Configure boardroom with LoRA manager
+                    if self.lora_manager:
+                        self.autonomous_boardroom.lora_manager = self.lora_manager
+                    
+                    # Configure Service Bus client
+                    if self.service_bus_client:
+                        self.autonomous_boardroom.service_bus_client = self.service_bus_client
+                    
+                    self.logger.info("Autonomous Boardroom initialized successfully")
+                else:
+                    self.logger.warning("Autonomous Boardroom not available, using fallback")
+                    self.autonomous_boardroom = None
             
             # Initialize MCP-UI Dashboard connections
             await self._initialize_mcp_ui_dashboard()
@@ -656,6 +667,139 @@ class BusinessInfinity:
         except Exception as e:
             self.logger.error(f"Failed to infer with agent {agent_role}: {e}")
             return f"Inference failed: {str(e)}"
+    
+    # === Conversation System Integration ===
+    
+    async def create_boardroom_conversation(self, conversation_type: str, champion_role: str,
+                                          title: str, content: str, context: Dict[str, Any] = None) -> Optional[str]:
+        """Create a boardroom conversation through the autonomous boardroom"""
+        if not self.autonomous_boardroom:
+            self.logger.error("Autonomous boardroom not available")
+            return None
+        
+        return await self.autonomous_boardroom.create_boardroom_conversation(
+            conversation_type, champion_role, title, content, context
+        )
+    
+    async def initiate_a2a_communication(self, from_agent: str, to_agent: str,
+                                       conversation_type: str, message: str,
+                                       context: Dict[str, Any] = None) -> Optional[str]:
+        """Initiate Agent-to-Agent communication"""
+        if not self.autonomous_boardroom:
+            self.logger.error("Autonomous boardroom not available")
+            return None
+        
+        return await self.autonomous_boardroom.initiate_a2a_communication(
+            from_agent, to_agent, conversation_type, message, context
+        )
+    
+    async def get_agent_conversations(self, agent_role: str) -> Dict[str, Any]:
+        """Get conversations for a specific agent role"""
+        if not self.autonomous_boardroom:
+            return {"error": "Autonomous boardroom not available"}
+        
+        return await self.autonomous_boardroom.get_agent_conversations(agent_role)
+    
+    async def sign_conversation(self, conversation_id: str, signer_role: str, signer_name: str) -> bool:
+        """Sign a conversation"""
+        if not self.autonomous_boardroom:
+            self.logger.error("Autonomous boardroom not available")
+            return False
+        
+        return await self.autonomous_boardroom.sign_conversation(conversation_id, signer_role, signer_name)
+    
+    async def list_conversation_types(self) -> List[str]:
+        """List available conversation types"""
+        try:
+            from conversations.conversation_system import ConversationType
+            return [conv_type.value for conv_type in ConversationType]
+        except ImportError:
+            return []
+    
+    async def list_conversation_roles(self) -> List[str]:
+        """List available conversation roles"""
+        try:
+            from conversations.conversation_system import ConversationRole
+            return [role.value for role in ConversationRole]
+        except ImportError:
+            return []
+    
+    async def get_conversation_templates(self) -> Dict[str, Any]:
+        """Get conversation templates for different types"""
+        try:
+            from conversations.conversation_system import ConversationTemplateManager
+            template_manager = ConversationTemplateManager()
+            
+            templates = {}
+            for conv_type in template_manager.templates:
+                templates[conv_type.value] = template_manager.get_template(conv_type)
+            
+            return templates
+        except ImportError:
+            return {}
+    
+    async def create_strategic_conversation(self, title: str, content: str, 
+                                          champion: str = "Founder") -> Optional[str]:
+        """Convenience method for creating strategic conversations"""
+        return await self.create_boardroom_conversation(
+            conversation_type="strategic_frame",
+            champion_role=champion,
+            title=title,
+            content=content,
+            context={"frame_type": "strategic", "scope": "company_wide"}
+        )
+    
+    async def create_investment_conversation(self, amount: float, purpose: str,
+                                           champion: str = "Investor") -> Optional[str]:
+        """Convenience method for creating investment conversations"""
+        return await self.create_boardroom_conversation(
+            conversation_type="investment_decision",
+            champion_role=champion,
+            title=f"Investment Decision: ${amount:,.2f} for {purpose}",
+            content=f"Proposed investment of ${amount:,.2f} for {purpose}",
+            context={
+                "amount": amount,
+                "purpose": purpose,
+                "decision_type": "investment",
+                "requires_due_diligence": amount > 100000
+            }
+        )
+    
+    async def create_external_stakeholder_communication(self, stakeholder_type: str,
+                                                       message: str, from_agent: str = "CEO") -> Optional[str]:
+        """Create communication with external stakeholders"""
+        stakeholder_mapping = {
+            "customer": "Customer",
+            "partner": "Partner", 
+            "supplier": "Supplier",
+            "regulator": "Regulator"
+        }
+        
+        to_agent = stakeholder_mapping.get(stakeholder_type.lower())
+        if not to_agent:
+            self.logger.error(f"Unknown stakeholder type: {stakeholder_type}")
+            return None
+        
+        # Determine appropriate conversation type
+        conversation_type_mapping = {
+            "customer": "customer_enrollment_ext",
+            "partner": "partner_enrollment_ext",
+            "supplier": "supplier_procurement",
+            "regulator": "regulator_boundary"
+        }
+        
+        conv_type = conversation_type_mapping.get(stakeholder_type.lower(), "customer_enrollment_ext")
+        
+        return await self.initiate_a2a_communication(
+            from_agent=from_agent,
+            to_agent=to_agent,
+            conversation_type=conv_type,
+            message=message,
+            context={
+                "stakeholder_type": stakeholder_type,
+                "external_communication": True
+            }
+        )
     
     async def shutdown(self):
         """Graceful shutdown of Business Infinity"""

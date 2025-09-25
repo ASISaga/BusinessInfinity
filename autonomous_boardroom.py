@@ -28,6 +28,11 @@ try:
 except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available")
+    
+    # Create fallback AOSConfig for type annotations
+    class AOSConfig:
+        def __init__(self):
+            pass
 
 # Import audit trail system
 from core.audit_trail import (
@@ -168,7 +173,7 @@ class AutonomousBoardroom:
     """
     
     def __init__(self, aos_config: AOSConfig = None):
-        self.config = aos_config or default_config
+        self.config = aos_config or (default_config if AOS_AVAILABLE else AOSConfig())
         self.logger = logging.getLogger(__name__)
         
         # Initialize audit trail manager
@@ -231,6 +236,15 @@ class AutonomousBoardroom:
                 self.lora_manager = LoRAManager()
                 await self.lora_manager.initialize()
                 self.logger.info("FineTunedLLM LoRA Manager initialized")
+            
+            # Initialize Conversation System
+            try:
+                from conversations.boardroom_conversations import get_conversation_manager
+                self.conversation_manager = get_conversation_manager()
+                self.logger.info("Boardroom Conversation System initialized")
+            except ImportError as e:
+                self.logger.warning(f"Failed to initialize conversation system: {e}")
+                self.conversation_manager = None
             
             # Initialize local adapter system
             if LOCAL_ADAPTER_SYSTEM_AVAILABLE:
@@ -1373,6 +1387,152 @@ class AutonomousBoardroom:
         except Exception as e:
             self.logger.error(f"Failed to determine decision status: {e}")
             return "error"
+    
+    # === Conversation System Integration ===
+    
+    async def create_boardroom_conversation(self, conversation_type: str, champion_role: str, 
+                                          title: str, content: str, context: Dict[str, Any] = None) -> str:
+        """Create a new boardroom conversation"""
+        if not self.conversation_manager:
+            self.logger.error("Conversation system not available")
+            return None
+            
+        try:
+            from conversations.conversation_system import ConversationType, ConversationRole
+            
+            # Map string parameters to enums
+            conv_type = ConversationType(conversation_type)
+            champion = ConversationRole(champion_role)
+            
+            conversation_id = await self.conversation_manager.create_conversation(
+                conversation_type=conv_type,
+                champion=champion,
+                title=title,
+                content=content,
+                context=context or {}
+            )
+            
+            # Log conversation creation
+            self.audit_manager.log_event(
+                event_type=AuditEventType.CONVERSATION_CREATED,
+                subject_id=conversation_id,
+                subject_type="conversation",
+                action=f"Created {conversation_type} conversation",
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "conversation_type": conversation_type,
+                    "champion": champion_role,
+                    "title": title
+                },
+                compliance_tags={"governance", "conversation_management"}
+            )
+            
+            return conversation_id
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create boardroom conversation: {e}")
+            return None
+    
+    async def initiate_a2a_communication(self, from_agent: str, to_agent: str, 
+                                       conversation_type: str, message: str, 
+                                       context: Dict[str, Any] = None) -> str:
+        """Initiate Agent-to-Agent communication"""
+        if not self.conversation_manager:
+            self.logger.error("Conversation system not available")
+            return None
+            
+        try:
+            from conversations.conversation_system import ConversationType, ConversationRole
+            
+            from_role = ConversationRole(from_agent)
+            to_role = ConversationRole(to_agent)
+            conv_type = ConversationType(conversation_type)
+            
+            conversation_id = await self.conversation_manager.create_a2a_communication(
+                from_agent=from_role,
+                to_agent=to_role,
+                conversation_type=conv_type,
+                message_content=message,
+                context=context or {}
+            )
+            
+            # Log A2A communication
+            self.audit_manager.log_event(
+                event_type=AuditEventType.A2A_COMMUNICATION,
+                subject_id=conversation_id,
+                subject_type="a2a_conversation",
+                action=f"A2A communication: {from_agent} → {to_agent}",
+                severity=AuditSeverity.MEDIUM,
+                context={
+                    "from_agent": from_agent,
+                    "to_agent": to_agent,
+                    "conversation_type": conversation_type,
+                    "is_external": to_agent in ["Customer", "Partner", "Supplier", "Regulator"]
+                },
+                compliance_tags={"governance", "a2a_communication"}
+            )
+            
+            return conversation_id
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initiate A2A communication: {e}")
+            return None
+    
+    async def get_agent_conversations(self, agent_role: str) -> Dict[str, Any]:
+        """Get conversations for a specific agent"""
+        if not self.conversation_manager:
+            return {"error": "Conversation system not available"}
+            
+        try:
+            from conversations.conversation_system import ConversationRole
+            
+            role = ConversationRole(agent_role)
+            conversations = await self.conversation_manager.list_conversations_by_agent(role)
+            
+            # Convert conversations to serializable format
+            result = {}
+            for category, conv_list in conversations.items():
+                result[category] = [conv.to_dict() for conv in conv_list]
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get agent conversations for {agent_role}: {e}")
+            return {"error": str(e)}
+    
+    async def sign_conversation(self, conversation_id: str, signer_role: str, signer_name: str) -> bool:
+        """Sign a conversation"""
+        if not self.conversation_manager:
+            self.logger.error("Conversation system not available")
+            return False
+            
+        try:
+            from conversations.conversation_system import ConversationRole
+            
+            role = ConversationRole(signer_role)
+            success = await self.conversation_manager.sign_conversation(conversation_id, role, signer_name)
+            
+            if success:
+                # Log conversation signature
+                self.audit_manager.log_event(
+                    event_type=AuditEventType.CONVERSATION_SIGNED,
+                    subject_id=conversation_id,
+                    subject_type="conversation",
+                    action=f"Conversation signed by {signer_name}[{signer_role}]",
+                    severity=AuditSeverity.MEDIUM,
+                    context={
+                        "signer_role": signer_role,
+                        "signer_name": signer_name,
+                        "conversation_id": conversation_id
+                    },
+                    compliance_tags={"governance", "conversation_signature"}
+                )
+            
+            return success
+            
+        except Exception as e:
+            self.logger.error(f"Failed to sign conversation {conversation_id}: {e}")
+            return False
 
 
 # Factory function
