@@ -49,6 +49,13 @@ class AuditEventType(Enum):
     BUSINESS_DATA_ACCESS = "business_data_access"
     BUSINESS_CONFIGURATION = "business_configuration"
     
+    # Conversation events
+    CONVERSATION_CREATED = "conversation_created"
+    CONVERSATION_SIGNED = "conversation_signed"
+    A2A_COMMUNICATION = "a2a_communication"
+    CONVERSATION_FLAGGED = "conversation_flagged"
+    HUMAN_GATE_REQUIRED = "human_gate_required"
+    
     # Security events
     ACCESS_GRANTED = "access_granted"
     ACCESS_DENIED = "access_denied"
