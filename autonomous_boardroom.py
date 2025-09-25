@@ -240,8 +240,12 @@ class AutonomousBoardroom:
             # Initialize Conversation System
             try:
                 from conversations.boardroom_conversations import get_conversation_manager
-                self.conversation_manager = get_conversation_manager()
-                self.logger.info("Boardroom Conversation System initialized")
+                from core.features.storage import UnifiedStorageManager
+                
+                # Initialize storage manager for conversations
+                storage_manager = UnifiedStorageManager()
+                self.conversation_manager = get_conversation_manager(storage_manager)
+                self.logger.info("Boardroom Conversation System initialized with Azure Table Storage")
             except ImportError as e:
                 self.logger.warning(f"Failed to initialize conversation system: {e}")
                 self.conversation_manager = None
