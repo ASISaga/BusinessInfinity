@@ -1,28 +1,51 @@
-# Business Infinity - AOS-Based Business Application
+# Business Infinity - Enterprise Business Application (Refactored)
 
-Business Infinity is a comprehensive business application built on top of the Agent Operating System (AOS) from RealmOfAgents. It provides strategic decision-making, operational execution, and growth management capabilities through AI-powered C-Suite agents, Founder, and Investor agents.
+Business Infinity is a comprehensive enterprise business application built on top of the Agent Operating System (AOS) from RealmOfAgents. It provides strategic decision-making, operational execution, and growth management capabilities through AI-powered C-Suite agents, Founder, and Investor agents.
 
-## Architecture Overview
+## Refactored Architecture Overview
 
 ```
-Business Infinity (Business Application Layer)
-├── business_infinity.py          # Main Business Infinity application
-├── business_agents.py           # Business-specific agent implementations
-├── function_app.py              # Azure Functions HTTP API
-├── core/                        # Core integration modules
-│   ├── agents.py               # Unified agent management
-│   └── utils.py                # Utility functions
-└── mvp_agents.py               # Fallback MVP implementations
+┌─────────────────────────────────────────────────────────────┐
+│                    Business Infinity (BI)                  │
+│                   Business Application Layer                │
+├─────────────────────────────────────────────────────────────┤
+│  • Business logic and workflows                           │
+│  • Business-specific agents (CEO, CFO, CTO, etc.)         │
+│  • Business analytics and KPIs                            │
+│  • Strategic decision-making processes                    │
+│  • Business workflow orchestration                        │
+│  • External business system integrations                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              │ depends on
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│               Agent Operating System (AOS)                 │
+│                  Infrastructure Layer                       │
+├─────────────────────────────────────────────────────────────┤
+│  • Agent lifecycle management                             │
+│  • Message bus and communication                          │
+│  • Storage and persistence                                │
+│  • Environment and configuration                          │
+│  • Authentication and security                            │
+│  • ML pipeline and model management                       │
+│  • MCP server integrations                                │
+│  • System monitoring and telemetry                        │
+│  • Base agent classes (LeadershipAgent, BaseAgent)        │
+└─────────────────────────────────────────────────────────────┘
+```
 
-Agent Operating System (AOS Foundation)
-├── RealmOfAgents/AgentOperatingSystem/
-│   ├── aos_core.py             # Core AOS kernel
-│   ├── AgentOperatingSystem.py # Main AOS entry point
-│   ├── config.py               # Configuration management
-│   ├── messaging.py            # Message bus infrastructure
-│   ├── orchestration.py        # Workflow orchestration
-│   ├── storage.py              # Storage abstraction
-│   └── monitoring.py           # System monitoring
+### Clean Architecture Files
+
+```
+BusinessInfinity/
+├── business_infinity_refactored.py    # Main business application (CLEAN)
+├── business_agents_refactored.py      # Business agents extending AOS (CLEAN)
+├── business_workflows.py              # Business workflow engine (NEW)
+├── business_analytics.py              # Business analytics engine (NEW)
+├── business_infinity_core.py          # Clean module exports (NEW)
+├── function_app_refactored.py         # Clean Azure Functions API (CLEAN)
+└── REFACTORING_ARCHITECTURE.md        # Architecture documentation
 ```
 
 ## Key Components

@@ -14,13 +14,12 @@ from datetime import datetime, timedelta
 # Import AOS base classes
 try:
     from RealmOfAgents.AgentOperatingSystem.LeadershipAgent import LeadershipAgent
-    from RealmOfAgents.AgentOperatingSystem.aos_core import BaseAgent
     from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
     from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
     AOS_AGENTS_AVAILABLE = True
 except ImportError:
     # Fallback to local implementations
-    from .mvp_agents import LeadershipAgent, BaseAgent
+    from .mvp_agents import LeadershipAgent
     AOS_AGENTS_AVAILABLE = False
 
 
