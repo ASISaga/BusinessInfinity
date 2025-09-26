@@ -59,7 +59,8 @@
   "Website": {
     "businessinfinity.asisaga.com": {
       "manifest": "Website/businessinfinity.asisaga.com/manifest.json",
-  "purpose": "Modern web interface for business automation, agent management, and analytics for BusinessInfinity. In BI, this module provides the primary user interface for interacting with and visualizing agent operations.",
+      "purpose": "Modern web interface for business automation, agent management, and analytics for BusinessInfinity. In BI, this module provides the primary user interface for interacting with and visualizing agent operations.",
+      "alias": "BI-web",
       "remote": "https://github.com/ASISaga/businessinfinity.asisaga.com"
     },
     "theme.asisaga.com": {
