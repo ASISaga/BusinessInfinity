@@ -19,7 +19,7 @@ try:
     AOS_AGENTS_AVAILABLE = True
 except ImportError:
     # Fallback to local implementations
-    from .mvp_agents import LeadershipAgent
+    from RealmOfAgents.LeadershipAgent.LeadershipAgent import LeadershipAgent
     AOS_AGENTS_AVAILABLE = False
 
 

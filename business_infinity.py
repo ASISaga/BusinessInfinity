@@ -77,9 +77,12 @@ except ImportError:
     STAKEHOLDER_AGENTS_AVAILABLE = False
     logging.warning("Stakeholder agents not available, using fallback implementations")
 
+
 # Fallback imports from MVP implementation
 if not C_SUITE_AVAILABLE or not STAKEHOLDER_AGENTS_AVAILABLE:
-    from mvp_agents import LeadershipAgent, AgentManager as MVPAgentManager
+    from RealmOfAgents.LeadershipAgent.LeadershipAgent import LeadershipAgent
+    # AgentManager is now the fallback MVP manager
+    from BusinessInfinity.mvp_agents import AgentManager
 
 
 class BusinessInfinityConfig:
@@ -164,7 +167,7 @@ class BusinessInfinity:
         # Fallback MVP manager for degraded operation
         self.mvp_manager = None
         if not AOS_AVAILABLE:
-            self.mvp_manager = MVPAgentManager()
+            self.mvp_manager = AgentManager()
         
         # Initialize systems
         asyncio.create_task(self._initialize_systems())

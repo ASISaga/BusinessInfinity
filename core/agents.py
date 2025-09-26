@@ -29,7 +29,7 @@ except ImportError:
 # Fallback to MVP agents
 if not BUSINESS_INFINITY_AVAILABLE:
     try:
-        from ..mvp_agents import AgentManager as MVPAgentManager
+        from ..mvp_agents import AgentManager
         MVP_AGENTS_AVAILABLE = True
     except ImportError:
         MVP_AGENTS_AVAILABLE = False
@@ -96,10 +96,9 @@ class UnifiedAgentManager:
     def _initialize_mvp_agents(self):
         """Initialize MVP agent fallback"""
         try:
-            self.mvp_manager = MVPAgentManager()
+            self.mvp_manager = AgentManager()
             self.initialized = True
             logger.info("MVP agent system initialized successfully")
-            
         except Exception as e:
             logger.error(f"Failed to initialize MVP agent system: {e}")
             self.initialized = False
