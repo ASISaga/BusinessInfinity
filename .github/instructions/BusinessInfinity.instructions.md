@@ -2,11 +2,11 @@
 applyTo: '**'
 ---
 
-Business Infinity is a modular application in the ASISaga workspace.
+BusinessInfinity is a modular application in the ASISaga workspace.
 - Python modules use pyproject.toml as their manifest.
 - Jekyll modules use _config.yml as their manifest.
-- The Business Infinity app runs as an API on Azure Functions (Python runtime).
-- The business-infinity-site repo is its frontend, currently Jekyll on GitHub Pages, migratable to Azure Static Web Apps.
+- The BusinessInfinity app runs as an API on Azure Functions (Python runtime).
+- The businessinfinity.asisaga.com repo is its frontend, currently Jekyll on GitHub Pages.
 - A shared theme repo provides design consistency across sites.
 - The root manifest.json is the AI-managed system map that ties modules together, encoding roles, dependencies, hosting, and interconnections.
 
