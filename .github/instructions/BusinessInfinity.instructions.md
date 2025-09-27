@@ -1,10 +1,7 @@
 ---
 applyTo: '**'
 ---
-applyTo
-Provide project context and coding guidelines that AI should follow when generating code, answering questions, or reviewing changes.
 
-AI Context and Manifest Network
 Business Infinity is a modular application in the ASISaga workspace.
 - Python modules use pyproject.toml as their manifest.
 - Jekyll modules use _config.yml as their manifest.
