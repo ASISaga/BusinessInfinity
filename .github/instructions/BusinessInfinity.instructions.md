@@ -1,36 +1,30 @@
 ---
 applyTo: '**'
 ---
+applyTo
 Provide project context and coding guidelines that AI should follow when generating code, answering questions, or reviewing changes.
 
----
-## Copilot/AI Custom Instructions
+AI Context and Manifest Network
+Business Infinity is a modular application in the ASISaga workspace.
+- Python modules use pyproject.toml as their manifest.
+- Jekyll modules use _config.yml as their manifest.
+- The Business Infinity app runs as an API on Azure Functions (Python runtime).
+- The business-infinity-site repo is its frontend, currently Jekyll on GitHub Pages, migratable to Azure Static Web Apps.
+- A shared theme repo provides design consistency across sites.
+- The root manifest.json is the AI-managed system map that ties modules together, encoding roles, dependencies, hosting, and interconnections.
 
-### AI Context and Manifest Network
-BusinessInfinity comprises of a network of modules, across the ASISaga workspace, connected via their manifest.json files. These manifests define logical relationships, dependencies, capabilities, and metadata for each module.
+Schema Enforcement
+- A JSON Schema defines the authoritative structure of manifest.json.
+- Always validate manifest.json against this schema before returning updates.
+- If required information is missing or ambiguous, ask for clarification instead of assuming.
+- You may improve prompts or outputs if it makes the manifest clearer, more consistent, or more future-proof, as long as you remain faithful to the schema and Business Infinity context.
 
-### Logical Structure of Business Infinity
-The logical structure of the Business Infinity app is defined by its `manifest.json` file. This manifest specifies:
+Guidelines
+- Roles: every module must declare one of: frontend, backend, api, library, theme.
+- Dependencies: only internal logical dependencies are listed in manifest.json; external packages remain in pyproject.toml or _config.yml.
+- Hosting: websites declare hosted_on (e.g. GitHub Pages, Azure Static Web Apps).
+- Frontends: may declare frontend_for to link explicitly to their backend/API.
 
-- The module’s metadata (such as name, version, and description).
-- Its capabilities (what features or services it provides).
-- Its dependencies (other modules or services it relies on).
-- Relationships to other modules in the ASISaga network.
-
-This structure enables Business Infinity to integrate seamlessly with other modules, ensures consistency, and allows for automated impact analysis and context-aware code suggestions, as outlined in these instructions. The `manifest.json` acts as the central configuration and relationship map for the Business Infinity module within the broader ASISaga ecosystem.
-
-### Guidelines for Copilot/AI Tools
-
-- Remote dependencies  
-  - In pyproject.toml of each cloned repository, python dependencies are declared as Git URLs (e.g. git+https://...).  
-  - This is what collaborators or CI/CD will use when they build the project fresh.
-
-- Local development overrides  
-  - On your machine, you clone those same repos into your workspace.  
-  - From the root of each repo, we run:  
-    `pip install -e .`  
-    (or with uv: uv pip install -e .)  
-  - That creates a small .pth file inside the virtual environment’s site-packages/.  
-  - Each .pth file just contains the absolute path to the local repo. That’s how Python “remembers” where to find the code.
-
----
+Python Dependencies
+- Remote: declared in pyproject.toml as Git URLs for CI/CD.
+- Local: install with pip install -e . (or uv pip install -e .) to create .pth links for development.
