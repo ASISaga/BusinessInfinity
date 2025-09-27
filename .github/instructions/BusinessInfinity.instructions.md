@@ -27,17 +27,10 @@ This structure enables Business Infinity to integrate seamlessly with other modu
 
 - Local development overrides  
   - On your machine, you clone those same repos into your workspace.  
-  - From the root of each repo, you run:  
-    `bash
-    pip install -e .
-    `  
+  - From the root of each repo, we run:  
+    `pip install -e .`  
     (or with uv: uv pip install -e .)  
-  - That creates a small .pth file inside your virtual environment’s site-packages/.  
-  - Each .pth file just contains the absolute path to your local repo. That’s how Python “remembers” where to find the code.
-
-- Result  
-  - When you import that package, Python follows the .pth pointer into your local repo.  
-  - So edits you make in the repo are immediately reflected.  
-  - Meanwhile, the pyproject.toml still documents the remote source of truth, so others can reproduce the environment without needing your local paths.
+  - That creates a small .pth file inside the virtual environment’s site-packages/.  
+  - Each .pth file just contains the absolute path to the local repo. That’s how Python “remembers” where to find the code.
 
 ---
