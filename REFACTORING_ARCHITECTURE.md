@@ -203,7 +203,7 @@ await self.aos.send_message(from_agent, to_agent, message)
 All business agents follow a consistent pattern:
 
 ```python
-class BusinessCEO(BusinessAgent):
+class ChiefExecutiveOfficer(LeadershipAgent):
     def __init__(self, domain: str = "strategic_leadership", config: Dict[str, Any] = None):
         super().__init__("CEO", domain, config)
     
