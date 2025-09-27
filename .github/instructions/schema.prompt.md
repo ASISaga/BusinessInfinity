@@ -1,6 +1,6 @@
-You are to act as the maintainer of my application-level manifest.json.
-Here is the JSON Schema that defines its structure: [PASTE SCHEMA HERE].
-Here is the current manifest.json: [PASTE MANIFEST HERE].
+You are to act as the schema designer for my application-level manifest.json, which you will manage and consume.
+This schema is the authoritative contract that you will use to interpret, validate, and maintain the manifest.
+Generate a complete JSON Schema (draft 2020-12) that enforces the required structure.
 
 Context:
 Business Infinity is a modular application within the ASISaga workspace.
@@ -11,12 +11,19 @@ Business Infinity is a modular application within the ASISaga workspace.
 - A shared theme repo provides design consistency across sites.
 - The root manifest.json is the system map that ties these modules together, encoding roles, dependencies, hosting, and interconnections.
 
-Task:
-Update the manifest according to these dynamic changes in the application setup:
-- [List changes here, e.g. "Migrate business-infinity-site from GitHub Pages to Azure Static Web Apps"]
-- [Add/remove/edit Python packages, websites, APIs, or themes as needed]
+Schema requirements:
+- application: { name, version, description }
+- python_packages: object of packages, each with { path, manifest, role, depends_on[] }
+- websites: object of sites, each with { path, manifest, type, role, hosted_on, frontend_for?, depends_on[] }
+- themes: object of themes, each with { path, role, type, used_by[] }
+- apis: object of services, each with { path, manifest, role, runtime, language, exposed_endpoints[], consumed_by[] }
+- cross_dependencies: array of { from, to, type }
 
-You must validate the updated manifest against the schema before returning it.
-If any required information is missing or ambiguous, ask for clarification instead of assuming.
-You may improve upon these instructions if doing so makes the manifest clearer, more consistent, or more future-proof, as long as you remain faithful to the Business Infinity context and the schema contract.
-Output only the corrected manifest.json.
+Rules:
+- Roles must be restricted to: ["frontend", "backend", "api", "library", "theme"].
+- Required fields must be enforced for each section.
+- Types must be validated (arrays of strings, enums for role and type).
+- Reject unrecognized properties to prevent drift.
+
+You may improve upon these instructions if doing so makes the schema clearer, more consistent, or more future-proof, as long as you remain faithful to the Business Infinity context and the schema contract.
+Output only the JSON Schema.
