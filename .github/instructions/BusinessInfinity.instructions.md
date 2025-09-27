@@ -14,7 +14,7 @@ Schema Enforcement
 - The file schema.json defines the authoritative structure of manifest.json.
 - Always validate manifest.json against this schema before returning updates.
 - If required information is missing or ambiguous, ask for clarification instead of assuming.
-- You may improve schema, if it makes the manifest clearer, more consistent, or more future-proof, as long as you remain faithful to the schema and Business Infinity context.
+- You may improve schema.json, if it makes the manifest clearer, more consistent, or more future-proof, as long as you remain faithful to the schema and BusinessInfinity context.
 
 Guidelines
 - Roles: every module must declare one of: frontend, backend, api, library, theme.
