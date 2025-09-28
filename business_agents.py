@@ -172,8 +172,6 @@ class BusinessAgent(LeadershipAgent):
                 )
 
 
-# NOTE: BusinessCEO has been removed. Use ChiefExecutiveOfficer from Boardroom.C-Suite.CEO.ChiefExecutiveOfficer instead.
-
 
 class BusinessCTO(BusinessAgent):
     """

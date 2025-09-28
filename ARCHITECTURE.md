@@ -65,7 +65,7 @@ from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import trigger_lora_trai
 
 ### Business-Specific Implementations
 ```python
-from business_agents import BusinessAgent, BusinessCEO, BusinessCFO
+from business_agents import BusinessAgent, ChiefExecutiveOfficer, BusinessCFO
 from autonomous_boardroom import AutonomousBoardroom
 from core.mentor_mode import MentorMode  # Business-specific mentor mode
 ```

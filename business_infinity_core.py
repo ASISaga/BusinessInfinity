@@ -14,7 +14,7 @@ from .business_infinity_refactored import (
 
 from .business_agents_refactored import (
     BusinessAgent,
-    BusinessCEO,
+    ChiefExecutiveOfficer,
     BusinessCFO, 
     BusinessCTO,
     BusinessFounder,
@@ -34,7 +34,7 @@ __all__ = [
     
     # Business Agents
     "BusinessAgent",
-    "BusinessCEO",
+    "ChiefExecutiveOfficer",
     "BusinessCFO",
     "BusinessCTO", 
     "BusinessFounder",

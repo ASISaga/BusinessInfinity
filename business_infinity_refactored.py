@@ -30,7 +30,7 @@ from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceB
 
 # Business-specific imports
 from .business_agents import (
-    BusinessCEO, BusinessCFO, BusinessCTO, 
+    ChiefExecutiveOfficer, BusinessCFO, BusinessCTO, 
     BusinessFounder, BusinessInvestor
 )
 from .business_workflows import BusinessWorkflowEngine
@@ -201,7 +201,7 @@ class BusinessInfinity:
             }
             
             # C-Suite agents
-            self.business_agents["ceo"] = BusinessCEO(
+            self.business_agents["ceo"] = ChiefExecutiveOfficer(
                 domain="strategic_leadership",
                 config=agents_config
             )

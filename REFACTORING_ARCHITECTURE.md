@@ -105,7 +105,7 @@ from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageMan
 from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
 
 # Business-specific components only
-from .business_agents_refactored import BusinessCEO, BusinessCFO, BusinessCTO
+from .business_agents_refactored import ChiefExecutiveOfficer, BusinessCFO, BusinessCTO
 from .business_workflows import BusinessWorkflowEngine
 from .business_analytics import BusinessAnalyticsEngine
 ```
@@ -332,7 +332,7 @@ performance = await business_infinity.analytics_engine.generate_performance_repo
 3. **Agent Usage**: Agents have same interface but cleaner implementation
    ```python
    # Same usage pattern, but now properly extends AOS LeadershipAgent
-   ceo = BusinessCEO(domain="strategic_leadership", config=config)
+   ceo = ChiefExecutiveOfficer(domain="strategic_leadership", config=config)
    ```
 
 ### Testing

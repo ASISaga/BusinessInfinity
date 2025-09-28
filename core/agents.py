@@ -16,7 +16,7 @@ from typing import Dict, Any, List, Optional, Union
 try:
     from ..business_infinity import BusinessInfinity, BusinessInfinityConfig, get_business_infinity
     from ..business_agents import (
-        BusinessCEO, BusinessCFO, BusinessCTO, 
+        ChiefExecutiveOfficer, BusinessCFO, BusinessCTO, 
         BusinessFounder, BusinessInvestor,
         create_ceo, create_cfo, create_cto, 
         create_founder, create_investor

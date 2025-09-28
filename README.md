@@ -64,7 +64,7 @@ The main business application that orchestrates all business operations:
 
 Specialized business agents built on AOS foundation:
 
-- **BusinessCEO**: Strategic leadership and vision
+- **ChiefExecutiveOfficer**: Strategic leadership and vision
 - **BusinessCFO**: Financial leadership and analysis  
 - **BusinessCTO**: Technology leadership and innovation
 - **BusinessFounder**: Vision, innovation, and entrepreneurial leadership
