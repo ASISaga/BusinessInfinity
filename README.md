@@ -120,6 +120,16 @@ Centralized agent management system:
 - **Version Management**: Track and compare different agent model versions
 - **Scenario Testing**: Evaluate agent performance against test cases
 
+### Trust and Compliance
+- **Data Export**: GDPR-compliant customer data export with integrity verification
+- **Data Deletion**: Right to erasure with confirmation workflow and SLA tracking
+- **RBAC Transparency**: Clear role and permission information for users
+- **Incident Response**: Comprehensive escalation paths and contact information
+- **Retention Policies**: Transparent data retention and deletion policies
+- **Consent Logging**: Comprehensive tracking of user consent with audit trail
+- **Customer Isolation**: Strict partition-based data segregation
+- **Audit Trail**: Complete compliance logging for all trust-related operations
+
 ### Scalable Architecture
 - Built on AOS foundation for reliability
 - Azure Functions for serverless scaling

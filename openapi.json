@@ -188,6 +188,181 @@
         "operationId": "getHealth",
         "responses": { "200": { "description": "Health status" } }
       }
+    },
+    "/api/onboarding/export-data": {
+      "get": {
+        "summary": "Export customer data",
+        "operationId": "exportCustomerData",
+        "description": "Export all data associated with the customer's partition in JSON format with integrity hash",
+        "security": [{"ApiKeyAuth": []}],
+        "parameters": [
+          { "name": "customer_id", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "x-customer-id", "in": "header", "required": true, "schema": { "type": "string" } },
+          { "name": "x-user-id", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { 
+          "200": { 
+            "description": "Customer data export with integrity hash",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "export_id": { "type": "string" },
+                    "customer_id": { "type": "string" },
+                    "export_timestamp": { "type": "string", "format": "date-time" },
+                    "data_types": { "type": "array", "items": { "type": "string" } },
+                    "data": { "type": "object" },
+                    "integrity_hash": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Customer ID and User ID required" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/onboarding/request-deletion": {
+      "post": {
+        "summary": "Request data deletion",
+        "operationId": "requestDataDeletion",
+        "description": "Request deletion of customer partition data with confirmation step",
+        "security": [{"ApiKeyAuth": []}],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": { "type": "string" },
+                  "confirm": { "type": "boolean", "default": false },
+                  "request_id": { "type": "string", "description": "Required for confirmation step" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deletion request response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "request_id": { "type": "string" },
+                    "status": { "type": "string", "enum": ["pending_confirmation", "confirmed"] },
+                    "sla_days": { "type": "number" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/onboarding/rbac": {
+      "get": {
+        "summary": "Get RBAC information",
+        "operationId": "getRbacInfo",
+        "description": "Get current user's roles, permissions, and governance defaults",
+        "security": [{"ApiKeyAuth": []}],
+        "parameters": [
+          { "name": "customer_id", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "x-customer-id", "in": "header", "required": true, "schema": { "type": "string" } },
+          { "name": "x-user-id", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "User RBAC information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": { "type": "string" },
+                    "customer_id": { "type": "string" },
+                    "role": { "type": "string" },
+                    "permissions": { "type": "array", "items": { "type": "string" } },
+                    "restrictions": { "type": "array", "items": { "type": "string" } },
+                    "governance_defaults": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/onboarding/incident-contact": {
+      "get": {
+        "summary": "Get incident contact information",
+        "operationId": "getIncidentContactInfo",
+        "description": "Get incident response and escalation contact information",
+        "security": [{"ApiKeyAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Incident response contact information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "incident_response": {
+                      "type": "object",
+                      "properties": {
+                        "primary_contact": { "type": "object" },
+                        "escalation_path": { "type": "array", "items": { "type": "object" } }
+                      }
+                    },
+                    "breach_notification": { "type": "object" },
+                    "compliance_officer": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/onboarding/retention-policy": {
+      "get": {
+        "summary": "Get retention policy",
+        "operationId": "getRetentionPolicy",
+        "description": "Get current data retention and deletion policy information",
+        "security": [{"ApiKeyAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Data retention and deletion policies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data_retention": { "type": "object" },
+                    "deletion_policies": { "type": "object" },
+                    "backup_policy": { "type": "object" },
+                    "gdpr_compliance": { "type": "object" },
+                    "policy_version": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-functions-key"
+      }
     }
   }
 }
