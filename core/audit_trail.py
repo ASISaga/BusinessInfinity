@@ -59,6 +59,7 @@ class AuditEventType(Enum):
     # Security events
     ACCESS_GRANTED = "access_granted"
     ACCESS_DENIED = "access_denied"
+    ACCESS_CONTROL = "access_control"
     PERMISSION_CHANGE = "permission_change"
     
     # System events
