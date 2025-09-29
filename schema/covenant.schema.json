@@ -1,0 +1,557 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://businessinfinity.asisaga.com/schema/covenant.json",
+  "title": "Business Infinity Covenant Schema",
+  "description": "Schema for Business Infinity Covenant - a living constitution for autonomous enterprise boardrooms",
+  "type": "object",
+  "required": [
+    "covenant_version",
+    "preamble",
+    "identity",
+    "constitutional_roles",
+    "obligations",
+    "governance_protocols",
+    "provenance"
+  ],
+  "properties": {
+    "covenant_version": {
+      "type": "string",
+      "description": "Version of the covenant schema",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "default": "1.0.0"
+    },
+    "preamble": {
+      "type": "object",
+      "description": "Declaration of intent and values",
+      "required": ["mission_statement", "core_values", "declaration_of_intent"],
+      "properties": {
+        "mission_statement": {
+          "type": "string",
+          "description": "Enterprise mission statement",
+          "minLength": 50,
+          "maxLength": 1000
+        },
+        "core_values": {
+          "type": "array",
+          "description": "List of core organizational values",
+          "items": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100
+          },
+          "minItems": 3,
+          "maxItems": 10
+        },
+        "declaration_of_intent": {
+          "type": "string",
+          "description": "Declaration of intent to participate in the global boardroom network",
+          "minLength": 100,
+          "maxLength": 2000
+        },
+        "ethical_commitments": {
+          "type": "array",
+          "description": "Specific ethical commitments",
+          "items": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "description": "Verified enterprise identity details",
+      "required": [
+        "company_name",
+        "linkedin_verification",
+        "registration_details",
+        "verification_timestamp"
+      ],
+      "properties": {
+        "company_name": {
+          "type": "string",
+          "description": "Official company name",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "linkedin_verification": {
+          "type": "object",
+          "description": "LinkedIn verification details",
+          "required": ["company_url", "verification_status", "verified_at"],
+          "properties": {
+            "company_url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://www\\.linkedin\\.com/company/.*"
+            },
+            "verification_status": {
+              "type": "string",
+              "enum": ["verified", "pending", "expired", "revoked", "failed"]
+            },
+            "verified_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "verification_expires": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "registration_details": {
+          "type": "object",
+          "description": "Business registration information",
+          "properties": {
+            "jurisdiction": {
+              "type": "string",
+              "description": "Legal jurisdiction of incorporation"
+            },
+            "registration_number": {
+              "type": "string",
+              "description": "Business registration number"
+            },
+            "industry": {
+              "type": "string",
+              "description": "Primary industry classification"
+            },
+            "size": {
+              "type": "string",
+              "enum": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"]
+            },
+            "location": {
+              "type": "string",
+              "description": "Primary business location"
+            }
+          }
+        },
+        "verification_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when identity was last verified"
+        }
+      }
+    },
+    "constitutional_roles": {
+      "type": "object",
+      "description": "Defined agent roles and accountabilities",
+      "required": ["boardroom_structure", "agent_definitions"],
+      "properties": {
+        "boardroom_structure": {
+          "type": "object",
+          "description": "Structure of the autonomous boardroom",
+          "properties": {
+            "c_suite": {
+              "type": "array",
+              "description": "C-Suite agents in the boardroom",
+              "items": {
+                "type": "string",
+                "enum": ["CEO", "CFO", "CTO", "COO", "CMO", "CHRO", "CSO"]
+              },
+              "minItems": 3
+            },
+            "stakeholder_agents": {
+              "type": "array",
+              "description": "Stakeholder agents",
+              "items": {
+                "type": "string",
+                "enum": ["Founder", "Investor", "Board_Member", "Advisor"]
+              }
+            }
+          }
+        },
+        "agent_definitions": {
+          "type": "object",
+          "description": "Detailed definitions for each agent role",
+          "patternProperties": {
+            "^[A-Z][A-Za-z_]*$": {
+              "type": "object",
+              "required": ["role", "domain", "responsibilities", "authorities"],
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "description": "Agent role title"
+                },
+                "domain": {
+                  "type": "string",
+                  "description": "Domain of expertise"
+                },
+                "responsibilities": {
+                  "type": "array",
+                  "description": "List of responsibilities",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "authorities": {
+                  "type": "array",
+                  "description": "Decision-making authorities",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "voting_weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Voting weight in boardroom decisions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "obligations": {
+      "type": "object",
+      "description": "Commitments to transparency, provenance, and interoperability",
+      "required": ["transparency", "provenance", "interoperability"],
+      "properties": {
+        "transparency": {
+          "type": "object",
+          "description": "Transparency commitments",
+          "properties": {
+            "decision_logging": {
+              "type": "boolean",
+              "description": "Commitment to log all boardroom decisions",
+              "default": true
+            },
+            "audit_trail": {
+              "type": "boolean",
+              "description": "Commitment to maintain immutable audit trails",
+              "default": true
+            },
+            "public_reporting": {
+              "type": "object",
+              "description": "Public reporting commitments",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "frequency": {
+                  "type": "string",
+                  "enum": ["monthly", "quarterly", "annually"]
+                }
+              }
+            }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "description": "Provenance and validation commitments",
+          "properties": {
+            "decision_provenance": {
+              "type": "boolean",
+              "description": "Commitment to maintain decision provenance",
+              "default": true
+            },
+            "schema_validation": {
+              "type": "boolean",
+              "description": "Commitment to schema validation",
+              "default": true
+            },
+            "cryptographic_signing": {
+              "type": "boolean",
+              "description": "Commitment to cryptographic signing",
+              "default": true
+            }
+          }
+        },
+        "interoperability": {
+          "type": "object",
+          "description": "Interoperability commitments",
+          "properties": {
+            "standard_protocols": {
+              "type": "boolean",
+              "description": "Commitment to use standard protocols",
+              "default": true
+            },
+            "peer_validation": {
+              "type": "boolean",
+              "description": "Commitment to participate in peer validation",
+              "default": true
+            },
+            "federation_participation": {
+              "type": "boolean",
+              "description": "Willingness to participate in federations",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "governance_protocols": {
+      "type": "object",
+      "description": "Decision-making, amendment, and dispute resolution rules",
+      "required": ["decision_making", "amendment_process"],
+      "properties": {
+        "decision_making": {
+          "type": "object",
+          "description": "Decision-making protocols",
+          "properties": {
+            "quorum_requirement": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 1.0,
+              "description": "Minimum participation required for decisions"
+            },
+            "consensus_threshold": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 1.0,
+              "description": "Threshold for consensus decisions"
+            },
+            "voting_method": {
+              "type": "string",
+              "enum": ["majority", "consensus", "weighted", "unanimous"],
+              "description": "Primary voting method"
+            },
+            "tie_breaking": {
+              "type": "string",
+              "enum": ["ceo_decides", "founder_decides", "random", "delay"],
+              "description": "Tie-breaking mechanism"
+            }
+          }
+        },
+        "amendment_process": {
+          "type": "object",
+          "description": "Covenant amendment process",
+          "properties": {
+            "proposal_threshold": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 1.0,
+              "description": "Threshold to propose amendments"
+            },
+            "approval_threshold": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 1.0,
+              "description": "Threshold to approve amendments"
+            },
+            "cooling_period": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365,
+              "description": "Cooling period in days before amendment takes effect"
+            },
+            "peer_notification": {
+              "type": "boolean",
+              "description": "Whether to notify peer boardrooms of amendments",
+              "default": true
+            }
+          }
+        },
+        "dispute_resolution": {
+          "type": "object",
+          "description": "Dispute resolution mechanisms",
+          "properties": {
+            "internal_arbitration": {
+              "type": "boolean",
+              "description": "Use internal arbitration for disputes",
+              "default": true
+            },
+            "external_arbitration": {
+              "type": "boolean",
+              "description": "Accept external arbitration",
+              "default": false
+            },
+            "mediation_preference": {
+              "type": "string",
+              "enum": ["internal", "peer_network", "external_professional"]
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Immutable validation records and peer acknowledgments",
+      "required": ["covenant_history", "validation_records"],
+      "properties": {
+        "covenant_history": {
+          "type": "array",
+          "description": "History of covenant versions and changes",
+          "items": {
+            "type": "object",
+            "required": ["version", "created_at", "changes"],
+            "properties": {
+              "version": {
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "changes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "approved_by": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "content_hash": {
+                "type": "string",
+                "description": "Cryptographic hash of covenant content"
+              }
+            }
+          }
+        },
+        "validation_records": {
+          "type": "array",
+          "description": "Peer validation records",
+          "items": {
+            "type": "object",
+            "required": ["validator_id", "validation_type", "validated_at"],
+            "properties": {
+              "validator_id": {
+                "type": "string",
+                "description": "ID of validating boardroom"
+              },
+              "validator_enterprise": {
+                "type": "string",
+                "description": "Name of validating enterprise"
+              },
+              "validation_type": {
+                "type": "string",
+                "enum": ["initial_validation", "amendment_validation", "periodic_review"]
+              },
+              "validated_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "validation_signature": {
+                "type": "string",
+                "description": "Cryptographic signature of validation"
+              },
+              "validation_notes": {
+                "type": "string",
+                "description": "Additional validation notes"
+              }
+            }
+          }
+        },
+        "recognition_status": {
+          "type": "object",
+          "description": "Current recognition status in the network",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["draft", "pending", "recognized", "suspended", "revoked"]
+            },
+            "recognized_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "recognition_count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of peer recognitions"
+            },
+            "bic_badge": {
+              "type": "object",
+              "description": "Business Infinity Compliant badge information",
+              "properties": {
+                "awarded": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "awarded_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "badge_level": {
+                  "type": "string",
+                  "enum": ["bronze", "silver", "gold", "platinum"]
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "federation_memberships": {
+      "type": "array",
+      "description": "Industry federations and coalitions the boardroom belongs to",
+      "items": {
+        "type": "object",
+        "required": ["federation_id", "federation_name", "joined_at"],
+        "properties": {
+          "federation_id": {
+            "type": "string",
+            "description": "Unique federation identifier"
+          },
+          "federation_name": {
+            "type": "string",
+            "description": "Human-readable federation name"
+          },
+          "federation_type": {
+            "type": "string",
+            "enum": ["industry", "geographic", "capability", "standards", "advocacy"]
+          },
+          "joined_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["member", "contributor", "board_member", "founder"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          }
+        }
+      }
+    },
+    "compliance_metadata": {
+      "type": "object",
+      "description": "Metadata for compliance tracking and validation",
+      "properties": {
+        "schema_compliance_version": {
+          "type": "string",
+          "description": "Version of schema this covenant complies with"
+        },
+        "last_validated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validation_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Compliance validation score"
+        },
+        "compliance_issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "issue_type": {
+                "type": "string",
+                "enum": ["warning", "error", "info"]
+              },
+              "message": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,20 @@
 {
   "name": "BusinessInfinity",
   "alias": "BI",
-  "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making.",
+  "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making. Enhanced with covenant-based compliance for the Global Boardroom Network.",
+  "covenant_compliance": {
+    "enabled": true,
+    "schema_version": "1.0.0",
+    "compliance_standard": "Business Infinity Compliance Standard (BIC)",
+    "features": [
+      "LinkedIn enterprise verification",
+      "Peer validation and recognition",
+      "Immutable decision provenance",
+      "Autonomous governance protocols",
+      "Global network participation",
+      "Federation membership support"
+    ]
+  },
   "Boardroom": {
     "Founder": {
       "local": "Boardroom/Founder",
@@ -158,6 +171,49 @@
       "manifest": "MCP/mcp.asisaga.com/manifest.json",
   "purpose": "Web interface and endpoint for MCP services and integrations in the ASISaga ecosystem. In BI, mcp.asisaga.com provides a unified access point for all MCP-powered business integrations.",
       "remote": "https://github.com/ASISaga/mcp.asisaga.com"
+    }
+  },
+  "GlobalBoardroomNetwork": {
+    "covenant_manager": {
+      "local": "network/covenant_manager.py",
+      "purpose": "Covenant-based compliance management system for autonomous enterprise governance. Handles covenant creation, validation, publication, peer recognition, and amendment processes according to the Business Infinity Compliance Standard.",
+      "capabilities": [
+        "covenant_creation",
+        "schema_validation", 
+        "peer_recognition",
+        "amendment_governance",
+        "compliance_badges"
+      ]
+    },
+    "verification_service": {
+      "local": "network/verification.py", 
+      "purpose": "LinkedIn enterprise verification service ensuring only verified organizations can participate in the global boardroom network. Provides cryptographic binding of enterprise identity to covenant.",
+      "capabilities": [
+        "linkedin_verification",
+        "enterprise_identity",
+        "verification_caching",
+        "employee_validation"
+      ]
+    },
+    "network_discovery": {
+      "local": "network/discovery.py",
+      "purpose": "Discovery service for the global network of autonomous boardrooms. Enables boardrooms to find peers by industry, capabilities, location, and other criteria for collaboration and federation formation.",
+      "capabilities": [
+        "boardroom_directory",
+        "peer_discovery",
+        "network_mapping",
+        "federation_support"
+      ]
+    },
+    "covenant_ledger": {
+      "local": "network/covenant_ledger.py",
+      "purpose": "Immutable ledger system for inter-boardroom agreements, contracts, and covenants. Maintains provenance and enables validation of all network transactions and governance decisions.",
+      "capabilities": [
+        "agreement_ledger",
+        "signature_validation", 
+        "provenance_tracking",
+        "dispute_resolution"
+      ]
     }
   },
   "meta": "config/meta.json",
