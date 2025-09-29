@@ -48,6 +48,9 @@ class ConversationType(Enum):
     # Technology
     TECHNICAL_DECISION = "technical_decision"
     TELEMETRY_OCCURRENCE = "telemetry_occurrence"
+    
+    # Network Communications
+    NEGOTIATION = "negotiation"
     BOUNDARY_DATA_PRIVACY = "boundary_data_privacy"
     INTEGRATION_COORDINATION = "integration_coordination"
     
@@ -93,6 +96,7 @@ class ConversationRole(Enum):
     SUPPLIER = "Supplier"
     REGULATOR = "Regulator"
     INVESTOR_NETWORK = "InvestorNetwork"
+    EXTERNAL_STAKEHOLDER = "ExternalStakeholder"
 
 
 class ConversationStatus(Enum):
