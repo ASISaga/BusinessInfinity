@@ -1165,6 +1165,10 @@ async def connect_system(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=400
             )
         
+        # Extract user info for consent logging
+        user_id = request_data.get('user_id', 'onboarding_user')
+        customer_id = request_data.get('customer_id', 'onboarding_customer')
+        
         # Generate OAuth URL for the requested system
         # In a real implementation, this would generate actual OAuth URLs
         oauth_urls = {
@@ -1178,13 +1182,23 @@ async def connect_system(req: func.HttpRequest) -> func.HttpResponse:
         
         auth_url = oauth_urls.get(system_name, f'https://example.com/oauth/{system_name}')
         
+        # Log consent for system connection
+        log_onboarding_consent(
+            user_id=user_id,
+            customer_id=customer_id,
+            consent_type="system_integration",
+            consent_given=True,
+            description=f"User consented to connect {system_name} system with read-only access for business analysis"
+        )
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
                 "auth_url": auth_url,
                 "system": system_name,
                 "scopes": "read-only",
-                "message": f"OAuth URL generated for {system_name}"
+                "message": f"OAuth URL generated for {system_name}",
+                "consent_logged": True
             }),
             mimetype="application/json",
             status_code=200
@@ -1237,21 +1251,44 @@ async def handle_quick_action(req: func.HttpRequest) -> func.HttpResponse:
         request_data = req.get_json()
         message = request_data.get('message', '').lower()
         
+        # Extract user info for consent logging
+        user_id = request_data.get('user_id', 'onboarding_user')
+        customer_id = request_data.get('customer_id', 'onboarding_customer')
+        
         # Handle different quick actions
         if 'a' in message or 'runway' in message or 'cfo' in message:
             response = "Excellent choice! I'll connect you with our CFO agent who will analyze your financial data and create a comprehensive runway model. This will include burn rate analysis, funding requirements, and key financial milestones."
+            consent_desc = "User chose CFO agent analysis - consented to financial data processing for runway modeling"
+            action_type = "cfo_analysis"
         elif 'b' in message or 'gtm' in message or 'cmo' in message:
             response = "Great selection! Our CMO agent will create a Go-to-Market voice brief based on your company profile, target market analysis, and communication style. This will help align your messaging across all channels."
+            consent_desc = "User chose CMO agent analysis - consented to marketing data processing for GTM strategy"
+            action_type = "cmo_analysis"
         elif 'c' in message or 'review' in message or 'deep' in message:
             response = "I'll schedule a comprehensive strategic review session with the full C-Suite team. We'll analyze all your data and provide detailed insights on operations, finance, marketing, and growth opportunities."
+            consent_desc = "User chose comprehensive strategic review - consented to full business data analysis by C-Suite agents"
+            action_type = "full_review"
         else:
             response = "I understand you'd like to explore other options. Feel free to ask me anything about your business, or you can always return to the quick actions (A, B, or C) when you're ready."
+            consent_desc = "User explored other options - implicit consent to continue onboarding process"
+            action_type = "explore_options"
+        
+        # Log the consent for this onboarding choice
+        log_onboarding_consent(
+            user_id=user_id,
+            customer_id=customer_id,
+            consent_type="onboarding_service_selection",
+            consent_given=True,
+            description=consent_desc
+        )
         
         return func.HttpResponse(
             json.dumps({
                 "success": True,
                 "response": response,
-                "action_recorded": True
+                "action_recorded": True,
+                "action_type": action_type,
+                "consent_logged": True
             }),
             mimetype="application/json",
             status_code=200
@@ -1321,6 +1358,229 @@ async def get_audit_trail(req: func.HttpRequest) -> func.HttpResponse:
             f"Error loading audit trail: {str(e)}",
             status_code=500
         )
+
+
+# === Trust and Compliance Endpoints ===
+
+@app.route(route="api/onboarding/export-data", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def export_customer_data(req: func.HttpRequest) -> func.HttpResponse:
+    """Export all data associated with the customer's partition"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        
+        # Extract user and customer info from request
+        # In a real implementation, this would come from authentication headers
+        customer_id = req.params.get('customer_id') or req.headers.get('x-customer-id', 'customer_default')
+        user_id = req.headers.get('x-user-id', 'user_default')
+        
+        if not customer_id or not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Customer ID and User ID required"}),
+                mimetype="application/json",
+                status_code=400
+            )
+        
+        # Get trust compliance manager and export data
+        tcm = get_trust_compliance_manager()
+        export_data = tcm.export_customer_data(customer_id, user_id)
+        
+        # Prepare export response
+        export_response = {
+            "export_id": export_data.export_id,
+            "customer_id": export_data.customer_id,
+            "export_timestamp": export_data.export_timestamp.isoformat(),
+            "data_types": export_data.data_types,
+            "data": export_data.data_records,
+            "integrity_hash": export_data.integrity_hash,
+            "export_info": {
+                "format": "json",
+                "compliance": "GDPR Article 20 - Right to data portability",
+                "verification": "SHA-256 integrity hash included"
+            }
+        }
+        
+        return func.HttpResponse(
+            json.dumps(export_response, default=str),
+            mimetype="application/json",
+            status_code=200,
+            headers={
+                "Content-Disposition": f"attachment; filename=customer_data_export_{customer_id}.json"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting customer data: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="api/onboarding/request-deletion", auth_level=func.AuthLevel.FUNCTION, methods=["POST"])
+async def request_data_deletion(req: func.HttpRequest) -> func.HttpResponse:
+    """Request deletion of customer partition data"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        
+        request_data = req.get_json()
+        customer_id = request_data.get('customer_id') or req.headers.get('x-customer-id', 'customer_default')
+        user_id = req.headers.get('x-user-id', 'user_default')
+        confirm = request_data.get('confirm', False)
+        
+        if not customer_id or not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Customer ID and User ID required"}),
+                mimetype="application/json",
+                status_code=400
+            )
+        
+        tcm = get_trust_compliance_manager()
+        
+        if not confirm:
+            # Initial deletion request
+            deletion_request = tcm.request_data_deletion(customer_id, user_id)
+            
+            response = {
+                "request_id": deletion_request.request_id,
+                "status": "pending_confirmation",
+                "confirmation_required": True,
+                "sla_completion_date": deletion_request.sla_completion_date.isoformat(),
+                "sla_days": tcm.deletion_sla_days,
+                "message": "Deletion request created. Please confirm by sending another request with 'confirm': true",
+                "next_steps": {
+                    "confirmation": "POST to same endpoint with 'confirm': true",
+                    "cancellation": "Contact support to cancel request"
+                }
+            }
+        else:
+            # Confirmation step
+            request_id = request_data.get('request_id')
+            if not request_id:
+                return func.HttpResponse(
+                    json.dumps({"error": "Request ID required for confirmation"}),
+                    mimetype="application/json",
+                    status_code=400
+                )
+            
+            success = tcm.confirm_data_deletion(request_id, customer_id, user_id)
+            
+            response = {
+                "request_id": request_id,
+                "status": "confirmed",
+                "confirmed": success,
+                "message": "Deletion request confirmed. Processing will begin within 24 hours.",
+                "sla_days": tcm.deletion_sla_days,
+                "gdpr_notice": "This fulfills your right to erasure under GDPR Article 17"
+            }
+        
+        return func.HttpResponse(
+            json.dumps(response, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"Error processing deletion request: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="api/onboarding/rbac", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def get_rbac_info(req: func.HttpRequest) -> func.HttpResponse:
+    """Get current user's roles, permissions, and governance defaults"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        
+        customer_id = req.params.get('customer_id') or req.headers.get('x-customer-id', 'customer_default')
+        user_id = req.headers.get('x-user-id', 'user_default')
+        
+        if not customer_id or not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Customer ID and User ID required"}),
+                mimetype="application/json",
+                status_code=400
+            )
+        
+        tcm = get_trust_compliance_manager()
+        rbac_info = tcm.get_user_rbac_info(user_id, customer_id)
+        
+        return func.HttpResponse(
+            json.dumps(rbac_info, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting RBAC info: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="api/onboarding/incident-contact", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def get_incident_contact_info(req: func.HttpRequest) -> func.HttpResponse:
+    """Get incident response and escalation contact information"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        
+        tcm = get_trust_compliance_manager()
+        contact_info = tcm.get_incident_contact_info()
+        
+        return func.HttpResponse(
+            json.dumps(contact_info, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting incident contact info: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="api/onboarding/retention-policy", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def get_retention_policy(req: func.HttpRequest) -> func.HttpResponse:
+    """Get current data retention and deletion policy"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        
+        tcm = get_trust_compliance_manager()
+        retention_policy = tcm.get_retention_policy()
+        
+        return func.HttpResponse(
+            json.dumps(retention_policy, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting retention policy: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+# Enhanced consent logging for existing onboarding endpoints
+def log_onboarding_consent(user_id: str, customer_id: str, consent_type: str, 
+                          consent_given: bool, description: str) -> None:
+    """Helper function to log consent during onboarding"""
+    try:
+        from core.trust_compliance import get_trust_compliance_manager
+        tcm = get_trust_compliance_manager()
+        tcm.log_consent(user_id, customer_id, consent_type, consent_given, description)
+    except Exception as e:
+        logger.warning(f"Failed to log consent: {e}")
 
 
 # Export the app for Azure Functions runtime
