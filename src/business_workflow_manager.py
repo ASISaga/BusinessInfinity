@@ -5,12 +5,25 @@ from datetime import datetime
 from typing import Dict, Any
 import logging
 
-class BusinessWorkflowManager:
-    def __init__(self, aos=None, logger=None):
-        self.aos = aos
-        self.logger = logger or logging.getLogger(__name__)
 
-    async def execute_business_workflow(self, workflow_name: str, workflow_params: Dict[str, Any]) -> str:
+class BusinessWorkflowManager:
+    def __init__(self, config, logger=None):
+        self.config = config
+        self.logger = logger or logging.getLogger(__name__)
+        self.aos = None
+
+    async def initialize(self):
+        # Example: set up workflow engine, restore workflow definitions
+        self.logger.info("BusinessWorkflowManager initialized (stub)")
+
+    async def shutdown(self):
+        self.logger.info("BusinessWorkflowManager shutdown")
+
+    async def make_strategic_decision(self, decision_context):
+        # Stub: delegate to workflow logic
+        return await self.execute_business_workflow("strategic_decision", decision_context)
+
+    async def execute_business_workflow(self, workflow_name: str, workflow_params: Dict[str, Any]) -> Any:
         try:
             if self.aos:
                 workflow_definition = self._get_business_workflow_definition(workflow_name, workflow_params)
@@ -18,7 +31,7 @@ class BusinessWorkflowManager:
             return await self._execute_fallback_workflow(workflow_name, workflow_params)
         except Exception as e:
             self.logger.error(f"Error executing business workflow {workflow_name}: {e}")
-            return f"error_{datetime.now().timestamp()}"
+            return {"error": str(e)}
 
     def _get_business_workflow_definition(self, workflow_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
         workflows = {

@@ -4,13 +4,47 @@ BusinessAgentManager - Handles agent management for Business Infinity
 from typing import Dict, Any, List, Optional
 import logging
 
+
 class BusinessAgentManager:
-    def __init__(self, c_suite, founder, investor, mvp_manager=None):
-        self.c_suite = c_suite
-        self.founder = founder
-        self.investor = investor
-        self.mvp_manager = mvp_manager
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, config, logger=None):
+        self.config = config
+        self.logger = logger or logging.getLogger(__name__)
+        self.c_suite = {}
+        self.founder = None
+        self.investor = None
+        self.mvp_manager = None
+        self.business_context = {
+            "company_name": getattr(config, "company_name", "Business Infinity Corp"),
+            "industry": getattr(config, "industry", "Technology"),
+            "stage": getattr(config, "business_stage", "growth"),
+            "market_focus": getattr(config, "market_focus", "global"),
+            "initialized_at": None,
+            "status": "initializing"
+        }
+
+    async def initialize(self):
+        # Initialize agents here (stub)
+        self.logger.info("BusinessAgentManager initialized")
+        self.business_context["status"] = "operational"
+
+    async def shutdown(self):
+        self.logger.info("BusinessAgentManager shutdown")
+
+    def get_business_context(self):
+        return self.business_context
+
+    def determine_relevant_agents(self, decision_context):
+        decision_type = decision_context.get("type", "general")
+        if decision_type in ["funding", "investment", "valuation"]:
+            return ["cfo", "founder", "investor"]
+        elif decision_type in ["product", "technology", "innovation"]:
+            return ["ceo", "cto", "founder"]
+        elif decision_type in ["strategy", "vision", "market"]:
+            return ["ceo", "founder", "investor"]
+        elif decision_type in ["operations", "finance", "resources"]:
+            return ["ceo", "cfo", "cto"]
+        else:
+            return ["ceo", "cfo", "cto"]
 
     def get_agent(self, role: str):
         if role in self.c_suite:

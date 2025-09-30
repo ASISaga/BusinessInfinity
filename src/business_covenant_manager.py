@@ -4,18 +4,30 @@ BusinessCovenantManager - Handles covenant and network management for Business I
 import logging
 from typing import Dict, Any, Optional, List
 
+
 class BusinessCovenantManager:
-    def __init__(self, config, verification_service, covenant_manager, network_discovery, logger=None):
+    def __init__(self, config, logger=None):
         self.config = config
-        self.verification_service = verification_service
-        self.covenant_manager = covenant_manager
-        self.network_discovery = network_discovery
         self.logger = logger or logging.getLogger(__name__)
         self.covenant_id = None
         self.covenant_status = "not_created"
+        self.covenant_manager = None
+        self.verification_service = None
+        self.network_discovery = None
+
+    async def initialize(self):
+        # Restore covenant, verification, and network discovery services if available
+        self.logger.info("BusinessCovenantManager initializing...")
+        self.covenant_manager = getattr(self.config, "covenant_manager", None)
+        self.verification_service = getattr(self.config, "verification_service", None)
+        self.network_discovery = getattr(self.config, "network_discovery", None)
+        self.covenant_id = None
+        self.covenant_status = "not_created"
+        await self.initialize_covenant()
+        self.logger.info("BusinessCovenantManager initialized")
 
     async def initialize_covenant(self):
-        if not self.config.enable_covenant_compliance or not self.covenant_manager:
+        if not getattr(self.config, "enable_covenant_compliance", True) or not self.covenant_manager:
             self.logger.info("Covenant compliance disabled, skipping covenant initialization")
             return
         covenant_id = await self._load_existing_covenant()
@@ -23,7 +35,7 @@ class BusinessCovenantManager:
             self.covenant_id = covenant_id
             self.covenant_status = await self.covenant_manager.get_covenant_status(covenant_id)
             self.logger.info(f"Loaded existing covenant: {covenant_id} (status: {self.covenant_status})")
-        elif self.config.linkedin_company_url:
+        elif getattr(self.config, "linkedin_company_url", None):
             covenant_id = await self._create_enterprise_covenant()
             if covenant_id:
                 self.covenant_id = covenant_id
@@ -31,6 +43,33 @@ class BusinessCovenantManager:
                 self.logger.info(f"Created new covenant: {covenant_id}")
         else:
             self.logger.warning("No LinkedIn company URL provided, covenant creation skipped")
+
+    async def shutdown(self):
+        self.logger.info("BusinessCovenantManager shutdown")
+
+    async def publish_covenant(self) -> bool:
+        self.logger.info("Stub: publish_covenant")
+        return True
+
+    async def get_covenant_status(self) -> Dict[str, Any]:
+        self.logger.info("Stub: get_covenant_status")
+        return {"covenant_exists": False, "status": "not_created"}
+
+    async def propose_covenant_amendment(self, changes: Dict[str, Any], rationale: str, proposer_agent: str = "ceo") -> Optional[str]:
+        self.logger.info("Stub: propose_covenant_amendment")
+        return None
+
+    async def vote_on_amendment(self, amendment_id: str, agent_id: str, vote: str, rationale: str = None) -> bool:
+        self.logger.info("Stub: vote_on_amendment")
+        return True
+
+    async def discover_peer_boardrooms(self, criteria: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        self.logger.info("Stub: discover_peer_boardrooms")
+        return []
+
+    async def get_compliance_statistics(self) -> Dict[str, Any]:
+        self.logger.info("Stub: get_compliance_statistics")
+        return {}
 
     async def _load_existing_covenant(self) -> Optional[str]:
         return None
