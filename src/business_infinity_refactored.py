@@ -19,6 +19,60 @@ Architecture:
 - Peer Recognition: Network validation and compliance badges
 """
 
+from .business_agents_refactored import (
+    BusinessAgent,
+    ChiefExecutiveOfficer,
+    BusinessCFO, 
+    BusinessCTO,
+    BusinessFounder,
+    BusinessInvestor
+)
+from .business_workflows import BusinessWorkflowEngine, WorkflowStatus
+from .business_analytics import BusinessAnalyticsEngine, BusinessMetric, MetricType
+
+# Export main classes and functions for external use
+__all__ = [
+    # Core Business Application
+    "BusinessInfinity",
+    "BusinessInfinityConfig", 
+    "create_business_infinity",
+    "create_default_business_infinity",
+    # Business Agents
+    "BusinessAgent",
+    "ChiefExecutiveOfficer",
+    "BusinessCFO",
+    "BusinessCTO", 
+    "BusinessFounder",
+    "BusinessInvestor",
+    # Business Engines
+    "BusinessWorkflowEngine",
+    "BusinessAnalyticsEngine",
+    # Supporting Classes
+    "WorkflowStatus",
+    "BusinessMetric", 
+    "MetricType"
+]
+"""
+Business Infinity - Enterprise Business Application
+
+This module provides the main Business Infinity application built on top of the
+Agent Operating System (AOS). It focuses purely on business logic, workflows,
+and business-specific agent orchestration while leveraging AOS for all
+infrastructure needs.
+
+Enhanced with Covenant-Based Compliance for the Global Boardroom Network.
+
+Architecture:
+- BusinessInfinity: Main business application orchestrator
+- BusinessAgents: Business-specific agents extending AOS LeadershipAgent
+- Business Workflows: Strategic decision-making and operational processes
+- Business Analytics: KPIs, metrics, and performance tracking
+- Business Integration: External system connections via MCP
+- Covenant Management: Compliance and governance for global network participation
+- LinkedIn Verification: Enterprise identity verification and trust
+- Peer Recognition: Network validation and compliance badges
+"""
+
 import os
 import json
 import asyncio
