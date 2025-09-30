@@ -17,7 +17,7 @@ try:
     from ..business_infinity import BusinessInfinity, BusinessInfinityConfig, get_business_infinity
     from ..business_agents import (
         ChiefExecutiveOfficer, BusinessCFO, BusinessCTO, 
-        BusinessFounder, BusinessInvestor,
+        FounderAgent, InvestorAgent,
         create_ceo, create_cfo, create_cto, 
         create_founder, create_investor
     )

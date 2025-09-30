@@ -84,7 +84,7 @@ Leadership Agents (C-Suite, Founder, Investor)
 
 - **`business_agents.py`** - Business-specific agent implementations:
   - BusinessAgent base class extending LeadershipAgent
-  - Specialized agents: ChiefExecutiveOfficer, BusinessCFO, BusinessCTO, BusinessFounder, BusinessInvestor
+  - Specialized agents: ChiefExecutiveOfficer, BusinessCFO, BusinessCTO, FounderAgent, InvestorAgent
   - Domain-specific analysis and expertise areas
   - KPI tracking and performance metrics
   - Business context awareness and decision frameworks

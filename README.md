@@ -67,8 +67,8 @@ Specialized business agents built on AOS foundation:
 - **ChiefExecutiveOfficer**: Strategic leadership and vision
 - **BusinessCFO**: Financial leadership and analysis  
 - **BusinessCTO**: Technology leadership and innovation
-- **BusinessFounder**: Vision, innovation, and entrepreneurial leadership
-- **BusinessInvestor**: Investment analysis and funding strategy
+- **FounderAgent**: Vision, innovation, and entrepreneurial leadership
+- **InvestorAgent**: Investment analysis and funding strategy
 
 Each agent provides:
 - Domain-specific expertise and analysis

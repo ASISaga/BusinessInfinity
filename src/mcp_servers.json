@@ -1,0 +1,30 @@
+{
+  "erpnext": {
+    "name": "ERPNext MCP Server",
+    "description": "Model Context Protocol server for ERPNext operations.",
+    "endpoint": "/api/erpnext-mcp",
+    "azure_function": "erpnext_mcp.main",
+    "source": "MCP/ERPNext-MCP/erpnext_mcp/__init__.py"
+  },
+  "linkedin": {
+    "name": "LinkedIn MCP Server",
+    "description": "Model Context Protocol server for LinkedIn integration.",
+    "endpoint": "/api/mcp",
+    "azure_function": "linkedin_mcp",
+    "source": "MCP/linkedin-mcp-server/function_app.py"
+  },
+  "reddit": {
+    "name": "Reddit MCP Server",
+    "description": "Model Context Protocol server for Reddit integration.",
+    "endpoint": "/api/reddit-mcp",
+    "azure_function": "mcp_reddit.main",
+    "source": "MCP/mcp-reddit/src/mcp_reddit/__init__.py"
+  },
+  "generic": {
+    "name": "Generic MCP Server",
+    "description": "Generic MCP server (mcp.asisaga.com)",
+    "endpoint": "/api/generic-mcp",
+    "azure_function": "function_app",
+    "source": "MCP/mcp.asisaga.com/function_app.py"
+  }
+}

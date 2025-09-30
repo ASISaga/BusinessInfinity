@@ -19,14 +19,19 @@ Architecture:
 - Peer Recognition: Network validation and compliance badges
 """
 
-from .business_agents import (
-    BusinessAgent,
-    ChiefExecutiveOfficer,
-    BusinessCFO, 
-    BusinessCTO,
-    BusinessFounder,
-    BusinessInvestor
-)
+# Business-Specific Agent Implementations (merged from business_agents.py)
+"""
+Business-Specific Agent Implementations
+
+This module provides business-specific agent implementations that extend
+AOS LeadershipAgent with business intelligence and domain expertise.
+These agents integrate with Business Infinity workflows and provide
+specialized business capabilities built on AOS foundation.
+"""
+from .business_agent import BusinessAgent
+from .chief_technology_officer import ChiefTechnologyOfficer
+from .founder_agent import FounderAgent
+from .investor_agent import InvestorAgent
 from .business_workflows import BusinessWorkflowEngine, WorkflowStatus
 from .business_analytics import BusinessAnalyticsEngine, BusinessMetric, MetricType
 from .business_conversation_manager import BusinessConversationManager
@@ -41,10 +46,10 @@ __all__ = [
     # Business Agents
     "BusinessAgent",
     "ChiefExecutiveOfficer",
-    "BusinessCFO",
-    "BusinessCTO", 
-    "BusinessFounder",
-    "BusinessInvestor",
+    "ChiefFinancialOfficer",
+    "ChiefTechnologyOfficer",
+    "FounderAgent",
+    "InvestorAgent",
     # Business Engines
     "BusinessWorkflowEngine",
     "BusinessAnalyticsEngine",
@@ -115,37 +120,10 @@ class BusinessInfinity:
         self._strategic_planning_task = None
         self._performance_monitoring_task = None
         self._autonomous_boardroom_task = None
-        # MCP Servers registry (metadata and endpoints)
-        self.mcp_servers = {
-            "erpnext": {
-                "name": "ERPNext MCP Server",
-                "description": "Model Context Protocol server for ERPNext operations.",
-                "endpoint": "/api/erpnext-mcp",  # Example endpoint
-                "azure_function": "erpnext_mcp.main",
-                "source": "MCP/ERPNext-MCP/erpnext_mcp/__init__.py"
-            },
-            "linkedin": {
-                "name": "LinkedIn MCP Server",
-                "description": "Model Context Protocol server for LinkedIn integration.",
-                "endpoint": "/api/mcp",  # Example endpoint
-                "azure_function": "linkedin_mcp",
-                "source": "MCP/linkedin-mcp-server/function_app.py"
-            },
-            "reddit": {
-                "name": "Reddit MCP Server",
-                "description": "Model Context Protocol server for Reddit integration.",
-                "endpoint": "/api/reddit-mcp",  # Example endpoint
-                "azure_function": "mcp_reddit.main",
-                "source": "MCP/mcp-reddit/src/mcp_reddit/__init__.py"
-            },
-            "generic": {
-                "name": "Generic MCP Server",
-                "description": "Generic MCP server (mcp.asisaga.com)",
-                "endpoint": "/api/generic-mcp",  # Example endpoint
-                "azure_function": "function_app",
-                "source": "MCP/mcp.asisaga.com/function_app.py"
-            }
-        }
+        # MCP Servers registry (metadata and endpoints) loaded from JSON file
+        mcp_servers_path = os.path.join(os.path.dirname(__file__), "mcp_servers.json")
+        with open(mcp_servers_path, "r", encoding="utf-8") as f:
+            self.mcp_servers = json.load(f)
         self.config = config or BusinessInfinityConfig()
         self.logger = logging.getLogger(__name__)
         # Initialize AOS as the foundation
