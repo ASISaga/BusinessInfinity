@@ -1,7 +1,7 @@
 import azure.functions as func
 import json
 
-class BusinessAnalyticsEndpoint:
+class AnalyticsEndpoint:
     def __init__(self, business_infinity, business_infinity_available):
         self.business_infinity = business_infinity
         self.business_infinity_available = business_infinity_available

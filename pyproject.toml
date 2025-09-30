@@ -1,3 +1,4 @@
+
 [project]
 name = "BusinessInfinity"
 version = "0.1.0"
@@ -30,6 +31,11 @@ dependencies = [
     "opentelemetry-instrumentation-fastapi",
     "AgentOperatingSystem @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
 ]
+
+# Entry point for Azure Functions host (function_app.py moved to src/)
+[project.scripts]
+function_app = "src.function_app"
+
 
 [build-system]
 requires = ["setuptools", "wheel"]

@@ -2,14 +2,13 @@ import json
 import logging
 
 class BusinessServiceBusHandlers:
-    def __init__(self, business_infinity, business_infinity_available, logger=None):
+    def __init__(self, business_infinity, logger=None):
         self.business_infinity = business_infinity
-        self.business_infinity_available = business_infinity_available
         self.logger = logger or logging.getLogger(__name__)
 
     async def business_decision_processor(self, msg):
         try:
-            if not self.business_infinity_available or not self.business_infinity:
+            if not self.business_infinity:
                 self.logger.warning("Business decision received but Business Infinity not available")
                 return
             await self.business_infinity._initialize_task
