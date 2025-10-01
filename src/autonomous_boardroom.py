@@ -21,24 +21,40 @@ from enum import Enum
 
 # Import AOS foundation
 try:
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-    from RealmOfAgents.AgentOperatingSystem.config import AOSConfig, default_config
-    from RealmOfAgents.AgentOperatingSystem.messaging import Message, MessageBus
+    from aos.core.boardroom import AutonomousBoardroom
+    from aos.messaging.message_bus import MessageBus
+    from aos.orchestration.orchestrator import Orchestrator
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
     logging.warning("AOS not available")
     
-    # Create fallback AOSConfig for type annotations
-    class AOSConfig:
+    # Create fallbacks for type annotations
+    class AutonomousBoardroom:
+        def __init__(self):
+            pass
+    class MessageBus:
         def __init__(self):
             pass
 
-# Import audit trail system
-from core.audit_trail import (
-    AuditTrailManager, AuditEventType, AuditSeverity, 
-    audit_log, get_audit_manager
-)
+# Import audit trail system from AOS
+try:
+    from aos.monitoring.audit_trail import (
+        AuditTrailManager, AuditEventType, AuditSeverity, 
+        audit_log, get_audit_manager
+    )
+except ImportError:
+    # Fallback for development
+    class AuditTrailManager:
+        pass
+    class AuditEventType:
+        SYSTEM_STARTUP = "system_startup"
+    class AuditSeverity:
+        INFO = "info"
+    async def audit_log(*args, **kwargs):
+        pass
+    def get_audit_manager():
+        return AuditTrailManager()
 
 # Import FineTunedLLM for LoRA adapters
 try:

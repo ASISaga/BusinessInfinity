@@ -15,14 +15,18 @@ from dataclasses import dataclass, field
 from enum import Enum
 import uuid
 
-# Import existing conversation system
+# Import AOS conversation system
 try:
-    from conversations.conversation_system import ConversationRole, ConversationType
-    from conversations.boardroom_conversations import BoardroomConversationManager
+    from aos.messaging.conversation_system import ConversationRole, ConversationType, AOSConversationSystem
     CONVERSATION_SYSTEM_AVAILABLE = True
 except ImportError:
     CONVERSATION_SYSTEM_AVAILABLE = False
-    logging.warning("Conversation system not available for network protocol")
+    logging.warning("AOS conversation system not available for network protocol")
+    # Fallback classes
+    class ConversationRole:
+        pass
+    class ConversationType:
+        pass
 
 class MessageType(Enum):
     """Types of inter-boardroom messages"""
@@ -110,13 +114,13 @@ class NetworkProtocol:
         self.message_queue: List[InterBoardroomMessage] = []
         self.pending_negotiations: Dict[str, Dict[str, Any]] = {}
         
-        # Integration with existing conversation system
+        # Integration with AOS conversation system
         self.conversation_manager = None
         if CONVERSATION_SYSTEM_AVAILABLE:
             try:
-                self.conversation_manager = BoardroomConversationManager()
+                self.conversation_manager = AOSConversationSystem()
             except Exception as e:
-                self.logger.warning(f"Could not initialize conversation manager: {e}")
+                self.logger.warning(f"Could not initialize AOS conversation manager: {e}")
     
     async def join_network(self) -> bool:
         """Join the global network of boardrooms"""
