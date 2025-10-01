@@ -1,4 +1,5 @@
-
+# NOTE: This is an Azure Functions app, not a pip-installable Python package.
+# Do not add this app as a dependency in other pyproject.toml files.
 [project]
 name = "BusinessInfinity"
 version = "2.0.0"
@@ -29,7 +30,18 @@ dependencies = [
     "opentelemetry-sdk", 
     "opentelemetry-exporter-otlp-proto-grpc",
     "opentelemetry-instrumentation-fastapi",
-    "aos @ file://../../RealmOfAgents"
+    "BusinessAgent @ git+https://github.com/ASISaga/BusinessAgent.git",
+    "Founder @ git+https://github.com/ASISaga/Founder.git",
+    "Investor @ git+https://github.com/ASISaga/Investor.git",
+    "Mentor @ git+https://github.com/ASISaga/Mentor.git",
+    "CSO @ git+https://github.com/ASISaga/CSO.git",
+    "CEO @ git+https://github.com/ASISaga/CEO.git",
+    "CMO @ git+https://github.com/ASISaga/CMO.git",
+    "CFO @ git+https://github.com/ASISaga/CFO.git",
+    "COO @ git+https://github.com/ASISaga/COO.git",
+    "CHRO @ git+https://github.com/ASISaga/CHRO.git",
+    "CTO @ git+https://github.com/ASISaga/CTO.git",
+    "AgentOperatingSystem @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
 ]
 
 # Entry point for Azure Functions host (function_app.py moved to src/)
@@ -49,3 +61,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.businessinfinity]
+type = "azure-functions-app"
+note = "This project is an Azure Functions application, not a pip-installable package."
