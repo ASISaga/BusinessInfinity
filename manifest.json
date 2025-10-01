@@ -30,9 +30,16 @@
     },
     "Mentor": {
       "local": "Boardroom/Mentor",
-      "manifest": "Boardroom/Mentor/pyproject.toml",
+      "manifest": "Boardroom/Mentor/package.json",
       "purpose": "Mentor Mode: VS Code extension for unified control, fine-tuning, monitoring, and deployment of agent LoRA adapters via Azure ML and Azure Functions; enables real-time chat, training, and deployment for all boardroom agents. In BI, Mentor provides adaptive learning and model management for agent improvement and governance.",
       "remote": "https://github.com/ASISaga/Mentor.git"
+    },
+    "BusinessAgent": {
+      "local": "Boardroom/BusinessAgent",
+      "manifest": "Boardroom/BusinessAgent/pyproject.toml",
+      "purpose": "BusinessAgent is a modular Python package for the Boardroom system, providing core business agent logic and integration for the BusinessInfinity platform. In BI, BusinessAgent enables the creation, management, and orchestration of business agents within the autonomous boardroom.",
+      "remote": "https://github.com/ASISaga/BusinessAgent",
+      "role": "library"
     },
     "C-Suite": {
       "CSO": {
