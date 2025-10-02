@@ -18,9 +18,9 @@ except ImportError:
     from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
     from RealmOfAgents.AgentOperatingSystem.Agent import Agent
 
-from .ceo import ChiefExecutiveOfficer
-from .cto import ChiefTechnologyOfficer
-from .founder import FounderAgent
+from ChiefExecutiveOfficer import ChiefExecutiveOfficer
+from ChiefTechnologyOfficer import ChiefTechnologyOfficer
+from FounderAgent import FounderAgent
 from ..core.config import BusinessInfinityConfig
 
 

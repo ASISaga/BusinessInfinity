@@ -60,7 +60,7 @@ dependencies = [
 **Issue**: The `PurposeDrivenAgent.py` has duplicate `__init__` methods:
 
 ```python
-class PurposeDrivenAgent(SelfLearningAgent):
+class PurposeDrivenAgent(LeadershipAgent):
     def __init__(self, config: Optional[AgentConfig] = None, purpose: str = None, interval: int = 5):
         # First constructor
         
@@ -129,7 +129,7 @@ Buddhi/
 
 **Recommendation**: 
 ```python
-class PurposeDrivenAgent(SelfLearningAgent):
+class PurposeDrivenAgentLeadershipAgent:
     def __init__(self, 
                  config: Optional[AgentConfig] = None, 
                  purpose: str = None, 
