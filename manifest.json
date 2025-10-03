@@ -104,23 +104,18 @@
     }
   },
   "RealmOfAgents": {
-    "PossibilityDrivenAgent": {
-      "local": "RealmOfAgents/PossibilityDrivenAgent",
-      "manifest": "RealmOfAgents/PossibilityDrivenAgent/pyproject.toml",
-      "purpose": "Agent framework for creative, language-based possibility declaration; enables breakthrough solutions by creating new operational contexts beyond reactive problem-solving. In BI, PossibilityDrivenAgent empowers agents to generate novel business opportunities and strategies.",
-      "remote": "https://github.com/ASISaga/PossibilityDrivenAgent"
+    "PossibilityAgent": {
+      "local": "RealmOfAgents/PossibilityAgent",
+      "manifest": "RealmOfAgents/PossibilityAgent/pyproject.toml",
+      "purpose": "Base agent class that determines the overarching Possibility for a system or organization; foundational for all possibility-driven agent behaviors. In BI, PossibilityAgent provides the core possibility framework inherited by all business agents.",
+      "remote": "https://github.com/ASISaga/PossibilityAgent",
+      "role": "library"
     },
     "FineTunedLLM": {
       "local": "RealmOfAgents/FineTunedLLM",
       "manifest": "RealmOfAgents/FineTunedLLM/pyproject.toml",
       "purpose": "Centralized, cross-domain ML/LLM pipeline for all ASISaga modules; provides scalable, domain-specific model training, inference, and LLM-powered features using hybrid cloud architecture. In BI, FineTunedLLM delivers advanced language and learning capabilities to all business agents.",
       "remote": "https://github.com/ASISaga/FineTunedLLM"
-    },
-    "SelfLearningAgent": {
-      "local": "RealmOfAgents/SelfLearningAgent",
-      "manifest": "RealmOfAgents/SelfLearningAgent/pyproject.toml",
-      "purpose": "Multi-agent orchestration system with agent-to-agent (A2A) communication, self-learning, and unified orchestration for collaboration across domains. In BI, SelfLearningAgent enables agents to learn from each other and adapt to evolving business contexts.",
-      "remote": "https://github.com/ASISaga/SelfLearningAgent"
     },
     "PurposeDrivenAgent": {
       "local": "RealmOfAgents/PurposeDrivenAgent",
@@ -135,17 +130,19 @@
       "remote": "https://github.com/ASISaga/GitHubAgent"
     },
     "AgentOperatingSystem": {
-      "local": "RealmOfAgents/AgentOperatingSystem",
-      "manifest": "RealmOfAgents/AgentOperatingSystem/pyproject.toml",
-      "purpose": "Unified, domain-agnostic orchestration and agent management layer; provides all core agent orchestration, resource management, storage, environment, ML pipeline, MCP, and authentication features for all business and leadership agents. In BI, AOS is the foundational infrastructure enabling all agent operations, communication, and lifecycle management.",
+      "local": "AgentOperatingSystem",
+      "manifest": "AgentOperatingSystem/pyproject.toml",
+      "purpose": "Unified, domain-agnostic orchestration and agent management layer; provides all core agent orchestration, resource management, storage, environment, ML pipeline, MCP, and authentication features for all business and leadership agents. Serves as the operating system for LeadershipAgents. In BI, AOS is the foundational infrastructure enabling all agent operations, communication, and lifecycle management.",
       "remote": "https://github.com/ASISaga/AgentOperatingSystem",
-      "alias": "AOS"
+      "alias": "AOS",
+      "role": "library"
     },
     "LeadershipAgent": {
       "local": "RealmOfAgents/LeadershipAgent",
       "manifest": "RealmOfAgents/LeadershipAgent/pyproject.toml",
-      "purpose": "Base class for all business and leadership agents, ensuring consistent interface and orchestration pattern across the boardroom ecosystem. In BI, LeadershipAgent standardizes agent behavior and integration for seamless boardroom orchestration.",
-      "remote": "https://github.com/ASISaga/LeadershipAgent"
+      "purpose": "Base class for all business and leadership agents, ensuring consistent interface and orchestration pattern across the boardroom ecosystem. Inherits from PossibilityAgent. In BI, LeadershipAgent standardizes agent behavior and integration for seamless boardroom orchestration.",
+      "remote": "https://github.com/ASISaga/LeadershipAgent",
+      "role": "library"
     }
   },
   "MCP": {

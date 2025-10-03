@@ -28,7 +28,7 @@ AOS LeadershipAgent with business intelligence and domain expertise.
 These agents integrate with Business Infinity workflows and provide
 specialized business capabilities built on AOS foundation.
 """
-from .business_agent import BusinessAgent
+from BusinessAgent import BusinessAgent
 from .chief_technology_officer import ChiefTechnologyOfficer
 from .founder_agent import FounderAgent
 from .investor_agent import InvestorAgent

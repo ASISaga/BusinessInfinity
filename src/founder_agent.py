@@ -1,4 +1,4 @@
-from .business_agent import BusinessAgent
+from BusinessAgent import BusinessAgent
 from typing import Dict, Any, List
 
 class FounderAgent(BusinessAgent):

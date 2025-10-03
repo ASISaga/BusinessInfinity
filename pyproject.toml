@@ -30,6 +30,8 @@ dependencies = [
     "opentelemetry-sdk", 
     "opentelemetry-exporter-otlp-proto-grpc",
     "opentelemetry-instrumentation-fastapi",
+    "PossibilityAgent @ git+https://github.com/ASISaga/PossibilityAgent.git",
+    "LeadershipAgent @ git+https://github.com/ASISaga/LeadershipAgent.git",
     "BusinessAgent @ git+https://github.com/ASISaga/BusinessAgent.git",
     "Founder @ git+https://github.com/ASISaga/Founder.git",
     "Investor @ git+https://github.com/ASISaga/Investor.git",
