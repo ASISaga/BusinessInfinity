@@ -35,7 +35,6 @@ dependencies = [
     "BusinessAgent @ git+https://github.com/ASISaga/BusinessAgent.git",
     "Founder @ git+https://github.com/ASISaga/Founder.git",
     "Investor @ git+https://github.com/ASISaga/Investor.git",
-    "Mentor @ git+https://github.com/ASISaga/Mentor.git",
     "CSO @ git+https://github.com/ASISaga/CSO.git",
     "CEO @ git+https://github.com/ASISaga/CEO.git",
     "CMO @ git+https://github.com/ASISaga/CMO.git",

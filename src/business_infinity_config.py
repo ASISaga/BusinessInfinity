@@ -2,7 +2,7 @@
 BusinessInfinityConfig - Configuration for Business Infinity autonomous boardroom
 """
 import os
-from RealmOfAgents.AgentOperatingSystem.config import default_config, AOSConfig
+from AgentOperatingSystem.config import default_config, AOSConfig
 
 class BusinessInfinityConfig:
     def __init__(self):

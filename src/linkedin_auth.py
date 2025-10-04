@@ -2,7 +2,7 @@
 LinkedIn OAuth endpoints for BusinessInfinity
 Delegates all logic to the unified handler in AOS (RealmOfAgents/AgentOperatingSystem/aos_auth.py)
 """
-from RealmOfAgents.AgentOperatingSystem.aos_auth import auth_handler
+from AgentOperatingSystem.aos_auth import auth_handler
 
 # Azure Functions/FastAPI compatible endpoint for LinkedIn login URL
 def get_linkedin_login_url(req):

@@ -22,11 +22,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.trust_compliance import (
+from src.core.trust_compliance import (
     TrustComplianceManager, CustomerDataExport, DeletionRequest, 
     get_trust_compliance_manager
 )
-from core.audit_trail import AuditEventType, AuditSeverity
+from src.core.audit_trail import AuditEventType, AuditSeverity
 
 
 class TestTrustComplianceManager:

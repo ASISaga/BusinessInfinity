@@ -77,17 +77,20 @@ class UserAccessProfile:
 
 
 class MCPAccessControlManager:
+    def _default_config(self) -> dict:
+        """Return a minimal default config if config file is missing or invalid."""
+        return {}
     """
     Manages MCP access control with role-based permissions and progressive onboarding
     """
     
     def __init__(self, config_path: Optional[str] = None):
+        self.logger = logging.getLogger(__name__)
         self.config_path = config_path or str(Path(__file__).parent.parent / "config" / "mcp_access_control.json")
         self.config = self._load_config()
         self.user_profiles: Dict[str, UserAccessProfile] = {}
         self.boardroom_agent_profiles: Dict[str, BoardroomAgentProfile] = {}
         self.violations: List[AccessControlViolation] = []
-        self.logger = logging.getLogger(__name__)
         
         # Initialize audit trail manager
         self.audit_manager = get_audit_manager()

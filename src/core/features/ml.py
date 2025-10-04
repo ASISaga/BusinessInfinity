@@ -17,12 +17,12 @@ Example usage:
 """
 
 # Import the AOS ML pipeline manager and operations
-from RealmOfAgents.AgentOperatingSystem.MLPipelineManager import MLPipelineManager
-from RealmOfAgents.AgentOperatingSystem.ml_pipeline_ops import trigger_lora_training, run_azure_ml_pipeline, aml_infer
+from AgentOperatingSystem.MLPipelineManager import MLPipelineManager
+from AgentOperatingSystem.ml_pipeline_ops import trigger_lora_training, run_azure_ml_pipeline, aml_infer
 
 
 # Import UnifiedEnvManager from AOS
-from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
+from AgentOperatingSystem.environment import UnifiedEnvManager
 
 # Example usage in BusinessInfinity:
 # manager = MLPipelineManager()

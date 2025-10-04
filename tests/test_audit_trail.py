@@ -21,11 +21,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.audit_trail import (
+from src.core.audit_trail import (
     AuditTrailManager, AuditEventType, AuditSeverity, AuditEvent, AuditQuery,
     audit_log, get_audit_manager
 )
-from core.mcp_access_control import MCPAccessControlManager
+from src.core.mcp_access_control import MCPAccessControlManager
 
 
 class TestAuditTrailManager:

@@ -13,11 +13,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.mcp_access_control import (
+from src.core.mcp_access_control import (
     MCPAccessControlManager, AccessLevel, OnboardingStage,
     AccessControlViolation, UserAccessProfile
 )
-from core.utils import MCPAccessDeniedError
+from src.core.utils import MCPAccessDeniedError
 
 
 class TestMCPAccessControlManager:
@@ -262,7 +262,7 @@ class TestMCPAccessIntegration:
     
     def test_access_validation_function(self):
         """Test the validate_mcp_request function"""
-        from core.utils import validate_mcp_request
+        from src.core.utils import validate_mcp_request
         
         # This should work (no exception)
         try:
