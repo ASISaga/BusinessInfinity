@@ -1,15 +1,10 @@
-"""
-Tests for Business Infinity LoRA Adapter System
 
-Tests all components of the adapter system including:
-- LoRA adapter loading and orchestration
-- Self-learning system functionality
-- Model upgrade management
-- Evaluation harness metrics
-- Multi-dimensional learning system
-- Integration with autonomous boardroom
-"""
-
+# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+import sys
+from pathlib import Path
+src_path = str(Path(__file__).resolve().parent.parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 import pytest
 import asyncio
 import json

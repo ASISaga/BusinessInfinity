@@ -27,32 +27,11 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 # Import AOS from existing structure (will be updated when AOS is fully refactored)
-try:
-    # Try new AOS package structure first
-    from aos import AgentOperatingSystem
-    from aos.core.config import AOSConfig
-    from aos.storage import StorageManager
-    from aos.environment import EnvironmentManager
-except ImportError:
-    # Fall back to existing AOS structure
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-    # Create placeholder classes for now
-    class AOSConfig:
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-    
-    class StorageManager:
-        def __init__(self):
-            pass
-        async def store_data(self, path, data):
-            pass
-        async def load_data(self, path):
-            return None
-    
-    class EnvironmentManager:
-        def __init__(self):
-            pass
+
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.core.config import AOSConfig
+from AgentOperatingSystem.storage import StorageManager
+from AgentOperatingSystem.environment import EnvironmentManager
 
 from .config import BusinessInfinityConfig
 from .covenant_manager import BusinessCovenantManager

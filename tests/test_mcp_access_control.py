@@ -1,9 +1,10 @@
-"""
-Test MCP Access Control System
 
-Tests for role-based access control, progressive onboarding, and security features.
-"""
-
+# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+import sys
+from pathlib import Path
+src_path = str(Path(__file__).resolve().parent.parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 import pytest
 import json
 from datetime import datetime, timedelta

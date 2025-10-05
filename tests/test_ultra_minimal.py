@@ -4,10 +4,12 @@
 Ultra-minimal test script to verify BusinessInfinity package structure
 by creating mock AOS dependencies to avoid import errors.
 """
-
 import sys
-
-
+from pathlib import Path
+# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+src_path = str(Path(__file__).resolve().parent.parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 
 # Create proper mock classes for AOS dependencies
 class MockAgent:

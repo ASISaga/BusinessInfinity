@@ -1,13 +1,10 @@
-"""
-Test suite for the enhanced audit-driven self-learning system.
 
-Tests the new functionality added to implement the Self-Learning.md framework:
-- Episode processing and metrics calculation
-- Decision engine for focus area determination
-- Abstract context management
-- Shadow evaluation and rollback mechanisms
-"""
-
+# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+import sys
+from pathlib import Path
+src_path = str(Path(__file__).resolve().parent.parent / "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 import pytest
 import asyncio
 import json
