@@ -28,7 +28,7 @@ class TestBusinessInfinityAOSIntegration:
                 mock_boardroom.initiate_session = AsyncMock(return_value="session-001")
                 mock_create.return_value = mock_boardroom
                 
-                from business_infinity.core.business_manager import BusinessManager
+                from src.orchestration.business_manager import BusinessManager
                 bm = BusinessManager()
                 await bm.initialize()
                 
@@ -44,7 +44,7 @@ class TestBusinessInfinityAOSIntegration:
                 mock_conv.initialize = AsyncMock()
                 MockConv.return_value = mock_conv
                 
-                from business_infinity.core.business_manager import BusinessManager
+                from src.orchestration.business_manager import BusinessManager
                 bm = BusinessManager()
                 await bm.initialize()
                 
@@ -100,7 +100,7 @@ class TestBusinessInfinityAgentCollaboration:
     @pytest.fixture
     def business_manager_with_agents(self):
         """BusinessManager with multiple agents"""
-        from business_infinity.core.business_manager import BusinessManager, BusinessAgent
+        from src.orchestration.business_manager import BusinessManager, BusinessAgent
         
         bm = BusinessManager()
         
@@ -119,7 +119,7 @@ class TestBusinessInfinityAgentCollaboration:
     @pytest.mark.asyncio
     async def test_multi_agent_task_assignment(self, business_manager_with_agents):
         """Test assigning tasks to multiple agents"""
-        from business_infinity.core.business_manager import BusinessTask
+        from src.orchestration.business_manager import BusinessTask
         
         # Arrange
         tasks = [

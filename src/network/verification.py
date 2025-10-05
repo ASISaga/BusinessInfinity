@@ -15,7 +15,7 @@ import json
 
 # Import existing LinkedIn auth if available
 try:
-    from linkedin_auth import LinkedInAuth
+    from src.auth.linkedin_auth import LinkedInAuth
     LINKEDIN_AUTH_AVAILABLE = True
 except ImportError:
     LINKEDIN_AUTH_AVAILABLE = False

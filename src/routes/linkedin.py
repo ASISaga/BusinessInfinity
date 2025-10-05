@@ -8,7 +8,7 @@ class LinkedInEndpoint:
 
     async def linkedin_auth_endpoint(self, req: func.HttpRequest) -> func.HttpResponse:
         try:
-            from linkedin_auth import get_linkedin_login_url
+            from src.auth.linkedin_auth import get_linkedin_login_url
             result = get_linkedin_login_url(req)
             return func.HttpResponse(
                 json.dumps(result),

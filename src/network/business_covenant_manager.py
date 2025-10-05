@@ -169,7 +169,7 @@ class BusinessCovenantManager:
             self.logger.error("Network discovery not initialized")
             return []
         try:
-            from .network.discovery import DiscoveryCriteria, DiscoveryType
+            from .discovery import DiscoveryCriteria, DiscoveryType
             discovery_criteria = DiscoveryCriteria(
                 industry=criteria.get("industry") if criteria else self.config.industry,
                 verification_required=True,

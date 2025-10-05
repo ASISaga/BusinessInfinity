@@ -2,6 +2,9 @@
 Core Business Infinity System
 Consolidated core functionality for all features
 
+Core components for Business Infinity application including
+configuration, application orchestration, and supporting managers.
+
 This module consolidates:
 - Server functionality (FastAPI + WebSocket MCP + Static files)
 - Agent management (Operational, AML, Semantic agents)
@@ -13,6 +16,11 @@ This module consolidates:
 - Utilities and governance
 - Feature modules (Storage, ML, Environment, API)
 """
+
+from .application import BusinessInfinity, create_business_infinity, get_business_infinity, create_default_business_infinity
+from .config import BusinessInfinityConfig, create_default_config, create_production_config, create_development_config
+from .covenant_manager import BusinessCovenantManager
+from .conversation_manager import BusinessConversationManager
 
 # Import main components
 # from .server import unified_server, app as server_app
@@ -31,6 +39,22 @@ This module consolidates:
 
 # Export all major components
 __all__ = [
+    # Main Application
+    "BusinessInfinity",
+    "create_business_infinity",
+    "get_business_infinity", 
+    "create_default_business_infinity",
+    
+    # Configuration
+    "BusinessInfinityConfig",
+    "create_default_config",
+    "create_production_config",
+    "create_development_config",
+    
+    # Core Managers
+    "BusinessCovenantManager",
+    "BusinessConversationManager"
+
     # Audit trail system
     'audit_trail',
     'mcp_access_control',

@@ -123,7 +123,7 @@ async def test_business_infinity_integration():
         logger.info("\n=== Testing Business Infinity Integration ===")
         
         # Import Business Infinity
-        from business_infinity import BusinessInfinity, BusinessInfinityConfig
+        from src.tools import BusinessInfinity, BusinessInfinityConfig
         
         # Initialize Business Infinity
         config = BusinessInfinityConfig()

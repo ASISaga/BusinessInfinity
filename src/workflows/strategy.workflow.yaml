@@ -1,0 +1,37 @@
+id: workflow.strategy
+name: Strategic Onboarding Redesign
+description: >
+  Explore a business challenge from the lens of possibility, validate with finance,
+  and then reflect on the outcomes.
+
+agents:
+  - agent.possibility
+  - agent.cfo
+
+steps:
+  - id: step1
+    agent: agent.possibility
+    intent: "Explore onboarding redesign"
+    context:
+      query: "How can we reframe employee onboarding as a boardroom ritual?"
+
+  - id: step2
+    agent: agent.possibility
+    executor: reflect
+
+  - id: step3
+    agent: agent.possibility
+    executor: handoff
+    params:
+      to_agent_id: agent.cfo
+      reason: "Validate financial feasibility of proposed onboarding redesign"
+
+  - id: step4
+    agent: agent.cfo
+    intent: "Financial validation"
+    context:
+      query: "Assess cost implications and ROI of onboarding-as-ritual strategy"
+
+  - id: step5
+    agent: agent.cfo
+    executor: reflect

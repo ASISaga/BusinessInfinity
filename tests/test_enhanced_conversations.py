@@ -168,7 +168,7 @@ async def test_business_infinity_integration():
     try:
         logger.info("\n=== Testing Business Infinity Integration ===")
         
-        from business_infinity import BusinessInfinity, BusinessInfinityConfig
+        from src.tools import BusinessInfinity, BusinessInfinityConfig
         
         # Initialize Business Infinity
         config = BusinessInfinityConfig()

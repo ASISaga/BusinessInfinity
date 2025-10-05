@@ -36,7 +36,7 @@ def test_package_imports():
         print("✅ Analytics classes imported successfully")
         
         # Test main package imports
-        from business_infinity import __version__, __author__, __description__
+        from src.tools import __version__, __author__, __description__
         print(f"✅ Package metadata imported: v{__version__} by {__author__}")
         
         return True
@@ -110,7 +110,7 @@ def test_package_structure():
     
     try:
         # Test that main package imports work
-        from business_infinity import (
+        from src.tools import (
             BusinessInfinityConfig,
             BusinessAgent,
             ChiefExecutiveOfficer,
@@ -126,7 +126,7 @@ def test_package_structure():
         print("✅ All main package imports successful")
         
         # Test convenience functions exist
-        from business_infinity import (
+        from src.tools import (
             create_default_config,
             create_production_config,
             create_development_config

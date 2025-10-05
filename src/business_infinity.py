@@ -29,12 +29,12 @@ These agents integrate with Business Infinity workflows and provide
 specialized business capabilities built on AOS foundation.
 """
 from BusinessAgent import BusinessAgent
-from .chief_technology_officer import ChiefTechnologyOfficer
+from .agents.chief_technology_officer import ChiefTechnologyOfficer
 from .founder_agent import FounderAgent
 from .investor_agent import InvestorAgent
 from .business_workflows import BusinessWorkflowEngine, WorkflowStatus
 from .business_analytics import BusinessAnalyticsEngine, BusinessMetric, MetricType
-from .business_conversation_manager import BusinessConversationManager
+from .conversations.business_conversation_manager import BusinessConversationManager
 
 # Export main classes and functions for external use
 __all__ = [
@@ -93,11 +93,11 @@ from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageMan
 from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
 
 # Modular managers
-from .business_infinity_config import BusinessInfinityConfig
-from .business_agent_manager import BusinessAgentManager
+from .config.business_infinity_config import BusinessInfinityConfig
+from .agents.business_agent_manager import BusinessAgentManager
 from .business_workflow_manager import BusinessWorkflowManager
 from .business_analytics_manager import BusinessAnalyticsManager
-from .business_covenant_manager import BusinessCovenantManager
+from .network.business_covenant_manager import BusinessCovenantManager
 
 
 

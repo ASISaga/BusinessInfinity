@@ -19,7 +19,7 @@ class TestBusinessManagerInitialization:
     @pytest.fixture
     def business_manager(self):
         """Create BusinessManager instance for testing"""
-        from business_infinity.core.business_manager import BusinessManager
+        from src.orchestration.business_manager import BusinessManager
         return BusinessManager()
     
     @pytest.mark.unit
@@ -60,13 +60,13 @@ class TestAgentManagement:
     @pytest.fixture
     def business_manager(self):
         """Create BusinessManager for testing"""
-        from business_infinity.core.business_manager import BusinessManager
+        from src.orchestration.business_manager import BusinessManager
         return BusinessManager()
     
     @pytest.fixture
     def sample_agent(self):
         """Create sample business agent"""
-        from business_infinity.core.business_manager import BusinessAgent
+        from src.orchestration.business_manager import BusinessAgent
         return BusinessAgent(
             id="ceo-001",
             name="Chief Executive Officer",
@@ -117,7 +117,7 @@ class TestAgentManagement:
         business_manager.register_agent(sample_agent)
         
         # Create another agent
-        from business_infinity.core.business_manager import BusinessAgent
+        from src.orchestration.business_manager import BusinessAgent
         cfo_agent = BusinessAgent(
             id="cfo-001",
             name="Chief Financial Officer",
@@ -157,13 +157,13 @@ class TestTaskManagement:
     @pytest.fixture
     def business_manager(self):
         """Create BusinessManager for testing"""
-        from business_infinity.core.business_manager import BusinessManager
+        from src.orchestration.business_manager import BusinessManager
         return BusinessManager()
     
     @pytest.fixture
     def sample_task(self):
         """Create sample business task"""
-        from business_infinity.core.business_manager import BusinessTask
+        from src.orchestration.business_manager import BusinessTask
         return BusinessTask(
             task_id="task-001",
             agent_id="ceo-001",
@@ -197,7 +197,7 @@ class TestTaskManagement:
     @pytest.mark.parametrize("priority", ["low", "medium", "high", "critical"])
     def test_task_priorities(self, priority):
         """Test different task priority levels"""
-        from business_infinity.core.business_manager import BusinessTask
+        from src.orchestration.business_manager import BusinessTask
         
         task = BusinessTask(
             task_id=f"task-{priority}",
@@ -216,7 +216,7 @@ class TestWorkflowOrchestration:
     @pytest.fixture
     def business_manager(self):
         """Create BusinessManager for testing"""
-        from business_infinity.core.business_manager import BusinessManager
+        from src.orchestration.business_manager import BusinessManager
         return BusinessManager()
     
     @pytest.mark.asyncio
@@ -288,7 +288,7 @@ class TestBusinessManagerIntegration:
     @pytest.fixture
     def business_manager(self):
         """Create BusinessManager for testing"""
-        from business_infinity.core.business_manager import BusinessManager
+        from src.orchestration.business_manager import BusinessManager
         return BusinessManager()
     
     @pytest.mark.asyncio
@@ -322,7 +322,7 @@ class TestBusinessAgentDataClass:
     
     def test_business_agent_creation(self):
         """Test creating a BusinessAgent"""
-        from business_infinity.core.business_manager import BusinessAgent
+        from src.orchestration.business_manager import BusinessAgent
         
         agent = BusinessAgent(
             id="test-001",
@@ -344,7 +344,7 @@ class TestBusinessAgentDataClass:
     
     def test_business_agent_defaults(self):
         """Test BusinessAgent with default values"""
-        from business_infinity.core.business_manager import BusinessAgent
+        from src.orchestration.business_manager import BusinessAgent
         
         agent = BusinessAgent(
             id="minimal-001",
@@ -364,7 +364,7 @@ class TestBusinessTaskDataClass:
     
     def test_business_task_creation(self):
         """Test creating a BusinessTask"""
-        from business_infinity.core.business_manager import BusinessTask
+        from src.orchestration.business_manager import BusinessTask
         
         task = BusinessTask(
             task_id="task-test-001",
@@ -386,7 +386,7 @@ class TestBusinessTaskDataClass:
     
     def test_business_task_defaults(self):
         """Test BusinessTask with default values"""
-        from business_infinity.core.business_manager import BusinessTask
+        from src.orchestration.business_manager import BusinessTask
         
         task = BusinessTask(
             task_id="minimal-task",

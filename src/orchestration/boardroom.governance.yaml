@@ -1,0 +1,52 @@
+# boardroom.governance.yaml
+
+# --- Core governance mode ---
+decision_mode: weighted   # options: consensus | weighted | quorum
+
+# --- Voting weights (used in weighted mode) ---
+weights:
+  CEO: 3
+  Investor: 2
+  CFO: 1
+  CTO: 1
+  COO: 1
+  Founder: 1
+
+# --- Veto rules ---
+veto_roles:
+  - CEO
+  - Investor
+
+# --- Quorum rules (used in quorum mode) ---
+quorum:
+  required_roles:
+    - CEO
+    - Investor
+    - CFO
+  minimum_votes: 4   # minimum number of votes required to finalize a decision
+
+# --- Escalation rules ---
+# If decision fails (e.g., consensus not reached, quorum not met),
+# escalate to a specific role or external process.
+escalation:
+  fallback_role: CEO
+  notify_roles:
+    - Founder
+    - Investor
+  action: "Reopen discussion in next boardroom session"
+
+# --- Assignments template ---
+# Default assignment structure for decision artifacts.
+assignments:
+  default_owner: COO
+  default_due_days: 30
+  dependency_map:
+    finance: ["ERP:inventory_status", "CRM:pipeline_health"]
+    hiring: ["LinkedIn:hiring_signals"]
+
+# --- Logging & audit ---
+logging:
+  ledger_path: "decisions.ledger.jsonl"
+  format: jsonl   # options: jsonl | sqlite | api
+  include_evidence: true
+  redact_sensitive: true

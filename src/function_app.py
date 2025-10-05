@@ -1,3 +1,28 @@
+# Ensure LEGACY_AVAILABLE is always defined for status reporting
+LEGACY_AVAILABLE = False
+# =========================
+# BusinessInfinity Azure Functions App (from function_app1.py)
+# =========================
+
+# --- Imports for new business infinity structure and audit viewer ---
+import logging
+from typing import Optional
+try:
+    from src.orchestration.business_manager import create_business_manager, BusinessManager
+    from business_infinity.routes.agents1 import create_agents_api
+    from business_infinity.tools.audit_viewer1 import BusinessAuditViewer
+    BUSINESS_INFINITY_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"New BusinessInfinity structure not available: {e}")
+    BUSINESS_INFINITY_AVAILABLE = False
+
+# Import AOS components
+try:
+    from aos.monitoring.audit_trail import get_audit_manager
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+
 import logging
 import azure.functions as func
 from routes.health import HealthEndpoint
@@ -10,7 +35,7 @@ from routes.network import NetworkEndpoint
 from routes.onboarding import OnboardingEndpoint
 from routes.workflows import WorkflowsEndpoint
 from routes.analytics import AnalyticsEndpoint
-from business_infinity import BusinessInfinity, BusinessInfinityConfig
+from src.tools import BusinessInfinity, BusinessInfinityConfig
 from core.agents import UnifiedAgentManager, get_unified_manager
 from routes.business_service_bus import BusinessServiceBusHandlers
 
@@ -26,8 +51,217 @@ try:
 except ImportError:
     REFACTORED_BI_AVAILABLE = False
 
+# --- Global instances for new structure ---
+business_manager: Optional['BusinessManager'] = None
+agents_api = None
+audit_viewer = None
 
-# =========================
+async def initialize_business_infinity():
+    """Initialize BusinessInfinity system (new structure)"""
+    global business_manager, agents_api, audit_viewer
+    if not BUSINESS_INFINITY_AVAILABLE:
+        logger.warning("New BusinessInfinity structure not available")
+        return False
+    try:
+        # Initialize business manager
+        business_manager = await create_business_manager()
+        logger.info("BusinessManager initialized successfully")
+        # Initialize API endpoints
+        agents_api = create_agents_api(business_manager)
+        # Initialize audit viewer
+        if AOS_AVAILABLE:
+            audit_manager = get_audit_manager()
+            audit_viewer = BusinessAuditViewer(audit_manager)
+        logger.info("BusinessInfinity system initialized successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to initialize BusinessInfinity: {e}")
+        return False
+
+# --- Startup hook for Azure Functions (new structure) ---
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+@app.function_name("startup")
+@app.timer_trigger(schedule="0 0 0 1 1 *", arg_name="timer", run_on_startup=True)
+async def startup_function(timer: func.TimerRequest) -> None:
+    """Initialize BusinessInfinity on startup (new structure)"""
+    success = await initialize_business_infinity()
+    if success:
+        logger.info("BusinessInfinity startup completed successfully")
+    else:
+        logger.error("BusinessInfinity startup failed, running in degraded mode")
+
+# --- Health & Status Endpoints (new structure) ---
+@app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+async def health_check(req: func.HttpRequest) -> func.HttpResponse:
+    """Health check endpoint (new structure)"""
+    try:
+        status = {
+            "status": "healthy",
+            "timestamp": func.datetime.datetime.now().isoformat(),
+            "components": {
+                "business_manager": business_manager is not None,
+                "aos_integration": AOS_AVAILABLE,
+                "legacy_fallback": 'LEGACY_AVAILABLE' in globals() and LEGACY_AVAILABLE
+            }
+        }
+        if business_manager:
+            business_health = await business_manager.health_check()
+            status["business_health"] = business_health
+        return func.HttpResponse(
+            func.json.dumps(status),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        error_status = {
+            "status": "error",
+            "error": str(e),
+            "timestamp": func.datetime.datetime.now().isoformat()
+        }
+        return func.HttpResponse(
+            func.json.dumps(error_status),
+            mimetype="application/json",
+            status_code=500
+        )
+
+@app.route(route="status", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def system_status(req: func.HttpRequest) -> func.HttpResponse:
+    """Detailed system status endpoint (new structure)"""
+    try:
+        status = {
+            "business_infinity_available": BUSINESS_INFINITY_AVAILABLE,
+            "aos_available": AOS_AVAILABLE,
+            "legacy_available": 'LEGACY_AVAILABLE' in globals() and LEGACY_AVAILABLE,
+            "components_initialized": {
+                "business_manager": business_manager is not None,
+                "agents_api": agents_api is not None,
+                "audit_viewer": audit_viewer is not None
+            }
+        }
+        if business_manager:
+            business_metrics = await business_manager.get_business_metrics()
+            status["business_metrics"] = business_metrics
+        return func.HttpResponse(
+            func.json.dumps(status, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        return func.HttpResponse(
+            func.json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+# --- Agent Endpoints (new structure) ---
+@app.route(route="agents", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def list_agents(req: func.HttpRequest) -> func.HttpResponse:
+    """List all available business agents (new structure)"""
+    if agents_api:
+        return await agents_api.list_agents(req)
+    else:
+        return func.HttpResponse(
+            func.json.dumps({"error": "Agents service not available"}),
+            mimetype="application/json",
+            status_code=503
+        )
+
+@app.route(route="agents/{agent_id}", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def get_agent_details(req: func.HttpRequest) -> func.HttpResponse:
+    """Get detailed information about a specific agent (new structure)"""
+    if agents_api:
+        return await agents_api.get_agent_details(req)
+    else:
+        return func.HttpResponse(
+            func.json.dumps({"error": "Agents service not available"}),
+            mimetype="application/json",
+            status_code=503
+        )
+
+@app.route(route="agents/{agent_id}/ask", auth_level=func.AuthLevel.FUNCTION, methods=["POST"])
+async def ask_agent(req: func.HttpRequest) -> func.HttpResponse:
+    """Ask a question to a specific agent (new structure)"""
+    if agents_api:
+        return await agents_api.ask_agent(req)
+    else:
+        return func.HttpResponse(
+            func.json.dumps({"error": "Agents service not available"}),
+            mimetype="application/json",
+            status_code=503
+        )
+
+@app.route(route="agents/{agent_id}/tasks", auth_level=func.AuthLevel.FUNCTION, methods=["GET", "POST"])
+async def agent_tasks(req: func.HttpRequest) -> func.HttpResponse:
+    """Get or assign tasks for an agent (new structure)"""
+    if not agents_api:
+        return func.HttpResponse(
+            func.json.dumps({"error": "Agents service not available"}),
+            mimetype="application/json",
+            status_code=503
+        )
+    if req.method == "GET":
+        return await agents_api.get_agent_tasks(req)
+    elif req.method == "POST":
+        return await agents_api.assign_task(req)
+
+# --- Audit & Monitoring Endpoints (new structure) ---
+@app.route(route="audit/report", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def audit_report(req: func.HttpRequest) -> func.HttpResponse:
+    """Generate business audit report (new structure)"""
+    try:
+        if not audit_viewer:
+            return func.HttpResponse(
+                func.json.dumps({"error": "Audit viewer not available"}),
+                mimetype="application/json",
+                status_code=503
+            )
+        days = int(req.params.get("days", 7))
+        report = await audit_viewer.generate_business_report(days)
+        return func.HttpResponse(
+            func.json.dumps(report, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        return func.HttpResponse(
+            func.json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+@app.route(route="audit/decisions", auth_level=func.AuthLevel.FUNCTION, methods=["GET"])
+async def audit_decisions(req: func.HttpRequest) -> func.HttpResponse:
+    """Get audit trail of business decisions (new structure)"""
+    try:
+        if not audit_viewer:
+            return func.HttpResponse(
+                func.json.dumps({"error": "Audit viewer not available"}),
+                mimetype="application/json",
+                status_code=503
+            )
+        days = int(req.params.get("days", 7))
+        end_date = func.datetime.datetime.now()
+        start_date = end_date - func.datetime.timedelta(days=days)
+        decisions = await audit_viewer.view_business_decisions(start_date, end_date)
+        return func.HttpResponse(
+            func.json.dumps({
+                "decisions": decisions,
+                "period": {
+                    "start": start_date.isoformat(),
+                    "end": end_date.isoformat(),
+                    "days": days
+                },
+                "total": len(decisions)
+            }, default=str),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        return func.HttpResponse(
+            func.json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
 
 # =========================
 # Logging & Initialization
