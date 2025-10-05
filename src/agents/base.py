@@ -11,5 +11,5 @@ AOS Agent with:
 """
 
 # Imports for split classes
-from business_agent import BusinessAgent
-from message import Message, MessageType, MessagePriority
+from BusinessAgent import BusinessAgent
+from BusinessAgent.message import Message, MessageType, MessagePriority

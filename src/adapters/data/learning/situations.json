@@ -314,5 +314,84 @@
     "complexity_level": 4,
     "created_at": "2025-10-03T19:41:45.318745",
     "source": "generated"
+  },
+  {
+    "id": "sit_20251005_224048_6d84a9",
+    "title": "Financial financial Analysis",
+    "description": "Financial analysis needed for financial with complexity 2.",
+    "context": {
+      "company_stage": "growth",
+      "market_conditions": "competitive",
+      "timeline": "Q4 decision needed",
+      "stakeholders": [
+        "board",
+        "investors",
+        "employees"
+      ],
+      "complexity_factors": [
+        "multiple_stakeholders",
+        "some_uncertainty"
+      ]
+    },
+    "decision_type": "financial",
+    "target_roles": [
+      "cfo"
+    ],
+    "complexity_level": 2,
+    "created_at": "2025-10-05T22:40:48.887935",
+    "source": "generated"
+  },
+  {
+    "id": "sit_20251005_224048_254bb1",
+    "title": "Boardroom investment Decision",
+    "description": "Board decision required for investment at complexity 3.",
+    "context": {
+      "company_stage": "growth",
+      "market_conditions": "competitive",
+      "timeline": "Q4 decision needed",
+      "stakeholders": [
+        "board",
+        "investors",
+        "employees"
+      ],
+      "complexity_factors": [
+        "competing_priorities",
+        "moderate_risk"
+      ]
+    },
+    "decision_type": "investment",
+    "target_roles": [
+      "cfo"
+    ],
+    "complexity_level": 3,
+    "created_at": "2025-10-05T22:40:48.904651",
+    "source": "generated"
+  },
+  {
+    "id": "sit_20251005_224048_b02931",
+    "title": "Boardroom operational Decision",
+    "description": "Board decision required for operational at complexity 4.",
+    "context": {
+      "company_stage": "growth",
+      "market_conditions": "competitive",
+      "timeline": "Q4 decision needed",
+      "stakeholders": [
+        "board",
+        "investors",
+        "employees"
+      ],
+      "complexity_factors": [
+        "high_stakes",
+        "time_pressure",
+        "regulatory_concerns"
+      ]
+    },
+    "decision_type": "operational",
+    "target_roles": [
+      "cfo"
+    ],
+    "complexity_level": 4,
+    "created_at": "2025-10-05T22:40:48.923731",
+    "source": "generated"
   }
 ]

@@ -29,16 +29,16 @@ from datetime import datetime
 # Import AOS from existing structure (will be updated when AOS is fully refactored)
 
 from AgentOperatingSystem import AgentOperatingSystem
-from AgentOperatingSystem.core.config import AOSConfig
-from AgentOperatingSystem.storage import StorageManager
-from AgentOperatingSystem.environment import EnvironmentManager
+from AgentOperatingSystem.config import AOSConfig
+from AgentOperatingSystem.storage.manager import StorageManager
+from AgentOperatingSystem.environment.manager import EnvironmentManager
 
 from .config import BusinessInfinityConfig
 from .covenant_manager import BusinessCovenantManager
 from .conversation_manager import BusinessConversationManager
-from ..agents.manager import BusinessAgentManager
-from ..workflows.manager import BusinessWorkflowManager
-from ..analytics.manager import BusinessAnalyticsManager
+from agents.manager import BusinessAgentManager
+from workflows.manager import BusinessWorkflowManager
+from analytics.manager import BusinessAnalyticsManager
 
 
 class BusinessInfinity:

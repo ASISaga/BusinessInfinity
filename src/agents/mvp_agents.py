@@ -1,7 +1,7 @@
 
 
-# Import LeadershipAgent from RealmOfAgents
-from leadership_agent import LeadershipAgent
+# Import LeadershipAgent from package
+from LeadershipAgent import LeadershipAgent
 
 """
 Minimal Agent Base Classes for BusinessInfinity MVP

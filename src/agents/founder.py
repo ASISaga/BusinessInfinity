@@ -6,7 +6,7 @@ and entrepreneurial capabilities.
 """
 
 from typing import Dict, Any, List
-from ..agents.base import BusinessAgent
+from .base import BusinessAgent
 
 
 class FounderAgent(BusinessAgent):

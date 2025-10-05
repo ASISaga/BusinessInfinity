@@ -1,10 +1,12 @@
 
-# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+# Ensure BusinessInfinity/src and AgentOperatingSystem/src are in sys.path for pytest import resolution
 import sys
 from pathlib import Path
 src_path = str(Path(__file__).resolve().parent.parent / "src")
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
+aos_path = str(Path(__file__).resolve().parent.parent.parent / "AgentOperatingSystem" / "src")
+for p in [src_path, aos_path]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 import pytest
 import json
 from datetime import datetime, timedelta
@@ -259,13 +261,13 @@ class TestMCPAccessIntegration:
     
     def test_access_validation_function(self):
         """Test the validate_mcp_request function"""
-        from src.core.utils import validate_mcp_request
+    from core.utils import validate_mcp_request
         
-        # This should work (no exception)
-        try:
-            validate_mcp_request("user1", "Founder", "linkedin", "admin")
-        except MCPAccessDeniedError:
-            pytest.fail("Access should be granted for Founder")
+    # This should work (no exception)
+    try:
+        validate_mcp_request("user1", "Founder", "linkedin", "admin")
+    except MCPAccessDeniedError:
+        pytest.fail("Access should be granted for Founder")
     
     def test_access_denied_exception(self):
         """Test MCPAccessDeniedError is raised correctly"""

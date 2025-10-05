@@ -1,3 +1,4 @@
+from BusinessAgent import BusinessAgent
 #!/usr/bin/env python3
 """
 Minimal test script to verify the new BusinessInfinity package structure
@@ -16,10 +17,10 @@ def test_package_imports():
         print("✅ Configuration classes imported successfully")
         
         # Test agent imports
-        from business_infinity.agents.base import BusinessAgent
-        from business_infinity.agents.ceo import ChiefExecutiveOfficer
-        from business_infinity.agents.cto import ChiefTechnologyOfficer
-        from business_infinity.agents.founder import FounderAgent
+        from BusinessAgent import BusinessAgent
+        from CEO import ChiefExecutiveOfficer
+        from CTO import ChiefTechnologyOfficer
+        from Founder import FounderAgent
         print("✅ Agent classes imported successfully")
         
         # Test workflow imports
@@ -77,9 +78,9 @@ def test_agent_class_structure():
     print("\nTesting agent class structure...")
     
     try:
-        from business_infinity.agents.ceo import ChiefExecutiveOfficer
-        from business_infinity.agents.cto import ChiefTechnologyOfficer
-        from business_infinity.agents.founder import FounderAgent
+        from CEO import ChiefExecutiveOfficer
+        from CTO import ChiefTechnologyOfficer
+        from Founder import FounderAgent
         
         # Check that classes have expected attributes
         print(f"✅ CEO class: {ChiefExecutiveOfficer.__name__}")
@@ -87,7 +88,7 @@ def test_agent_class_structure():
         print(f"✅ Founder class: {FounderAgent.__name__}")
         
         # Check that they inherit from BusinessAgent
-        from business_infinity.agents.base import BusinessAgent
+        from BusinessAgent import BusinessAgent
         assert issubclass(ChiefExecutiveOfficer, BusinessAgent)
         assert issubclass(ChiefTechnologyOfficer, BusinessAgent)
         assert issubclass(FounderAgent, BusinessAgent)

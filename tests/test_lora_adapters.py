@@ -1,10 +1,12 @@
 
-# Ensure BusinessInfinity/src is in sys.path for pytest import resolution
+# Ensure BusinessInfinity/src and AgentOperatingSystem/src are in sys.path for pytest import resolution
 import sys
 from pathlib import Path
 src_path = str(Path(__file__).resolve().parent.parent / "src")
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
+aos_path = str(Path(__file__).resolve().parent.parent.parent / "AgentOperatingSystem" / "src")
+for p in [src_path, aos_path]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 import pytest
 import asyncio
 import json

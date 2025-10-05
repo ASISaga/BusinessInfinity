@@ -10,13 +10,8 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Import from existing AOS structure for now
-try:
-    from aos import AgentOperatingSystem
-    from aos.agents import Agent
-except ImportError:
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-    from RealmOfAgents.AgentOperatingSystem.Agent import Agent
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.agents import Agent
 
 from ChiefExecutiveOfficer import ChiefExecutiveOfficer
 from ChiefTechnologyOfficer import ChiefTechnologyOfficer

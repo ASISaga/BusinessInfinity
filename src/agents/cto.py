@@ -6,7 +6,7 @@ and innovation oversight.
 """
 
 from typing import Dict, Any, List
-from ..agents.base import BusinessAgent
+from .base import BusinessAgent
 
 
 class ChiefTechnologyOfficer(BusinessAgent):

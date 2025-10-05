@@ -10,13 +10,11 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Import from existing AOS structure for now
-try:
-    from aos import AgentOperatingSystem
-except ImportError:
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
 
-from ..core.config import BusinessInfinityConfig
+# Import AgentOperatingSystem from the correct package
+from AgentOperatingSystem import AgentOperatingSystem
+
+from core.config import BusinessInfinityConfig
 
 
 class BusinessCovenantManager:

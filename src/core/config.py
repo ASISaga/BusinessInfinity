@@ -10,7 +10,7 @@ import os
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 
-from aos.core.config import AOSConfig
+from AgentOperatingSystem.config import AOSConfig
 
 
 @dataclass

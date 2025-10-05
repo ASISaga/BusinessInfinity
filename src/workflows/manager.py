@@ -11,34 +11,31 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from enum import Enum
 
-# Import from existing AOS structure for now
-try:
-    from aos import AgentOperatingSystem
-    from aos.orchestration import OrchestrationEngine, WorkflowStep
-except ImportError:
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-    
-    # Create placeholder classes for orchestration
-    class WorkflowStep:
-        def __init__(self, step_id, name, description, agent_requirements=None, dependencies=None, timeout_seconds=300):
-            self.step_id = step_id
-            self.name = name
-            self.description = description
-            self.agent_requirements = agent_requirements or []
-            self.dependencies = dependencies or []
-            self.timeout_seconds = timeout_seconds
-    
-    class OrchestrationEngine:
-        def __init__(self):
-            pass
-        async def execute_workflow(self, workflow_id, steps, context):
-            return {"status": "completed", "workflow_id": workflow_id}
-        async def get_workflow_status(self, workflow_id):
-            return {"status": "completed"}
-        async def cancel_workflow(self, workflow_id):
-            return True
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.orchestration import OrchestrationEngine, WorkflowStep
 
 from ..core.config import BusinessInfinityConfig
+
+# Create placeholder classes for orchestration
+class WorkflowStep:
+    def __init__(self, step_id, name, description, agent_requirements=None, dependencies=None, timeout_seconds=300):
+        self.step_id = step_id
+        self.name = name
+        self.description = description
+        self.agent_requirements = agent_requirements or []
+        self.dependencies = dependencies or []
+        self.timeout_seconds = timeout_seconds
+
+class OrchestrationEngine:
+    def __init__(self):
+        pass
+    async def execute_workflow(self, workflow_id, steps, context):
+        return {"status": "completed", "workflow_id": workflow_id}
+    async def get_workflow_status(self, workflow_id):
+        return {"status": "completed"}
+    async def cancel_workflow(self, workflow_id):
+        return True
+
 
 
 class WorkflowStatus(Enum):

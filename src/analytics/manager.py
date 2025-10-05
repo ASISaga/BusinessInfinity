@@ -11,26 +11,20 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from enum import Enum
 
-# Import from existing AOS structure for now
-try:
-    from aos import AgentOperatingSystem
-    from aos.monitoring import SystemMonitor
-except ImportError:
-    from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-    
-    # Create placeholder class for monitoring
-    class SystemMonitor:
-        def __init__(self):
-            pass
-        async def get_metrics(self):
-            return {
-                "uptime_percentage": 99.5,
-                "avg_response_time_ms": 150,
-                "error_rate_percentage": 0.05
-            }
-
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.monitoring import SystemMonitor
 from ..core.config import BusinessInfinityConfig
 
+# Create placeholder class for monitoring
+class SystemMonitor:
+    def __init__(self):
+        pass
+    async def get_metrics(self):
+        return {
+            "uptime_percentage": 99.5,
+            "avg_response_time_ms": 150,
+            "error_rate_percentage": 0.05
+        }
 
 class MetricType(Enum):
     """Types of business metrics."""

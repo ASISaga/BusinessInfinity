@@ -1,3 +1,4 @@
+from BusinessAgent import BusinessAgent
 """
 Unit tests for BusinessInfinity Business Manager
 
@@ -10,6 +11,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch, call
 from datetime import datetime
 from typing import Dict, Any
+from BusinessAgent import BusinessAgent
 
 
 @pytest.mark.unit
@@ -66,7 +68,6 @@ class TestAgentManagement:
     @pytest.fixture
     def sample_agent(self):
         """Create sample business agent"""
-        from src.orchestration.business_manager import BusinessAgent
         return BusinessAgent(
             id="ceo-001",
             name="Chief Executive Officer",
