@@ -8,11 +8,7 @@ the expansion meets the requirements from covenant.md.
 
 import asyncio
 import json
-import sys
-from pathlib import Path
 
-# Add the project root to the path
-sys.path.insert(0, str(Path(__file__).parent))
 
 async def test_covenant_schema_validation():
     """Test that the covenant schema is valid and can validate covenants"""
@@ -275,5 +271,6 @@ async def main():
         return False
 
 if __name__ == "__main__":
+    import sys
     success = asyncio.run(main())
     sys.exit(0 if success else 1)

@@ -17,15 +17,11 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.core.audit_trail import (
+from core.audit_trail import (
     AuditTrailManager, AuditEventType, AuditSeverity, AuditEvent, AuditQuery,
     audit_log, get_audit_manager
 )
-from src.core.mcp_access_control import MCPAccessControlManager
+from core.mcp_access_control import MCPAccessControlManager
 
 
 class TestAuditTrailManager:

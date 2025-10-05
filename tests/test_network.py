@@ -12,11 +12,7 @@ Tests the network functionality including:
 
 import asyncio
 import logging
-import sys
-import os
 
-# Add the parent directory to sys.path to import network modules
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

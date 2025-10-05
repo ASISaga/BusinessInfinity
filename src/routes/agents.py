@@ -12,14 +12,8 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 
 # Import business infinity core
-try:
-    from src.orchestration.business_manager import BusinessManager
-    from src.agents.agent_coordinator import AgentCoordinator
-    BUSINESS_INFINITY_AVAILABLE = True
-except ImportError:
-    BUSINESS_INFINITY_AVAILABLE = False
-    print("Warning: BusinessInfinity core not available")
-
+from src.orchestration.business_manager import BusinessManager
+from src.agents.agent_coordinator import AgentCoordinator
 
 class AgentsEndpoint:
 
@@ -182,10 +176,7 @@ class AgentsEndpoint:
             """Create and configure the Agents API"""
             api = AgentsEndpoint(business_manager)
             # Optionally attach agent_coordinator if needed for new endpoints
-            if BUSINESS_INFINITY_AVAILABLE:
-                api.agent_coordinator = AgentCoordinator()
-            else:
-                api.agent_coordinator = None
+            api.agent_coordinator = AgentCoordinator()
             return api
 
         async def get_agent_handler(req: func.HttpRequest) -> func.HttpResponse:

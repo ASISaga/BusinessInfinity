@@ -4,12 +4,7 @@ Minimal test script to verify the new BusinessInfinity package structure
 without requiring full AOS dependencies.
 """
 
-import sys
-import os
 
-# Add paths for testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 def test_package_imports():
     """Test that the package structure can be imported."""
@@ -183,4 +178,5 @@ def main():
     return 0 if success else 1
 
 if __name__ == "__main__":
+    import sys
     sys.exit(main())

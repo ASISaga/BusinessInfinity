@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """
 Ultra-minimal test script to verify BusinessInfinity package structure
@@ -5,10 +6,8 @@ by creating mock AOS dependencies to avoid import errors.
 """
 
 import sys
-import os
 
-# Add paths
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+
 
 # Create proper mock classes for AOS dependencies
 class MockAgent:
@@ -163,7 +162,7 @@ def test_configuration_only():
     print("Testing BusinessInfinity configuration...")
     
     try:
-        from business_infinity.core.config import (
+        from src.core.config import (
             BusinessInfinityConfig,
             create_default_config,
             create_development_config,
@@ -197,8 +196,8 @@ def test_enum_classes():
     print("\nTesting enum classes...")
     
     try:
-        from business_infinity.workflows.manager import WorkflowStatus
-        from business_infinity.analytics.manager import MetricType
+        from src.workflows.manager import WorkflowStatus
+        from src.analytics.manager import MetricType
         
         print(f"✅ WorkflowStatus enum: {[status.value for status in WorkflowStatus]}")
         print(f"✅ MetricType enum: {[mtype.value for mtype in MetricType]}")
@@ -214,7 +213,7 @@ def test_business_metric():
     print("\nTesting BusinessMetric class...")
     
     try:
-        from business_infinity.analytics.manager import BusinessMetric, MetricType
+        from src.analytics.manager import BusinessMetric, MetricType
         
         # Create a metric
         metric = BusinessMetric(
@@ -250,11 +249,11 @@ def test_package_metadata():
     
     try:
         # Import without instantiating classes that need AOS
-        import business_infinity
+        import src
         
-        print(f"✅ Package version: {business_infinity.__version__}")
-        print(f"✅ Package author: {business_infinity.__author__}")
-        print(f"✅ Package description: {business_infinity.__description__}")
+        print(f"✅ Package version: {src.__version__}")
+        print(f"✅ Package author: {src.__author__}")
+        print(f"✅ Package description: {src.__description__}")
         
         # Check __all__ exports
         expected_exports = [
@@ -270,7 +269,7 @@ def test_package_metadata():
             'MetricType'
         ]
         
-        available_exports = [name for name in expected_exports if hasattr(business_infinity, name)]
+        available_exports = [name for name in expected_exports if hasattr(src, name)]
         print(f"✅ Available exports: {len(available_exports)}/{len(expected_exports)}")
         
         return True
@@ -285,10 +284,10 @@ def test_class_inheritance():
     
     try:
         # Test that we can import the classes
-        from business_infinity.agents.base import BusinessAgent
-        from business_infinity.agents.ceo import ChiefExecutiveOfficer
-        from business_infinity.agents.cto import ChiefTechnologyOfficer
-        from business_infinity.agents.founder import FounderAgent
+        from src.agents.base import BusinessAgent
+        from src.agents.ceo import ChiefExecutiveOfficer
+        from src.agents.cto import ChiefTechnologyOfficer
+        from src.agents.founder import FounderAgent
         
         print("✅ All agent classes imported successfully")
         

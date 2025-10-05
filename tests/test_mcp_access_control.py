@@ -9,15 +9,11 @@ import json
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.core.mcp_access_control import (
+from core.mcp_access_control import (
     MCPAccessControlManager, AccessLevel, OnboardingStage,
     AccessControlViolation, UserAccessProfile
 )
-from src.core.utils import MCPAccessDeniedError
+from core.utils import MCPAccessDeniedError
 
 
 class TestMCPAccessControlManager:

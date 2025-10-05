@@ -18,15 +18,11 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.core.trust_compliance import (
+from core.trust_compliance import (
     TrustComplianceManager, CustomerDataExport, DeletionRequest, 
     get_trust_compliance_manager
 )
-from src.core.audit_trail import AuditEventType, AuditSeverity
+from core.audit_trail import AuditEventType, AuditSeverity
 
 
 class TestTrustComplianceManager:

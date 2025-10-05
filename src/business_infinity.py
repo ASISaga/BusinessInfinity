@@ -28,36 +28,34 @@ AOS LeadershipAgent with business intelligence and domain expertise.
 These agents integrate with Business Infinity workflows and provide
 specialized business capabilities built on AOS foundation.
 """
+import os
+import json
+import asyncio
+import logging
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+
 from BusinessAgent import BusinessAgent
 from .agents.chief_technology_officer import ChiefTechnologyOfficer
 from .founder_agent import FounderAgent
 from .investor_agent import InvestorAgent
-from .business_workflows import BusinessWorkflowEngine, WorkflowStatus
-from .business_analytics import BusinessAnalyticsEngine, BusinessMetric, MetricType
-from .conversations.business_conversation_manager import BusinessConversationManager
 
-# Export main classes and functions for external use
-__all__ = [
-    # Core Business Application
-    "BusinessInfinity",
-    "BusinessInfinityConfig", 
-    "create_business_infinity",
-    "create_default_business_infinity",
-    # Business Agents
-    "BusinessAgent",
-    "ChiefExecutiveOfficer",
-    "ChiefFinancialOfficer",
-    "ChiefTechnologyOfficer",
-    "FounderAgent",
-    "InvestorAgent",
-    # Business Engines
-    "BusinessWorkflowEngine",
-    "BusinessAnalyticsEngine",
-    # Supporting Classes
-    "WorkflowStatus",
-    "BusinessMetric", 
-    "MetricType"
-]
+# Import AOS and UnifiedStorageManager
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+from AgentOperatingSystem.environment import UnifiedEnvManager
+
+# Modular managers
+from config.business_infinity_config import BusinessInfinityConfig
+from agents.business_agent_manager import BusinessAgentManager
+from workflows.business_workflow_manager import BusinessWorkflowManager
+from workflows.business_workflows import BusinessWorkflowEngine, WorkflowStatus
+from network.business_covenant_manager import BusinessCovenantManager
+from conversations.business_conversation_manager import BusinessConversationManager
+from analytics.business_analytics_manager import BusinessAnalyticsManager
+from analytics.business_analytics import BusinessAnalyticsEngine, BusinessMetric, MetricType
+
+
 """
 Business Infinity - Enterprise Business Application
 
@@ -80,24 +78,6 @@ Architecture:
 """
 
 
-
-import os
-import json
-import asyncio
-import logging
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-# Import AOS and UnifiedStorageManager
-from RealmOfAgents.AgentOperatingSystem.AgentOperatingSystem import AgentOperatingSystem
-from RealmOfAgents.AgentOperatingSystem.storage.manager import UnifiedStorageManager
-from RealmOfAgents.AgentOperatingSystem.environment import UnifiedEnvManager
-
-# Modular managers
-from .config.business_infinity_config import BusinessInfinityConfig
-from .agents.business_agent_manager import BusinessAgentManager
-from .business_workflow_manager import BusinessWorkflowManager
-from .business_analytics_manager import BusinessAnalyticsManager
-from .network.business_covenant_manager import BusinessCovenantManager
 
 
 
@@ -331,3 +311,26 @@ def get_business_infinity() -> BusinessInfinity:
 def create_default_business_infinity() -> BusinessInfinity:
     """Create Business Infinity with default configuration"""
     return BusinessInfinity(BusinessInfinityConfig())
+
+# Export main classes and functions for external use
+__all__ = [
+    # Core Business Application
+    "BusinessInfinity",
+    "BusinessInfinityConfig", 
+    "create_business_infinity",
+    "create_default_business_infinity",
+    # Business Agents
+    "BusinessAgent",
+    "ChiefExecutiveOfficer",
+    "ChiefFinancialOfficer",
+    "ChiefTechnologyOfficer",
+    "FounderAgent",
+    "InvestorAgent",
+    # Business Engines
+    "BusinessWorkflowEngine",
+    "BusinessAnalyticsEngine",
+    # Supporting Classes
+    "WorkflowStatus",
+    "BusinessMetric", 
+    "MetricType"
+]

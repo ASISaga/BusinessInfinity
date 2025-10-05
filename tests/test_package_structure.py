@@ -4,14 +4,9 @@ Test script to verify the new BusinessInfinity package structure
 after refactoring with AOS integration.
 """
 
-import sys
-import os
+
 import asyncio
 import logging
-
-# Add the src directory and parent directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))  # Parent directory for RealmOfAgents
 
 async def test_business_infinity():
     """Test the new BusinessInfinity application."""
@@ -19,7 +14,7 @@ async def test_business_infinity():
     
     try:
         # Import the new package
-        from business_infinity import (
+        from src import (
             create_default_business_app,
             create_development_config,
             BusinessInfinity,
@@ -105,4 +100,5 @@ def main():
     return 0 if success else 1
 
 if __name__ == "__main__":
+    import sys
     sys.exit(main())
