@@ -3,8 +3,15 @@ import json, os
 from datetime import datetime
 from .state import founder_state, investor_state, finance_state, tech_state, ops_state
 from .prompts import APPROVAL_PROMPT
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+
+# Import AOS Agent Framework system instead of Semantic Kernel
+try:
+    from AgentOperatingSystem import AgentFrameworkSystem
+    AGENT_FRAMEWORK_AVAILABLE = True
+except ImportError:
+    AGENT_FRAMEWORK_AVAILABLE = False
+    import logging
+    logging.warning("AOS Agent Framework not available in dashboard handlers")
 
 # Import MCP Access Control
 try:
@@ -15,19 +22,48 @@ except ImportError:
     import logging
     logging.warning("MCP Access Control not available in dashboard handlers")
 
-kernel = Kernel()
-try:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if api_key:
-        kernel.add_service(OpenAIChatCompletion(service_id="openai", api_key=api_key, ai_model_id=os.getenv("OPENAI_MODEL", "gpt-4o-mini")))
-except Exception as e:
-    # OpenAI service not available, will handle in the function
-    pass
+# Initialize AOS Agent Framework system for prompt processing
+agent_framework_system = None
+if AGENT_FRAMEWORK_AVAILABLE:
+    try:
+        agent_framework_system = AgentFrameworkSystem()
+    except Exception as e:
+        # Agent Framework system not available, will handle in the function
+        pass
 
 async def run_prompt(prompt: str, input_text: str) -> str:
-    func = kernel.create_semantic_function(prompt)
-    result = await func.invoke_async(input_text)
-    return str(result)
+    """Run a prompt using AOS Agent Framework system"""
+    if agent_framework_system and AGENT_FRAMEWORK_AVAILABLE:
+        try:
+            # Initialize the system if not already done
+            if not agent_framework_system.is_initialized:
+                await agent_framework_system.initialize()
+            
+            # Create a temporary agent for prompt processing
+            temp_agent = await agent_framework_system.create_agent(
+                "PromptProcessor",
+                prompt,
+                ["prompt_processing"]
+            )
+            
+            # Use the agent framework system to process the prompt
+            result = await agent_framework_system.run_multi_agent_conversation(
+                input_text, ["PromptProcessor"]
+            )
+            
+            # Clean up the temporary agent
+            await agent_framework_system.remove_agent("PromptProcessor")
+            
+            if result.get("success", False):
+                return result.get("result", str(result))
+            else:
+                return f"Error processing prompt: {result.get('error', 'Unknown error')}"
+                
+        except Exception as e:
+            return f"Agent Framework processing failed: {str(e)}"
+    else:
+        # Fallback to simple text processing if Agent Framework not available
+        return f"Processed (fallback): {prompt}\nInput: {input_text}"
 
 async def handle_mcp(body: dict, user_context: dict = None):
     """

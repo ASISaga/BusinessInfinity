@@ -18,7 +18,7 @@ dependencies = [
     "uvicorn>=0.30.5",
     "websockets>=12.0",
     "http-router",
-    "semantic-kernel>=0.9.18",
+    "agent-framework>=1.0.0b251001",
     "openai",
     "chromadb",
     "transformers",
@@ -45,9 +45,7 @@ dependencies = [
     "AgentOperatingSystem @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
 ]
 
-# Entry point for Azure Functions host (function_app.py moved to src/)
-[project.scripts]
-function_app = "src.function_app"
+# Entry points removed - not needed for Azure Functions
 
 
 [tool.setuptools.packages.find]
