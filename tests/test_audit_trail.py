@@ -212,6 +212,10 @@ class TestAuditTrailManager:
     
     def test_audit_query_filtering(self):
         """Test audit log querying and filtering"""
+        # Create a high severity event (business transaction)
+        self.audit_manager.log_event(
+            AuditEventType.BUSINESS_TRANSACTION, "finance_agent", "agent", "Financial transaction", severity=AuditSeverity.HIGH
+        )
         # Create multiple test events
         self.audit_manager.log_event(
             AuditEventType.ACCESS_GRANTED, "user1", "user", "Login successful"
@@ -222,23 +226,19 @@ class TestAuditTrailManager:
         self.audit_manager.log_event(
             AuditEventType.MCP_REQUEST, "agent1", "agent", "Data query"
         )
-        
         # Test filtering by event type
         access_query = AuditQuery(
             event_types=[AuditEventType.ACCESS_GRANTED, AuditEventType.ACCESS_DENIED]
         )
         access_events = self.audit_manager.query_events(access_query)
         assert len(access_events) == 2
-        
         # Test filtering by subject type
         user_query = AuditQuery(subject_types=["user"])
         user_events = self.audit_manager.query_events(user_query)
         assert len(user_events) == 2
-        
         # Test filtering by severity
         high_severity_query = AuditQuery(severities=[AuditSeverity.HIGH])
         high_events = self.audit_manager.query_events(high_severity_query)
-        # Should have business transaction from previous test
         assert len(high_events) >= 1
     
     def test_audit_context_manager(self):
@@ -316,23 +316,28 @@ class TestAuditTrailIntegration:
     def setup_method(self):
         """Setup test environment"""
         self.temp_dir = tempfile.mkdtemp()
-        
         # Create mock config for access control
         self.config_data = {
             "audit": {"log_denied_access": True, "log_all_access": True},
             "access_levels": {
                 "read_only": {"permissions": ["read"]},
-                "full_write": {"permissions": ["read", "create", "update"]}
+                "full_write": {"permissions": ["read", "create", "update", "delete"]}
             },
             "roles": {
                 "Employee": {"default_access_level": "read_only"},
-                "Manager": {"default_access_level": "full_write"}
+                "Manager": {
+                    "default_access_level": "full_write",
+                    "mcp_access": {"linkedin": "full_write"}
+                }
             }
         }
-        
         with patch.object(MCPAccessControlManager, '_load_config') as mock_load:
             mock_load.return_value = self.config_data
             self.access_manager = MCPAccessControlManager()
+        # Ensure config is set correctly for the test
+        self.access_manager.config = self.config_data
+        # Re-initialize internal state from config
+        self.access_manager._initialize_boardroom_agents()
     
     def teardown_method(self):
         """Clean up test environment"""

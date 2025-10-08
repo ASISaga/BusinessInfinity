@@ -14,7 +14,7 @@ from enum import Enum
 from AgentOperatingSystem import AgentOperatingSystem
 from AgentOperatingSystem.orchestration import OrchestrationEngine, WorkflowStep
 
-from ..core.config import BusinessInfinityConfig
+from core.config import BusinessInfinityConfig
 
 # Create placeholder classes for orchestration
 class WorkflowStep:

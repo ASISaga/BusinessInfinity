@@ -1,4 +1,4 @@
-pytest ../tests
+pytest tests
 
 # PowerShell script to activate venv, set PYTHONPATH, and run all test files sequentially
 $workspaceRoot = Resolve-Path "$PSScriptRoot/../.."

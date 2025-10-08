@@ -17,7 +17,7 @@ try:
 except ImportError:
     AZURE_AVAILABLE = False
 
-from .environment import UnifiedEnvManager
+from AgentOperatingSystem.environment import EnvironmentManager, env_manager
 
 
 class UnifiedStorageManager:
@@ -34,7 +34,12 @@ class UnifiedStorageManager:
         super().__init__(env)
         
         # Business-specific storage configuration
-        env_manager = env or UnifiedEnvManager()
+        env_manager_instance = env or env_manager
+        # For backward compatibility, allow passing an EnvironmentManager instance
+        if isinstance(env_manager_instance, EnvironmentManager):
+            env_manager = env_manager_instance
+        else:
+            env_manager = env_manager
         self.boardroom_table = env_manager.get("BOARDROOM_TABLE_NAME", "BoardroomDecisions")
         self.metrics_table = env_manager.get("METRICS_TABLE_NAME", "BusinessMetrics")
         self.collaboration_table = env_manager.get("COLLABORATION_TABLE_NAME", "AgentCollaboration")

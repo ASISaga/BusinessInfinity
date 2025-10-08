@@ -13,7 +13,7 @@ from enum import Enum
 
 from AgentOperatingSystem import AgentOperatingSystem
 from AgentOperatingSystem.monitoring import SystemMonitor
-from ..core.config import BusinessInfinityConfig
+from core.config import BusinessInfinityConfig
 
 # Create placeholder class for monitoring
 class SystemMonitor:

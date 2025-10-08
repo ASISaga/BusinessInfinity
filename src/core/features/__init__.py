@@ -9,13 +9,13 @@ Consolidates functionality from:
 
 from .storage import UnifiedStorageManager
 from .ml_pipeline import UnifiedMLManager  
-from .environment import UnifiedEnvManager
+from AgentOperatingSystem.environment import EnvironmentManager, env_manager
 from .api import UnifiedAPIOrchestrator
 
 # Create global instances
 storage_manager = UnifiedStorageManager()
 ml_manager = UnifiedMLManager()
-env_manager = UnifiedEnvManager()
+env_manager = env_manager
 api_orchestrator = UnifiedAPIOrchestrator()
 
 # Export all managers
@@ -26,6 +26,6 @@ __all__ = [
     'api_orchestrator',
     'UnifiedStorageManager',
     'UnifiedMLManager', 
-    'UnifiedEnvManager',
+    'EnvironmentManager',
     'UnifiedAPIOrchestrator'
 ]

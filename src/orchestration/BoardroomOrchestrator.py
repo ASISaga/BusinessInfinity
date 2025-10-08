@@ -4,14 +4,14 @@ import asyncio
 from agent_framework import WorkflowBuilder
 
 # Agents (inheritance chain: ChatAgent → PossibilityAgent → BusinessAgent → RoleAgents)
-from ChiefExecutiveOfficer import ChiefExecutiveOfficer
-from ChiefFinancialOfficer import ChiefFinancialOfficer
-from ChiefTechnologyOfficer import ChiefTechnologyOfficer
-from ChiefOperatingOfficer import ChiefOperatingOfficer
-from ChiefMarketingOfficer import ChiefMarketingOfficer
-from ChiefHumanResourcesOfficer import ChiefHumanResourcesOfficer
-from ChiefStrategyOfficer import ChiefStrategyOfficer
-from FounderAgent import FounderAgent
+from CEO import ChiefExecutiveOfficer
+from CFO import ChiefFinancialOfficer
+from CTO import ChiefTechnologyOfficer
+from COO import ChiefOperatingOfficer
+from CMO import ChiefMarketingOfficer
+from CHRO import ChiefHumanResourcesOfficer
+from CSO import ChiefStrategyOfficer
+Founder import FounderAgent
 from InvestorAgent import InvestorAgent
 
 # MCP Executors

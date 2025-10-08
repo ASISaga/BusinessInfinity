@@ -13,10 +13,10 @@ from datetime import datetime
 from AgentOperatingSystem import AgentOperatingSystem
 from AgentOperatingSystem.agents import Agent
 
-from ChiefExecutiveOfficer import ChiefExecutiveOfficer
-from ChiefTechnologyOfficer import ChiefTechnologyOfficer
-from FounderAgent import FounderAgent
-from ..core.config import BusinessInfinityConfig
+from CEO import ChiefExecutiveOfficer
+from CTO import ChiefTechnologyOfficer
+from Founder import FounderAgent
+from core.config import BusinessInfinityConfig
 
 
 class BusinessAgentManager:

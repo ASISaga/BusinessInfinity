@@ -19,7 +19,7 @@ Architecture:
 - Peer Recognition: Network validation and compliance badges
 """
 
-# Business-Specific Agent Implementations (merged from business_agents.py)
+# Business-Specific Agent Implementations (merged from BusinessAgents.py)
 """
 Business-Specific Agent Implementations
 
