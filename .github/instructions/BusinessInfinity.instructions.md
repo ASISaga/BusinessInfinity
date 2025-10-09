@@ -24,4 +24,4 @@ Guidelines
 
 Python Dependencies
 - Remote: declared in pyproject.toml as Git URLs for CI/CD.
-- Local: install with pip install -e . (or uv pip install -e .) to create .pth links for development.
+- Local: install with uv pip install -e . (or pip install -e . as a backup option) to create .pth links for development.

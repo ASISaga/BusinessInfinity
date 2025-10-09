@@ -8,15 +8,17 @@ Consolidates functionality from:
 """
 
 from .storage import UnifiedStorageManager
-from .ml_pipeline import UnifiedMLManager  
+# from .ml_pipeline import UnifiedMLManager  # Temporarily disabled - module missing
 from AgentOperatingSystem.environment import EnvironmentManager, env_manager
-from .api import UnifiedAPIOrchestrator
+# from .api import UnifiedAPIOrchestrator  # Temporarily disabled - module missing
 
 # Create global instances
 storage_manager = UnifiedStorageManager()
-ml_manager = UnifiedMLManager()
+# ml_manager = UnifiedMLManager()  # Temporarily disabled - module missing
+ml_manager = None  # Placeholder 
 env_manager = env_manager
-api_orchestrator = UnifiedAPIOrchestrator()
+# api_orchestrator = UnifiedAPIOrchestrator()  # Temporarily disabled - module missing
+api_orchestrator = None  # Placeholder
 
 # Export all managers
 __all__ = [
