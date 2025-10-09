@@ -11,7 +11,7 @@ from COO import ChiefOperatingOfficer
 from CMO import ChiefMarketingOfficer
 from CHRO import ChiefHumanResourcesOfficer
 from CSO import ChiefStrategyOfficer
-Founder import FounderAgent
+from Founder import FounderAgent
 from InvestorAgent import InvestorAgent
 
 # MCP Executors
