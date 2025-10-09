@@ -1,9 +1,10 @@
-from agent_framework import Executor, WorkflowContext, handler
+
+from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
 
 
 from ..mcp_clients.linkedin import create_linkedin_mcp_client  # You may need to adjust import path
 
-class LinkedInExecutor(Executor):
+class LinkedInExecutor(BaseExecutor):
     """Executor that delegates LinkedIn queries to an MCP LinkedIn server."""
 
     def __init__(self):

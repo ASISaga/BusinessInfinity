@@ -1,9 +1,11 @@
-from agent_framework import Executor, WorkflowContext, handler
+
+
+from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
 
 
 from ..mcp_clients.crm import create_crm_mcp_client  # You may need to adjust import path
 
-class CRMExecutor(Executor):
+class CRMExecutor(BaseExecutor):
     """Executor that delegates CRM queries to an MCP CRM server."""
 
     def __init__(self):

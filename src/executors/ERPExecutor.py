@@ -1,9 +1,10 @@
-from agent_framework import Executor, WorkflowContext, handler
+
+from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
 
 
 from ..mcp_clients.erp import create_erp_mcp_client  # You may need to adjust import path
 
-class ERPExecutor(Executor):
+class ERPExecutor(BaseExecutor):
     """Executor that delegates ERP queries to an MCP ERP server."""
 
     def __init__(self):
