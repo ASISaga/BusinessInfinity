@@ -280,10 +280,6 @@ Principles for evolution
 
 ---
 
-Great — here’s a clean README.md that ties the two layers together and orients new contributors. It explains how AgentOperatingSystem and BusinessInfinity interlock, and gives a quickstart for developers and strategists.
-
----
-
 BusinessInfinity & AgentOperatingSystem
 
 This repository is organized into two complementary layers:
