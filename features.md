@@ -1,4 +1,19 @@
-AgentOperatingSystem.md
+# Features for BusinessInfinity Ecosystem
+
+**Implementation Status and Repository Mapping**
+
+This document describes the comprehensive feature set for BusinessInfinity and AgentOperatingSystem. Features are distributed across multiple repositories:
+
+- **AgentOperatingSystem**: Platform-level infrastructure (lifecycle, messaging, reliability, observability)
+- **BusinessInfinity**: Business application layer (agents, workflows, analytics, governance)
+- **C-Suite Agents** (CEO, CFO, COO, CMO, CTO, CHRO, CSO, CISO): Domain-specific agent implementations
+- **businessinfinity.asisaga.com**: Frontend web interface for BusinessInfinity
+
+---
+
+## AgentOperatingSystem.md
+
+**Repository**: [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem)
 
 AgentOperatingSystem – Generic platform blueprint
 
@@ -122,7 +137,50 @@ Platform guarantees
 
 ---
 
-BusinessInfinity.md
+### TODO: AgentOperatingSystem Repository Implementation
+
+**Status**: These features should be implemented in the [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem) repository.
+
+#### Platform Infrastructure (Priority: P1 - Critical)
+- [ ] **Message Envelope Standardization**: Implement universal message format with type, version, timestamp, correlationId, causationId, actor, scope, attributes, payload
+- [ ] **Event Model and Topics**: Define core business-agnostic event topics (DecisionRequested, DecisionApproved, IncidentRaised, etc.) with versioned schemas
+- [ ] **Command/Query/Event Contracts**: Standardized interfaces for intent, preconditions, outcomes, failure modes
+- [ ] **Delivery Guarantees**: Exactly-once intent via outbox pattern, at-least-once delivery, idempotent consumers
+
+#### Reliability Patterns (Priority: P1 - Critical)
+- [ ] **Idempotency Framework**: Deterministic handlers keyed by message IDs and business keys
+- [ ] **Retry Logic**: Exponential backoff with jitter, max attempts per failure class, poison message quarantine
+- [ ] **Circuit Breakers**: Short-circuit failing dependencies with fallback mechanisms
+- [ ] **State Machines**: Explicit lifecycle states for decisions, approvals, incidents with timeout/escalation rules
+- [ ] **Backpressure Controls**: Queue length monitoring, rate limiting, load shedding for non-critical tasks
+
+#### Observability Infrastructure (Priority: P1 - Critical)
+- [ ] **Metrics Collection**: Decision latency (p50/p95), SLA compliance, incident MTTR, policy evaluation time, event lag
+- [ ] **Distributed Tracing**: Correlation and causation propagation across agents with detailed spans
+- [ ] **Structured Logging**: Context-aware logs with redaction rules, separation of audit and operational logs
+- [ ] **Alerting System**: Threshold monitoring on key SLOs with routing and playbook attachments
+
+#### Knowledge Services (Priority: P2 - Important)
+- [ ] **Evidence Retrieval Interface**: Standard API for fetching documents, metrics, prior decisions, external references
+- [ ] **Indexing Contracts**: Content ingestion, normalization, enrichment, searchable field definitions
+- [ ] **Precedent Query System**: Similarity and graph-based traversal for analogous decisions and outcomes
+
+#### Testing Infrastructure (Priority: P2 - Important)
+- [ ] **Contract Tests**: Message schema and topic envelope validation across versions
+- [ ] **Integration Test Framework**: End-to-end flows, cross-agent interactions, persistence validation
+- [ ] **Chaos Testing**: Simulate bus delays, storage outages, policy engine failures, verify graceful degradation
+- [ ] **Audit Completeness Tests**: Verify every decision path produces required artifacts and evidence
+
+#### Platform Extensibility (Priority: P3 - Nice to Have)
+- [ ] **Plugin Framework**: Register new policies, connectors, message types with hot-swappable adapters
+- [ ] **Schema Registry**: Central governance for message and model versions with migration guidance
+- [ ] **Agent Registry Enhancement**: Advanced capability discovery, dependency mapping, health status, upgrade orchestration
+
+---
+
+## BusinessInfinity.md
+
+**Repository**: [BusinessInfinity](https://github.com/ASISaga/BusinessInfinity)
 
 BusinessInfinity – Business‑specific C‑suite agents and value delivery
 
@@ -370,5 +428,281 @@ Summary
 - BusinessInfinity = the business‑specific application of that OS, encoding governance and decision‑making for organizations.  
 
 Together, they form a living, extensible network of agents that grows with the business, from startup to enterprise scale.
+
+---
+
+## Implementation TODO by Repository
+
+### TODO: BusinessInfinity Repository Implementation
+
+**Repository**: [BusinessInfinity](https://github.com/ASISaga/BusinessInfinity)  
+**Status**: Core implementation in progress. Many features already implemented.
+
+#### Core Features - Already Implemented ✅
+- [x] **Governance Kernel**: Covenant-based compliance system (`network/covenant_manager.py`)
+- [x] **Audit Trail**: Immutable audit logging (`core/audit_trail.py`)
+- [x] **Workflow Engine**: Strategic decision-making and business processes (`workflows/business_workflows.py`)
+- [x] **Analytics Engine**: KPI tracking and business metrics (`analytics/business_analytics.py`)
+- [x] **Agent Coordination**: CEO, CTO, Founder, Investor agents (`agents/`)
+- [x] **LinkedIn Verification**: Enterprise identity verification (`network/verification.py`)
+- [x] **Covenant Ledger**: Immutable inter-boardroom agreement tracking (`network/covenant_ledger.py`)
+- [x] **Network Discovery**: Global boardroom peer discovery (`network/discovery.py`)
+- [x] **MCP Integration**: External system connections (`mcp/`)
+- [x] **Authentication**: Multi-provider auth system (`auth/`)
+
+#### Missing Features - To Implement (Priority: P1 - Critical)
+- [ ] **Risk Registry System**: Comprehensive risk tracking with likelihood, impact, owner, mitigation plans
+  - Create `src/risk/risk_registry.py` with RiskRegistry class
+  - Integration with decision workflows for automatic risk assessment
+  - Risk dashboard and reporting capabilities
+  - Risk SLA tracking and escalation rules
+  
+- [ ] **Knowledge Base**: Centralized knowledge management with versioning
+  - Create `src/knowledge/knowledge_base.py` with KnowledgeManager class
+  - Document indexing and full-text search
+  - Knowledge graph for relationship tracking
+  - Auto-generation from workflows and decisions
+  
+- [ ] **Precedent System**: Historical decision tracking and retrieval
+  - Create `src/knowledge/precedent_engine.py` with PrecedentEngine class
+  - Similarity-based decision lookup
+  - Decision outcome tracking and learnings
+  - Integration with workflow engine for context-aware assistance
+  
+- [ ] **Policy Engine**: Robust policy evaluation and enforcement
+  - Create `src/policy/policy_engine.py` with PolicyEngine class
+  - Policy-as-code with precondition/postcondition checks
+  - Exception tracking with expiry dates
+  - Compensating controls for policy violations
+
+#### Missing Features - To Implement (Priority: P2 - Important)
+- [ ] **Cultural Cohesion Module**: Team rituals, values tracking, alignment dashboards
+  - Create `src/culture/` module with CultureAgent
+  - Ritual adherence tracking
+  - Value alignment scoring
+  - Narrative generation for leadership
+  
+- [ ] **Enhanced Testing**: Comprehensive test coverage
+  - Unit tests for all major modules
+  - Integration tests for workflows
+  - Contract tests for agent interactions
+  - Add to CI/CD pipeline
+
+#### Missing Features - To Implement (Priority: P3 - Nice to Have)
+- [ ] **Advanced Analytics Dashboards**: Enhanced visualization and reporting
+- [ ] **Chaos Testing Framework**: Resilience and failure testing
+- [ ] **Decision Impact Analysis**: Long-term outcome tracking
+
+---
+
+### TODO: C-Suite Agent Repositories
+
+**Repositories**: 
+- [CEO](https://github.com/ASISaga/CEO)
+- [CFO](https://github.com/ASISaga/CFO)
+- [COO](https://github.com/ASISaga/COO)
+- [CMO](https://github.com/ASISaga/CMO)
+- [CTO](https://github.com/ASISaga/CTO)
+- [CHRO](https://github.com/ASISaga/CHRO)
+- [CSO](https://github.com/ASISaga/CSO)
+- CISO (not yet created)
+- CPO (not yet created)
+
+**Status**: Individual agent repositories need feature enhancements to align with specifications.
+
+#### Common Features Needed Across All C-Suite Agents (Priority: P1)
+- [ ] **Decision Framework Integration**: Standardized decision-making processes
+  - Implement structured memo composition with counter-positions
+  - Risk overlay and impact path analysis
+  - Precedent decision surfacing
+  - Compliance assertion attachment
+  
+- [ ] **Agent-Specific KPIs**: Domain-specific performance metrics
+  - CEO: Strategic initiative throughput, alignment scores, conflict resolution time
+  - COO: SLA adherence, incident MTTR, throughput metrics, capacity utilization
+  - CFO: Budget approval latency, ROI accuracy, spend policy compliance
+  - CMO: Campaign effectiveness, brand metrics, market penetration
+  - CTO: System uptime, innovation velocity, technical debt ratio
+  - CHRO: Employee satisfaction, retention rate, onboarding efficiency
+  - CSO: Strategic goal achievement, competitive positioning
+  
+- [ ] **Compliance and Audit Integration**: Connect to BusinessInfinity audit trail
+  - All agent actions produce audit entries
+  - Compliance assertions for regulated decisions
+  - Decision rationale storage and retrieval
+  
+- [ ] **Workflow Integration**: Seamless integration with BusinessInfinity workflows
+  - Subscribe to relevant business events
+  - Emit domain-specific events
+  - Participate in multi-agent decision processes
+
+#### Agent-Specific Implementations (Priority: P1)
+- [ ] **CISO Agent** (New Repository Required)
+  - Policy-as-code enforcement
+  - Vulnerability triage and severity assignment
+  - Audit readiness tracking
+  - Incident classification and response
+  - Compensating control recommendations
+  
+- [ ] **CPO Agent** (New Repository Required)
+  - Roadmap gatekeeping and prioritization
+  - Discovery quality assessment
+  - Experiment authorization and ethics
+  - Feature impact analysis
+  - NPS and retention tracking
+
+#### Agent Enhancement Features (Priority: P2)
+- [ ] **Context-Aware Assistance**: Leverage knowledge base and precedent system
+- [ ] **Adaptive Learning**: Agent performance improvement over time
+- [ ] **Cross-Agent Collaboration**: Enhanced communication protocols
+- [ ] **Escalation Protocols**: Clear ownership and escalation chains
+
+---
+
+### TODO: businessinfinity.asisaga.com (Frontend)
+
+**Repository**: [businessinfinity.asisaga.com](https://github.com/ASISaga/businessinfinity.asisaga.com)  
+**Status**: Jekyll-based frontend needs comprehensive UI for BusinessInfinity features.
+
+#### Core Dashboard Features (Priority: P1 - Critical)
+- [ ] **Decision Dashboard**: Real-time decision monitoring and visualization
+  - Active decision pipeline view
+  - Decision history with filters (by type, agent, outcome)
+  - Decision detail view with full context and rationale
+  - Decision approval workflow interface
+  
+- [ ] **Agent Management UI**: Control and monitor all C-Suite agents
+  - Agent status dashboard (health, availability, current tasks)
+  - Agent chat interface for direct queries
+  - Agent performance metrics and KPI tracking
+  - Agent configuration and settings
+  
+- [ ] **Workflow Monitoring**: Track business workflow execution
+  - Active workflows with progress indicators
+  - Workflow templates and initiation interface
+  - Step-by-step execution visualization
+  - Workflow history and completion analytics
+  
+- [ ] **Analytics and KPI Dashboards**: Business intelligence visualization
+  - Financial KPIs (revenue growth, profit margin, burn rate)
+  - Operational KPIs (productivity, efficiency, cycle time)
+  - Strategic KPIs (goal achievement, initiative progress)
+  - Customer KPIs (satisfaction, retention, acquisition)
+  - Real-time and historical trend charts
+
+#### Governance and Compliance UI (Priority: P1 - Critical)
+- [ ] **Governance Template Interfaces**: Easy creation of governance artifacts
+  - Initiative memo template with structured fields
+  - Budget review template with ROI analysis
+  - Policy update template with compliance checks
+  - Runbook template with operational procedures
+  
+- [ ] **Trust Pages**: External-facing credibility and transparency
+  - Governance summary and maturity indicators
+  - Compliance badges and certifications
+  - Audit readiness score
+  - Public commitment statements
+  
+- [ ] **Investor Packs**: Automated reporting for stakeholders
+  - Live governance data aggregation
+  - Strategic decision summaries
+  - Financial performance metrics
+  - Risk posture and mitigation status
+  - Exportable PDF/PowerPoint formats
+
+#### Knowledge and Decision Support (Priority: P2 - Important)
+- [ ] **Knowledge Base UI**: Browse and search organizational knowledge
+  - Full-text search across documents and decisions
+  - Knowledge graph visualization
+  - Document versioning and history
+  - Contribution and curation interface
+  
+- [ ] **Precedent Explorer**: Find and analyze historical decisions
+  - Similarity-based decision search
+  - Decision outcome analysis
+  - Learnings and recommendations
+  - Precedent comparison view
+  
+- [ ] **Risk Registry Dashboard**: Monitor and manage business risks
+  - Risk heatmap (likelihood vs. impact)
+  - Risk timeline and tracking
+  - Mitigation plan status
+  - Risk owner assignment and escalation
+
+#### Collaboration and Communication (Priority: P2 - Important)
+- [ ] **Real-Time Notifications**: Teams/Slack integration for announcements
+  - Decision broadcasts with rationale summaries
+  - Workflow status updates
+  - Agent alerts and escalations
+  - Subscription management by function/role
+  
+- [ ] **Alignment Dashboard**: Track organizational cohesion
+  - Ritual adherence metrics
+  - Cross-team collaboration indicators
+  - Value alignment scores
+  - Cultural health indicators
+  
+- [ ] **Onboarding Portal**: Role-based playbooks and starter kits
+  - Function-specific onboarding workflows
+  - Governance template library
+  - Agent introduction and training
+  - Resource center and documentation
+
+#### Advanced Features (Priority: P3 - Nice to Have)
+- [ ] **Interactive Decision Simulation**: What-if analysis and scenario planning
+- [ ] **Custom Report Builder**: User-defined analytics and exports
+- [ ] **Mobile-Responsive Views**: Access on all devices
+- [ ] **Accessibility Compliance**: WCAG 2.1 AA standards
+
+---
+
+### TODO: Supporting Infrastructure and Integration
+
+#### MCP Servers (Priority: P2)
+- [ ] **ERPNext-MCP**: Enhanced business process integration
+- [ ] **LinkedIn-MCP**: Expanded professional network capabilities
+- [ ] **spec-kit-mcp**: Specification-driven workflow automation
+
+#### Testing and Quality Assurance (Priority: P1)
+- [ ] **End-to-End Test Suite**: Cross-repository integration testing
+- [ ] **Performance Benchmarks**: SLA validation and load testing
+- [ ] **Security Audit**: Penetration testing and vulnerability assessment
+
+#### Documentation (Priority: P1)
+- [ ] **API Documentation**: Complete OpenAPI specs for all endpoints
+- [ ] **Integration Guides**: How to connect external systems
+- [ ] **Developer Onboarding**: Contributing to the ecosystem
+- [ ] **User Guides**: End-user documentation for all features
+
+---
+
+## Feature Implementation Priorities
+
+### Immediate (Sprint 1-2)
+1. Risk Registry System (BusinessInfinity)
+2. Knowledge Base (BusinessInfinity)
+3. Decision Dashboard (Frontend)
+4. Agent Management UI (Frontend)
+
+### Short-term (Sprint 3-4)
+5. Precedent System (BusinessInfinity)
+6. Policy Engine (BusinessInfinity)
+7. CISO Agent (New Repository)
+8. CPO Agent (New Repository)
+9. Governance Template Interfaces (Frontend)
+10. Analytics Dashboards (Frontend)
+
+### Medium-term (Sprint 5-8)
+11. Platform Infrastructure (AgentOperatingSystem)
+12. Cultural Cohesion Module (BusinessInfinity)
+13. Knowledge Base UI (Frontend)
+14. Enhanced C-Suite Agent Features
+15. Comprehensive Testing Suite
+
+### Long-term (Sprint 9+)
+16. Advanced Analytics and AI
+17. Chaos Testing Framework
+18. Mobile Applications
+19. Third-party Marketplace
 
 ---
