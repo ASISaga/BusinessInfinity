@@ -174,6 +174,97 @@ class KnowledgeBase:
         results.sort(key=lambda d: d.last_modified_date, reverse=True)
         return results[:limit]
     
+    async def get_document(self, doc_id: str) -> Optional[KnowledgeDocument]:
+        """Get a document by ID"""
+        return self.documents.get(doc_id)
+    
+    async def get_knowledge_summary(self) -> Dict[str, Any]:
+        """Get summary statistics of knowledge base"""
+        total_docs = len(self.documents)
+        
+        # Count by type
+        by_type = {}
+        for doc_type in DocumentType:
+            by_type[doc_type.value] = len([
+                d for d in self.documents.values()
+                if d.document_type == doc_type
+            ])
+        
+        # Count by status
+        by_status = {}
+        for status in DocumentStatus:
+            by_status[status.value] = len([
+                d for d in self.documents.values()
+                if d.status == status
+            ])
+        
+        return {
+            'total_documents': total_docs,
+            'by_type': by_type,
+            'by_status': by_status,
+            'indexed_terms': len(self.search_index)
+        }
+    
+    async def auto_generate_from_decision(
+        self,
+        decision_data: Dict[str, Any],
+        created_by: str
+    ) -> KnowledgeDocument:
+        """Auto-generate knowledge document from a decision"""
+        title = f"Decision: {decision_data.get('title', 'Untitled')}"
+        
+        content = {
+            'decision_id': decision_data.get('id'),
+            'context': decision_data.get('context'),
+            'rationale': decision_data.get('rationale'),
+            'outcome': decision_data.get('outcome'),
+            'stakeholders': decision_data.get('stakeholders'),
+            'created_date': decision_data.get('created_date')
+        }
+        
+        tags = ['decision', 'auto-generated']
+        
+        document = await self.create_document(
+            title=title,
+            document_type=DocumentType.DECISION,
+            content=content,
+            created_by=created_by,
+            tags=tags,
+            metadata={'source': 'decision', 'decision_id': decision_data.get('id')}
+        )
+        
+        # Auto-publish
+        document.status = DocumentStatus.PUBLISHED
+        return document
+    
+    async def add_relationship(
+        self,
+        source_id: str,
+        target_id: str,
+        relationship_type: str,
+        strength: float = 1.0,
+        metadata: Optional[Dict[str, Any]] = None
+    ):
+        """Add a relationship between documents"""
+        # Simple implementation - just add to related_documents
+        if source_id in self.documents:
+            if target_id not in self.documents[source_id].related_documents:
+                self.documents[source_id].related_documents.append(target_id)
+        
+        self.logger.info(f"Relationship added: {source_id} -> {target_id} ({relationship_type})")
+    
+    async def get_related_documents(
+        self,
+        doc_id: str,
+        relationship_type: Optional[str] = None
+    ) -> List[KnowledgeDocument]:
+        """Get documents related to a specific document"""
+        if doc_id not in self.documents:
+            return []
+        
+        related_ids = self.documents[doc_id].related_documents
+        return [self.documents[rid] for rid in related_ids if rid in self.documents]
+    
     async def _index_document(self, document: KnowledgeDocument):
         """Index document for search"""
         terms = set()
