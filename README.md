@@ -130,6 +130,30 @@ Centralized agent management system:
 - **Customer Isolation**: Strict partition-based data segregation
 - **Audit Trail**: Complete compliance logging for all trust-related operations
 
+### Global Boardroom Network
+- **Covenant-Based Compliance**: Enterprise governance for autonomous boardrooms
+- **LinkedIn Verification**: Enterprise identity verification and trust
+- **Peer Recognition**: Network validation and compliance badges
+- **Covenant Ledger**: Immutable inter-boardroom agreement tracking
+- **Network Discovery**: Global boardroom peer discovery and collaboration
+- **Federation Support**: Join and participate in boardroom federations
+
+### Risk Management (NEW)
+- **Risk Registry**: Comprehensive risk tracking with likelihood and impact assessment
+- **Risk Assessment**: Automated severity calculation and categorization
+- **Mitigation Planning**: Track mitigation plans with owners and deadlines
+- **SLA Tracking**: Automated escalation for overdue risks
+- **Risk Analytics**: Summary dashboards and reporting by status, severity, category
+- **Workflow Integration**: Automatic risk identification from decision workflows
+
+### Knowledge Management (NEW)
+- **Centralized Knowledge Base**: Document storage with versioning and metadata
+- **Full-Text Search**: Find documents by keywords, tags, and content
+- **Document Versioning**: Track changes with complete version history
+- **Auto-Generation**: Automatically create knowledge from decisions and workflows
+- **Knowledge Relationships**: Link related documents and decisions
+- **Status Management**: Draft, review, approval, and publication workflows
+
 ### Scalable Architecture
 - Built on AOS foundation for reliability
 - Azure Functions for serverless scaling
