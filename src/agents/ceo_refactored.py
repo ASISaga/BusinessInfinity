@@ -243,7 +243,7 @@ class ChiefExecutiveOfficerRefactored(BusinessAgent):
         return opportunities
     
     async def _generate_recommendations(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Generate executive recommendations."""
+        """Generate executive recommendations based on context."""
         recommendations = []
         
         # Strategic alignment recommendation
@@ -277,6 +277,14 @@ class ChiefExecutiveOfficerRefactored(BusinessAgent):
             "recommendation": "Develop detailed execution plan with milestones",
             "rationale": "Effective execution determines success"
         })
+        
+        # NOTE: In production, these would be dynamically generated based on:
+        # - Decision type and urgency
+        # - Stakeholders involved
+        # - Market conditions
+        # - Financial constraints
+        # - Historical decision outcomes
+        # This is a simplified example for demonstration
         
         return recommendations
     
