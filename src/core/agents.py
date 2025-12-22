@@ -38,9 +38,9 @@ if not BUSINESS_INFINITY_AVAILABLE:
 try:
     from semantic_kernel import Kernel
     from semantic_kernel.contents import ChatHistory
-    SEMANTIC_KERNEL_AVAILABLE = True
+    AGENT_FRAMEWORK_AVAILABLE = True
 except ImportError:
-    SEMANTIC_KERNEL_AVAILABLE = False
+    AGENT_FRAMEWORK_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -269,7 +269,7 @@ class UnifiedAgentManager:
             "initialized": self.initialized,
             "business_infinity_available": BUSINESS_INFINITY_AVAILABLE,
             "mvp_agents_available": MVP_AGENTS_AVAILABLE,
-            "semantic_kernel_available": SEMANTIC_KERNEL_AVAILABLE,
+            "semantic_kernel_available": AGENT_FRAMEWORK_AVAILABLE,
             "system_type": "UnifiedAgentManager"
         }
         

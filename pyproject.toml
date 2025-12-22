@@ -13,7 +13,7 @@ dependencies = [
     "uvicorn>=0.30.5",
     "websockets>=12.0",
     "http-router",
-    "agent-framework>=1.0.0b251001",
+    "agent-framework>=1.0.0b251218",
     "openai",
     "chromadb",
     "transformers",

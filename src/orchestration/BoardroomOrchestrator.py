@@ -62,16 +62,16 @@ class BoardroomOrchestrator:
         # --- Workflow graph ---
         builder = WorkflowBuilder()
 
-        f_node = builder.add_executor(self.founder)
-        i_node = builder.add_executor(self.investor)
-        ceo_node = builder.add_executor(self.ceo)
-        cfo_node = builder.add_executor(self.cfo)
-        cto_node = builder.add_executor(self.cto)
-        coo_node = builder.add_executor(self.coo)
-        cmo_node = builder.add_executor(self.cmo)
-        chro_node = builder.add_executor(self.chro)
-        cso_node = builder.add_executor(self.cso)
-        di_node = builder.add_executor(self.decision_integrator)
+        f_node = builder.register_agent(self.founder)
+        i_node = builder.register_agent(self.investor)
+        ceo_node = builder.register_agent(self.ceo)
+        cfo_node = builder.register_agent(self.cfo)
+        cto_node = builder.register_agent(self.cto)
+        coo_node = builder.register_agent(self.coo)
+        cmo_node = builder.register_agent(self.cmo)
+        chro_node = builder.register_agent(self.chro)
+        cso_node = builder.register_agent(self.cso)
+        di_node = builder.register_executor(self.decision_integrator)
 
         # Flow: Founder → Investor → CEO → CFO/CTO/COO → DecisionIntegrator → CEO
         builder.add_edge(f_node, i_node)
