@@ -25,11 +25,14 @@ try:
 except ImportError:
     # Temporary fallback during refactoring
     AOS_AVAILABLE = False
-    from typing import Protocol
     
-    class LeadershipAgent(Protocol):
-        """Temporary placeholder for AOS LeadershipAgent"""
-        pass
+    class LeadershipAgent:
+        """Temporary placeholder for AOS LeadershipAgent during refactoring"""
+        def __init__(self, agent_id: str, name: str, role: str, config: Dict[str, Any] = None):
+            self.agent_id = agent_id
+            self.name = name
+            self.role = role
+            self.config = config or {}
 
 
 class BusinessAgent:
@@ -69,9 +72,8 @@ class BusinessAgent:
             domain: Domain expertise area
             config: Optional configuration
         """
-        # Call AOS LeadershipAgent init (when available)
-        if AOS_AVAILABLE:
-            super().__init__(agent_id, name, role, config)
+        # Call AOS LeadershipAgent init
+        super().__init__(agent_id, name, role, config)
         
         # Business-specific attributes
         self.domain = domain
