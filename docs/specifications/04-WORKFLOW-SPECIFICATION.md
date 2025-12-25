@@ -22,30 +22,49 @@ This specification covers:
 - Custom workflow definition
 - Workflow monitoring and analytics
 
+> **AOS Orchestration**: BusinessInfinity workflows are built on top of the [AOS Orchestration Engine](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md). This specification focuses on **business workflow definitions**. For infrastructure-level orchestration (state machines, scheduling, multi-agent coordination), refer to the AOS Orchestration specification.
+
 ## 2. Workflow Architecture
 
 ### 2.1 Workflow Engine
 
-**REQ-WF-001**: The system SHALL provide a BusinessWorkflowEngine for orchestrating business processes.
+**REQ-WF-001**: The system SHALL leverage the AOS OrchestrationEngine for workflow execution infrastructure.
+
+> **AOS Integration**: BusinessInfinity uses `AgentOperatingSystem.orchestration.OrchestrationEngine` for workflow execution. Business workflow definitions are layered on top of AOS orchestration capabilities.
 
 **REQ-WF-002**: The workflow engine SHALL support:
-- Sequential step execution
-- Parallel step execution
-- Conditional branching
-- Error handling and retries
-- Async execution
-- State persistence
+- Sequential step execution (via AOS orchestration)
+- Parallel step execution (via AOS multi-agent coordination)
+- Conditional branching (via AOS workflow steps)
+- Error handling and retries (via AOS reliability patterns)
+- Async execution (via AOS async runtime)
+- State persistence (via AOS storage services)
 
 ### 2.2 Workflow Components
 
 ```
-WorkflowEngine
-    ├── WorkflowRegistry: Stores workflow definitions
-    ├── ExecutionManager: Manages workflow executions
-    ├── StateManager: Tracks workflow state
+BusinessWorkflowEngine (BusinessInfinity Layer)
+    ├── BusinessWorkflowRegistry: Business-specific workflow definitions
+    ├── BusinessWorkflowManager: Business logic and KPI tracking
+    └── BusinessAnalytics: Workflow performance metrics
+            │
+            │ uses
+            ▼
+OrchestrationEngine (AOS Infrastructure Layer)
+    ├── WorkflowExecutor: Executes workflow steps
+    ├── StateManager: Tracks execution state  
     ├── AgentCoordinator: Coordinates agent participation
     └── EventPublisher: Publishes workflow events
 ```
+
+**Layer Separation**:
+
+| Layer | Component | Responsibility |
+|-------|-----------|----------------|
+| **Business** | `BusinessWorkflowEngine` | Business workflow definitions, business logic, KPIs |
+| **Business** | Built-in workflows | Product launch, funding round, strategic planning, etc. |
+| **Infrastructure** | `OrchestrationEngine` | Workflow execution, state management, agent coordination |
+| **Infrastructure** | State machines | Deterministic state transitions, timeout handling |
 
 ## 3. Workflow Definition
 

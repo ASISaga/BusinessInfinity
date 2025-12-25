@@ -15,46 +15,92 @@ This specification defines data models, storage architecture, persistence strate
 
 This specification covers:
 
-- Data models and schemas
-- Storage architecture
-- Persistence strategies
+- Data models and schemas (business-specific)
+- Storage architecture (business layer on AOS infrastructure)
+- Persistence strategies (business entities)
 - Data lifecycle management
 - Backup and recovery
 - Data migration
 - Data integrity and validation
 
+> **AOS Storage Infrastructure**: BusinessInfinity uses the [AOS Unified Storage Manager](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/storage.md) for all persistence operations. This specification focuses on **business data models**. For storage infrastructure (backends, APIs, configuration), refer to the AOS Storage specification.
+
 ## 2. Storage Architecture
 
 ### 2.1 Storage Layers
 
-**REQ-STO-001**: The system SHALL utilize a layered storage architecture:
+**REQ-STO-001**: The system SHALL utilize the AOS layered storage architecture:
 
 ```
-Application Layer
-    ↓
-Storage Abstraction Layer (AOS)
-    ↓
-Storage Backends
-    ├── Azure Table Storage (structured data)
-    ├── Azure Blob Storage (unstructured data)
-    ├── Azure Queue Storage (messages)
+BusinessInfinity Application Layer
+    ├── Business data models (Decision, Workflow, Risk, Knowledge, etc.)
+    └── Business-specific storage operations
+            │
+            │ uses
+            ▼
+AOS Storage Abstraction Layer
+    ├── UnifiedStorageManager: Backend-agnostic interface
+    ├── StorageConfig: Configuration management
+    └── Storage service interfaces (IStorageService)
+            │
+            │ implements
+            ▼
+Storage Backend Implementations
+    ├── Azure Table Storage (structured business data)
+    ├── Azure Blob Storage (documents, large objects)
+    ├── Azure Queue Storage (event messages)
+    ├── Cosmos DB (complex queries, global distribution)
     └── File System (local development)
 ```
 
+> **AOS Infrastructure**: All storage backend implementations, configuration, and low-level operations are provided by AgentOperatingSystem. See [AOS Storage Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/storage.md) for details.
+
 ### 2.2 Storage Manager
 
-**REQ-STO-002**: The system SHALL use AOS UnifiedStorageManager for all persistence operations.
-
-**REQ-STO-003**: BusinessInfinity SHALL extend storage manager with business-specific operations:
+**REQ-STO-002**: The system SHALL use AOS `UnifiedStorageManager` for all persistence operations.
 
 ```python
-class BusinessInfinityStorageManager(UnifiedStorageManager):
-    async def store_decision(self, decision: Decision) -> str
-    async def store_workflow_execution(self, execution: WorkflowExecution) -> str
-    async def store_business_metric(self, metric: BusinessMetric) -> str
-    async def store_covenant(self, covenant: Covenant) -> str
-    async def store_audit_event(self, event: AuditEvent) -> str
+from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+
+# AOS provides the infrastructure
+storage = UnifiedStorageManager()
+await storage.save("collection", "key", data)
+result = await storage.load("collection", "key")
 ```
+
+**REQ-STO-003**: BusinessInfinity SHALL define business-specific storage operations:
+
+```python
+# Business layer wraps AOS storage with domain logic
+class BusinessStorageManager:
+    def __init__(self):
+        self.storage = UnifiedStorageManager()  # AOS infrastructure
+    
+    async def store_decision(self, decision: Decision) -> str:
+        """Store business decision with validation and indexing"""
+        return await self.storage.save("decisions", decision.id, decision.to_dict())
+    
+    async def store_workflow_execution(self, execution: WorkflowExecution) -> str:
+        """Store workflow execution state"""
+        return await self.storage.save("workflows", execution.id, execution.to_dict())
+    
+    async def store_risk(self, risk: Risk) -> str:
+        """Store risk registry entry"""
+        return await self.storage.save("risks", risk.id, risk.to_dict())
+    
+    async def store_knowledge_document(self, doc: KnowledgeDocument) -> str:
+        """Store knowledge base document"""
+        return await self.storage.save("knowledge", doc.id, doc.to_dict())
+```
+
+**Storage Responsibility Split**:
+
+| Layer | Responsibility | Examples |
+|-------|---------------|----------|
+| **Business** | Business data models, validation, business logic | Decision, Risk, KnowledgeDocument, Covenant |
+| **Business** | Business-specific queries and indexing | Find risks by severity, search knowledge by keywords |
+| **Infrastructure** | Storage backends, serialization, connections | Azure Table/Blob/Queue, Cosmos DB, configuration |
+| **Infrastructure** | Low-level operations, retry logic, error handling | save(), load(), query(), connection pools |
 
 ## 3. Data Models
 
