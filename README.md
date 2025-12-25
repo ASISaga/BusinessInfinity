@@ -1,8 +1,12 @@
-# Business Infinity - Enterprise Business Application (Refactored)
+# Business Infinity - Enterprise Business Application
 
-Business Infinity is a comprehensive enterprise business application built on top of the Agent Operating System (AOS) from RealmOfAgents. It provides strategic decision-making, operational execution, and growth management capabilities through AI-powered C-Suite agents, Founder, and Investor agents.
+Business Infinity is a comprehensive enterprise business application built on the **Agent Operating System (AOS)** infrastructure. It provides strategic decision-making, operational execution, and growth management capabilities through AI-powered C-Suite agents, Founder, and Investor agents.
 
-## Refactored Architecture Overview
+> **🏗️ Built on AOS**: BusinessInfinity leverages the [Agent Operating System](https://github.com/ASISaga/AgentOperatingSystem) as its foundational infrastructure layer, providing agent lifecycle management, messaging, storage, ML pipelines, and observability. See [AOS Integration](#aos-integration) for details.
+
+## Architecture Overview
+
+BusinessInfinity follows a clean layered architecture where business logic is completely separated from infrastructure:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -15,25 +19,41 @@ Business Infinity is a comprehensive enterprise business application built on to
 │  • Strategic decision-making processes                    │
 │  • Business workflow orchestration                        │
 │  • External business system integrations                  │
+│  • Risk management and knowledge base                     │
+│  • Global boardroom network and compliance                │
 └─────────────────────────────────────────────────────────────┘
                               │
-                              │ depends on
+                              │ depends on (via clean interfaces)
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │               Agent Operating System (AOS)                 │
 │                  Infrastructure Layer                       │
 ├─────────────────────────────────────────────────────────────┤
-│  • Agent lifecycle management                             │
-│  • Message bus and communication                          │
-│  • Storage and persistence                                │
-│  • Environment and configuration                          │
-│  • Authentication and security                            │
-│  • ML pipeline and model management                       │
-│  • MCP server integrations                                │
-│  • System monitoring and telemetry                        │
-│  • Base agent classes (LeadershipAgent, BaseAgent)        │
+│  Core Kernel Services:                                    │
+│  • Orchestration Engine    • Agent Lifecycle Manager      │
+│  • Message Bus             • State Machine Manager        │
+│                                                            │
+│  System Services:                                         │
+│  • Storage (Blob, Table, Queue)  • ML Pipeline           │
+│  • Messaging (Service Bus)       • MCP Integration        │
+│  • Auth & Security               • Governance             │
+│  • Reliability (Circuit Breaker) • Observability          │
+│  • Knowledge Management          • Learning Pipeline      │
+│                                                            │
+│  Base Infrastructure:                                     │
+│  • BaseAgent, LeadershipAgent classes                    │
+│  • Service interfaces (IStorage, IMessaging, etc.)       │
+│  • Reliability patterns (Retry, Circuit Breaker)         │
+│  • Observability (Structured logs, Metrics, Tracing)     │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Design Principles
+
+1. **Separation of Concerns**: Business logic (BI) is completely separated from infrastructure (AOS)
+2. **Dependency Direction**: BI depends on AOS, never the reverse
+3. **Interface-Based**: BI uses AOS through clean service interfaces
+4. **Reusability**: AOS is domain-agnostic and can support multiple business applications
 
 ### Clean Architecture Files
 
@@ -314,7 +334,123 @@ class BusinessInfinityConfig:
 5. Negotiation (Founder)
 6. Closing (CFO)
 
-## Integration with AOS
+## AOS Integration
+
+BusinessInfinity is built on the [Agent Operating System (AOS)](https://github.com/ASISaga/AgentOperatingSystem) infrastructure layer. AOS provides the foundational "operating system" for AI agents, analogous to how Linux or Windows provides infrastructure for applications.
+
+### AOS Capabilities Leveraged
+
+#### Core Infrastructure Services
+- **🔄 Orchestration Engine**: Workflow execution, state management, multi-agent coordination
+- **👥 Agent Lifecycle Management**: Agent registration, discovery, health monitoring, capability tracking
+- **📨 Message Bus**: Inter-agent communication with pub/sub and request-response patterns
+- **💾 Storage Services**: Unified abstraction over Azure Blob, Table, Queue, and Cosmos DB
+- **🔐 Authentication & Authorization**: Multi-provider auth (Azure B2C, OAuth, JWT), RBAC
+- **🤖 ML Pipeline**: Azure ML integration, LoRA training, model inference with caching
+- **🔌 MCP Integration**: Model Context Protocol for external tool and resource access
+- **📊 Monitoring**: System health tracking, metrics collection, performance monitoring
+
+#### Advanced Capabilities (In Progress)
+- **🛡️ Reliability Patterns**: Circuit breakers, retry logic, idempotency handling
+- **👁️ Observability**: Structured logging, distributed tracing, OpenTelemetry integration
+- **📋 Governance**: Tamper-evident audit logs, compliance policy management, risk tracking
+- **📚 Knowledge Management**: Document versioning, semantic search, RAG engine
+- **🧠 Learning Pipeline**: Continuous improvement, self-learning mechanisms
+- **🔧 Extensibility**: Plugin framework, schema registry, hot-swappable adapters
+
+### Architecture: BI as Business Application on AOS
+
+```python
+# BusinessInfinity uses AOS infrastructure services
+from AgentOperatingSystem.orchestration import OrchestrationEngine
+from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+from AgentOperatingSystem.messaging import ServiceBusManager
+from AgentOperatingSystem.agents import LeadershipAgent, UnifiedAgentManager
+from AgentOperatingSystem.ml import MLPipelineManager
+from AgentOperatingSystem.environment import UnifiedEnvManager
+
+# Business agents extend AOS base classes
+class BusinessAgent(LeadershipAgent):
+    """Business-specific agent extending AOS LeadershipAgent"""
+    # Business logic here
+    
+class ChiefExecutiveOfficer(BusinessAgent):
+    """CEO agent with strategic leadership capabilities"""
+    # CEO-specific business logic
+```
+
+### Service Boundaries
+
+| Layer | Responsibility | Examples |
+|-------|---------------|----------|
+| **BusinessInfinity** (This Repository) | Business logic, domain expertise, workflows | CEO agent, strategic planning workflow, risk registry |
+| **AgentOperatingSystem** | Infrastructure, agent runtime, system services | Agent lifecycle, storage, messaging, ML pipeline |
+| **Azure Platform** | Cloud resources, compute, storage | Service Bus, Blob Storage, Azure ML |
+
+### Key AOS Services Used
+
+#### 1. Storage (`UnifiedStorageManager`)
+```python
+# Unified interface across Blob, Table, Queue, Cosmos DB
+storage = UnifiedStorageManager()
+await storage.save("decisions", decision_id, decision_data)
+result = await storage.load("decisions", decision_id)
+```
+
+#### 2. Orchestration (`OrchestrationEngine`)
+```python
+# Multi-agent workflow coordination
+engine = OrchestrationEngine()
+result = await engine.execute_workflow("product_launch", params)
+```
+
+#### 3. Messaging (`ServiceBusManager`)
+```python
+# Inter-agent communication
+bus = ServiceBusManager()
+await bus.publish("decision.strategic", decision_event)
+```
+
+#### 4. ML Pipeline (`MLPipelineManager`)
+```python
+# Model training and inference
+ml = MLPipelineManager()
+result = await ml.infer(agent_id, prompt, context)
+```
+
+### AOS Documentation References
+
+For detailed specifications on AOS capabilities:
+
+- **Main README**: [AgentOperatingSystem/README.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/README.md)
+- **Specifications**: [AgentOperatingSystem/docs/specifications/](https://github.com/ASISaga/AgentOperatingSystem/tree/main/docs/specifications)
+  - [Orchestration System](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md)
+  - [Storage Management](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/storage.md)
+  - [Messaging System](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/messaging.md)
+  - [ML Pipeline](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/ml.md)
+  - [Authentication](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/auth.md)
+  - [Observability](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/observability.md)
+  - [Reliability](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/reliability.md)
+  - [Governance](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/governance.md)
+
+### Migration to Full AOS Utilization
+
+BusinessInfinity is in the process of fully adopting all AOS capabilities. See:
+- [AOS_UTILIZATION_ANALYSIS.md](AOS_UTILIZATION_ANALYSIS.md) - Analysis of current vs. full AOS utilization
+- [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - Step-by-step migration guide
+- [AOS_REFACTORING_SPEC.md](AOS_REFACTORING_SPEC.md) - Refactoring specifications
+
+### Benefits of AOS Foundation
+
+1. **Focus on Business Logic**: BI developers focus on business problems, not infrastructure
+2. **Proven Infrastructure**: Leverage battle-tested agent runtime and services
+3. **Consistency**: Same infrastructure patterns across all ASISaga applications
+4. **Scalability**: Built on Azure's enterprise-grade platform
+5. **Extensibility**: Easy to add new capabilities via AOS plugin system
+6. **Maintainability**: Clean separation makes both layers easier to maintain
+7. **Reusability**: AOS can support multiple business applications
+
+## Integration with AOS (Legacy Section - See Above)
 
 Business Infinity leverages the Agent Operating System for:
 
