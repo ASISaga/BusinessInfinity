@@ -23,35 +23,47 @@ This specification covers:
 - Decision-making frameworks
 - Performance monitoring
 
+> **AOS Foundation**: BusinessInfinity agents extend the agent infrastructure provided by [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem). For infrastructure-level agent capabilities (lifecycle, messaging, state management), refer to [AOS Orchestration Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md).
+
 ## 2. Agent Architecture
 
 ### 2.1 Base Architecture
 
 **REQ-AGT-001**: All business agents SHALL inherit from the `LeadershipAgent` base class provided by AOS.
 
+> **AOS Dependency**: The base agent infrastructure is provided by AgentOperatingSystem. See [AOS Base Agent Documentation](https://github.com/ASISaga/AgentOperatingSystem/blob/main/src/AgentOperatingSystem/agents/) for `BaseAgent` and `LeadershipAgent` implementations.
+
 **REQ-AGT-002**: Agents SHALL implement the following core capabilities:
-- Asynchronous message processing
+- Asynchronous message processing (via AOS messaging infrastructure)
 - Decision-making with confidence scoring
-- State management
-- Performance metrics tracking
+- State management (via AOS storage services)
+- Performance metrics tracking (via AOS observability)
 
 ### 2.2 Agent Hierarchy
 
 ```
-BaseAgent (AOS)
-    └── PossibilityAgent (ASISaga)
-        └── LeadershipAgent (ASISaga)
-            └── BusinessAgent (BusinessInfinity)
-                ├── ChiefExecutiveOfficer
-                ├── ChiefFinancialOfficer
-                ├── ChiefTechnologyOfficer
-                ├── ChiefMarketingOfficer
-                ├── ChiefOperationsOfficer
-                ├── ChiefHumanResourcesOfficer
-                ├── ChiefStrategyOfficer
-                ├── FounderAgent
-                └── InvestorAgent
+BaseAgent (AOS Infrastructure Layer)
+    └── LeadershipAgent (AOS - adds decision-making capabilities)
+        └── BusinessAgent (BusinessInfinity - adds business domain logic)
+            ├── ChiefExecutiveOfficer (Strategic leadership)
+            ├── ChiefFinancialOfficer (Financial management)
+            ├── ChiefTechnologyOfficer (Technology strategy)
+            ├── ChiefMarketingOfficer (Marketing and growth)
+            ├── ChiefOperationsOfficer (Operations excellence)
+            ├── ChiefHumanResourcesOfficer (People and culture)
+            ├── ChiefStrategyOfficer (Strategic planning)
+            ├── FounderAgent (Vision and innovation)
+            └── InvestorAgent (Investment analysis)
 ```
+
+**Layer Responsibilities**:
+
+| Layer | Class | Provides | Defined In |
+|-------|-------|----------|------------|
+| Infrastructure | `BaseAgent` | Lifecycle, messaging, state management | AgentOperatingSystem |
+| Infrastructure | `LeadershipAgent` | Decision-making patterns, stakeholder coordination | AgentOperatingSystem |
+| Business | `BusinessAgent` | Domain expertise, KPIs, business analytics | BusinessInfinity |
+| Business | C-Suite Agents | Role-specific business logic and domain knowledge | BusinessInfinity |
 
 ### 2.3 Agent Components
 
