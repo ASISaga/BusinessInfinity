@@ -20,6 +20,9 @@ This specification covers:
 - Technology stack and infrastructure
 - System boundaries and interfaces
 - Design patterns and conventions
+- **Integration with AgentOperatingSystem (AOS) infrastructure**
+
+> **Note**: This specification focuses on BusinessInfinity-specific functionality. For infrastructure services (storage, messaging, orchestration, ML, etc.), refer to [AgentOperatingSystem Specifications](https://github.com/ASISaga/AgentOperatingSystem/tree/main/docs/specifications).
 
 ### 1.3 Audience
 
@@ -34,15 +37,19 @@ This specification covers:
 ### 2.1 Architectural Principles
 
 **REQ-SYS-001**: The system SHALL follow a layered architecture with clear separation between:
-- Business logic layer (BusinessInfinity)
-- Infrastructure layer (Agent Operating System)
-- Integration layer (MCP servers and external systems)
+- Business logic layer (BusinessInfinity) - domain-specific business capabilities
+- Infrastructure layer (Agent Operating System) - reusable agent runtime and services
+- Integration layer (MCP servers and external systems) - external tool and resource access
+
+> **AOS Dependency**: BusinessInfinity depends on [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem) for all infrastructure services. See [AOS Architecture Documentation](https://github.com/ASISaga/AgentOperatingSystem/blob/main/ARCHITECTURE.md) for infrastructure layer details.
 
 **REQ-SYS-002**: The system SHALL be cloud-native and serverless-first, utilizing Azure Functions as the primary runtime.
 
 **REQ-SYS-003**: The system SHALL support horizontal scaling for agent workloads and API endpoints.
 
 ### 2.2 Layered Architecture
+
+BusinessInfinity is built as a business application layer on top of the Agent Operating System infrastructure:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -55,25 +62,46 @@ This specification covers:
 │  • Strategic decision-making processes                    │
 │  • Business workflow orchestration                        │
 │  • External business system integrations                  │
+│  • Risk management and knowledge base                     │
+│  • Global boardroom network and compliance                │
 └─────────────────────────────────────────────────────────────┘
-                               │
-                               │ depends on
-                               ▼
+                              │
+                              │ depends on (via clean interfaces)
+                              ▼
 ┌─────────────────────────────────────────────────────────────┐
 │               Agent Operating System (AOS)                 │
 │                  Infrastructure Layer                       │
 ├─────────────────────────────────────────────────────────────┤
-│  • Agent lifecycle management                             │
-│  • Message bus and communication                          │
-│  • Storage and persistence                                │
-│  • Environment and configuration                          │
-│  • Authentication and security                            │
-│  • ML pipeline and model management                       │
-│  • MCP server integrations                                │
-│  • System monitoring and telemetry                        │
-│  • Base agent classes (LeadershipAgent, BaseAgent)        │
+│  Core Kernel Services:                                    │
+│  • Orchestration Engine    • Agent Lifecycle Manager      │
+│  • Message Bus             • State Machine Manager        │
+│                                                            │
+│  System Services:                                         │
+│  • Storage (Blob, Table, Queue)  • ML Pipeline           │
+│  • Messaging (Service Bus)       • MCP Integration        │
+│  • Auth & Security               • Governance             │
+│  • Reliability (Circuit Breaker) • Observability          │
+│  • Knowledge Management          • Learning Pipeline      │
+│                                                            │
+│  Base Infrastructure:                                     │
+│  • BaseAgent, LeadershipAgent classes                    │
+│  • Service interfaces (IStorage, IMessaging, etc.)       │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**AOS Infrastructure Services Used**:
+
+| AOS Service | Purpose | AOS Specification |
+|-------------|---------|-------------------|
+| Orchestration Engine | Multi-agent workflow coordination | [orchestration.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md) |
+| Storage Manager | Unified data persistence | [storage.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/storage.md) |
+| Message Bus | Inter-agent communication | [messaging.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/messaging.md) |
+| ML Pipeline | Model training and inference | [ml.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/ml.md) |
+| Auth Handler | Authentication and authorization | [auth.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/auth.md) |
+| MCP Integration | External tool access | [mcp.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/mcp.md) |
+| Agent Manager | Agent lifecycle and discovery | [orchestration.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md) |
+
+> **See Also**: [AOS_UTILIZATION_ANALYSIS.md](../../AOS_UTILIZATION_ANALYSIS.md) for detailed analysis of AOS capabilities used and opportunities for improvement.
 
 ### 2.3 Core Components
 
@@ -125,6 +153,103 @@ Components:
 - Network Discovery: Peer discovery and federation
 - Covenant Ledger: Immutable agreement tracking
 
+### 2.4 AgentOperatingSystem Integration
+
+**REQ-SYS-008A**: BusinessInfinity SHALL leverage AgentOperatingSystem (AOS) for all infrastructure services.
+
+#### 2.4.1 AOS Services Integration
+
+BusinessInfinity integrates with AOS through clean service interfaces:
+
+```python
+# Import AOS infrastructure services
+from AgentOperatingSystem.orchestration import OrchestrationEngine
+from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+from AgentOperatingSystem.messaging import ServiceBusManager
+from AgentOperatingSystem.agents import LeadershipAgent, UnifiedAgentManager
+from AgentOperatingSystem.ml import MLPipelineManager
+from AgentOperatingSystem.environment import UnifiedEnvManager
+```
+
+**AOS Infrastructure Utilized**:
+
+| Infrastructure Service | BusinessInfinity Usage | AOS Capability |
+|------------------------|------------------------|----------------|
+| **Orchestration Engine** | Business workflow coordination | Multi-agent orchestration, state management, scheduling |
+| **Unified Storage** | Decision storage, knowledge base, risk registry | Blob, Table, Queue, Cosmos DB abstraction |
+| **Service Bus** | Inter-agent messaging, event broadcasting | Pub/sub, request-response, conversation management |
+| **Agent Manager** | C-Suite agent lifecycle | Registration, discovery, health monitoring |
+| **ML Pipeline** | Agent model training and inference | Azure ML integration, LoRA adapters, inference caching |
+| **Environment Manager** | Configuration and secrets | Azure Key Vault, environment variables, secure config |
+| **Auth Handler** | API authentication, RBAC | Multi-provider auth, session management, RBAC |
+| **MCP Integration** | External tool access | LinkedIn, GitHub, ERPNext integration |
+
+#### 2.4.2 Business Logic Separation
+
+**REQ-SYS-008B**: Business logic SHALL be implemented in BusinessInfinity; infrastructure logic SHALL be delegated to AOS.
+
+**BusinessInfinity Responsibilities** (Business Layer):
+- C-Suite agent business logic (CEO strategic decisions, CFO financial analysis, etc.)
+- Business workflows (product launch, funding rounds, strategic planning)
+- Business analytics and KPIs
+- Risk management and knowledge base (business-specific)
+- Global boardroom network and covenant compliance (business-specific)
+
+**AOS Responsibilities** (Infrastructure Layer):
+- Agent lifecycle management (initialize, start, stop, health)
+- Storage operations (save, load, query across multiple backends)
+- Messaging infrastructure (pub/sub, routing, delivery guarantees)
+- ML pipeline (training, inference, model management)
+- Authentication and authorization
+- Observability (logging, metrics, tracing)
+- Reliability patterns (retry, circuit breaker, idempotency)
+
+#### 2.4.3 Interface-Based Integration
+
+**REQ-SYS-008C**: BusinessInfinity SHALL access AOS services through defined interfaces, not concrete implementations.
+
+Benefits:
+- **Testability**: Mock AOS services in unit tests
+- **Flexibility**: Swap AOS implementations without changing business code
+- **Decoupling**: Changes to AOS internals don't break BusinessInfinity
+- **Clarity**: Clear contracts between layers
+
+Example:
+```python
+# Business agent extends AOS LeadershipAgent
+from AgentOperatingSystem.agents import LeadershipAgent
+
+class BusinessAgent(LeadershipAgent):
+    """Base class for business agents with domain expertise"""
+    
+    def __init__(self, agent_id: str, role: str):
+        super().__init__(agent_id, role, role, config={})
+        self.domain_expertise = []
+        self.business_kpis = {}
+    
+    # Business-specific methods
+    async def analyze_business_context(self, context):
+        """Business analysis logic"""
+        pass
+```
+
+#### 2.4.4 AOS Documentation References
+
+For detailed specifications of infrastructure services, refer to:
+
+- **AOS Main Documentation**: [AgentOperatingSystem/README.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/README.md)
+- **AOS Specifications**: [AgentOperatingSystem/docs/specifications/](https://github.com/ASISaga/AgentOperatingSystem/tree/main/docs/specifications)
+  - Orchestration: [orchestration.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/orchestration.md)
+  - Storage: [storage.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/storage.md)
+  - Messaging: [messaging.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/messaging.md)
+  - ML Pipeline: [ml.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/ml.md)
+  - Authentication: [auth.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/auth.md)
+  - Reliability: [reliability.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/reliability.md)
+  - Observability: [observability.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/observability.md)
+  - Governance: [governance.md](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/governance.md)
+
+**Migration Status**: See [AOS_UTILIZATION_ANALYSIS.md](../../AOS_UTILIZATION_ANALYSIS.md) for analysis of current AOS utilization and planned improvements.
+
 ## 3. Technology Stack
 
 ### 3.1 Runtime Environment
@@ -139,13 +264,16 @@ Components:
 
 **REQ-SYS-010**: The system SHALL depend on the following core frameworks:
 
-| Dependency | Purpose | Version |
-|------------|---------|---------|
-| azure-functions | Serverless runtime | Latest |
-| fastapi | Web framework | >=0.112.2 |
-| pydantic | Data validation | >=2.8.2 |
-| uvicorn | ASGI server | >=0.30.5 |
-| agent-framework | Agent infrastructure | >=1.0.0b251218 |
+| Dependency | Purpose | Version | Layer |
+|------------|---------|---------|-------|
+| **AgentOperatingSystem** | **Infrastructure layer** | **Latest from GitHub** | **Infrastructure** |
+| azure-functions | Serverless runtime | Latest | Runtime |
+| fastapi | Web framework | >=0.112.2 | Runtime |
+| pydantic | Data validation | >=2.8.2 | Runtime |
+| uvicorn | ASGI server | >=0.30.5 | Runtime |
+| agent-framework | Agent base framework | >=1.0.0b251218 | Runtime |
+
+> **Primary Dependency**: [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem) provides all infrastructure services including orchestration, storage, messaging, ML pipeline, authentication, and observability.
 
 ### 3.3 AI/ML Stack
 

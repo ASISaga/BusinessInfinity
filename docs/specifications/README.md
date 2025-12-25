@@ -8,6 +8,8 @@
 
 This directory contains comprehensive technical specifications for the BusinessInfinity system - a perpetual, fully autonomous boardroom of AI agents with strategic voting and continuous decision-making capabilities.
 
+> **🏗️ Built on AOS**: BusinessInfinity is a business application layer built on the [Agent Operating System (AOS)](https://github.com/ASISaga/AgentOperatingSystem) infrastructure. These specifications focus on **business-specific functionality**. For infrastructure services (storage, messaging, orchestration, ML, auth, etc.), refer to [AOS Specifications](https://github.com/ASISaga/AgentOperatingSystem/tree/main/docs/specifications).
+
 ## 📚 Quick Start
 
 **New to BusinessInfinity?** Start here:
