@@ -15,37 +15,71 @@ This specification defines security architecture, authentication mechanisms, aut
 
 This specification covers:
 
-- Authentication mechanisms
-- Authorization and access control
+- Authentication mechanisms (business-specific)
+- Authorization and access control (business roles)
 - Security architecture
-- Data protection
-- Audit and compliance
+- Data protection (business data)
+- Audit and compliance (business requirements)
 - Threat protection
 - Security monitoring
+
+> **AOS Security Infrastructure**: BusinessInfinity leverages the [AOS Authentication & Authorization System](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/auth.md) for security infrastructure. This specification focuses on **business-specific security requirements**. For authentication protocols, session management, and security infrastructure, refer to the AOS Auth specification.
 
 ## 2. Security Architecture
 
 ### 2.1 Security Layers
 
-**SEC-001**: The system SHALL implement defense in depth:
+**SEC-001**: The system SHALL implement defense in depth leveraging AOS security infrastructure:
 
 ```
-┌─────────────────────────────────────────┐
-│  Network Security (Azure Firewall, NSG) │
-├─────────────────────────────────────────┤
-│  Application Gateway (WAF, DDoS)        │
-├─────────────────────────────────────────┤
-│  Authentication (OAuth, JWT, B2C)       │
-├─────────────────────────────────────────┤
-│  Authorization (RBAC, ABAC)             │
-├─────────────────────────────────────────┤
-│  Application Security (Input validation)│
-├─────────────────────────────────────────┤
-│  Data Protection (Encryption, Masking)  │
-├─────────────────────────────────────────┤
-│  Audit & Monitoring (Logging, Alerts)   │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  BusinessInfinity Security (Business Layer)             │
+│  • Business-specific RBAC roles                         │
+│  • Business data protection policies                    │
+│  • Compliance requirements (SOX, GDPR, etc.)            │
+├──────────────────────────────────────────────────────────┤
+│  AOS Security Infrastructure                             │
+│  • Multi-provider authentication (B2C, OAuth, JWT)      │
+│  • Session management and token lifecycle               │
+│  • RBAC enforcement engine                              │
+│  • Audit logging infrastructure                         │
+├──────────────────────────────────────────────────────────┤
+│  Azure Platform Security                                 │
+│  • Network Security (Azure Firewall, NSG)               │
+│  • Application Gateway (WAF, DDoS)                      │
+│  • Key Vault (secrets, certificates)                    │
+│  • Managed Identity                                      │
+│  • Encryption at rest and in transit                    │
+├──────────────────────────────────────────────────────────┤
+│  Application-Level Security (BI + AOS)                   │
+│  • Input validation and sanitization                    │
+│  • Business logic authorization checks                  │
+│  • Data masking for sensitive information               │
+│  • Rate limiting and throttling                         │
+├──────────────────────────────────────────────────────────┤
+│  Observability & Monitoring (AOS)                        │
+│  • Security event logging                               │
+│  • Anomaly detection and alerting                       │
+│  • Compliance audit trails                              │
+│  • Security metrics and dashboards                      │
+└──────────────────────────────────────────────────────────┘
 ```
+
+**Security Responsibility Split**:
+
+| Layer | Responsibility | Provided By |
+|-------|---------------|-------------|
+| **Business** | Business RBAC roles (Admin, Operator, Analyst, etc.) | BusinessInfinity |
+| **Business** | Business data protection policies | BusinessInfinity |
+| **Business** | Compliance requirements (industry-specific) | BusinessInfinity |
+| **Infrastructure** | Authentication protocols (OAuth, JWT, B2C) | AgentOperatingSystem |
+| **Infrastructure** | Session management, token lifecycle | AgentOperatingSystem |
+| **Infrastructure** | Audit logging infrastructure | AgentOperatingSystem |
+| **Azure** | Network security, Key Vault, Managed Identity | Microsoft Azure |
+
+> **See Also**: 
+> - [AOS Authentication Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/auth.md) for authentication infrastructure
+> - [AOS Governance Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/governance.md) for audit logging
 
 ### 2.2 Security Principles
 

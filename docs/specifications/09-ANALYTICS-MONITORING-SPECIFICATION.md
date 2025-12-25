@@ -15,41 +15,67 @@ This specification defines analytics capabilities, business intelligence, monito
 
 This specification covers:
 
-- Business analytics and KPIs
-- Agent performance monitoring
+- Business analytics and KPIs (business-specific metrics)
+- Agent performance monitoring (business agents)
 - System monitoring and observability
 - Metrics collection and analysis
 - Alerting and notification
 - Dashboards and reporting
+
+> **AOS Observability Infrastructure**: BusinessInfinity leverages the [AOS Observability System](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/observability.md) for monitoring infrastructure. This specification focuses on **business analytics and KPIs**. For system-level observability (metrics, logging, tracing, alerting), refer to the AOS Observability specification.
 
 ## 2. Analytics Architecture
 
 ### 2.1 Analytics Layers
 
 ```
-┌─────────────────────────────────────────┐
-│  Presentation Layer                    │
-│  ├── Dashboards                        │
-│  ├── Reports                           │
-│  └── Visualizations                    │
-├─────────────────────────────────────────┤
-│  Analytics Layer                       │
-│  ├── Business Analytics                │
-│  ├── Agent Analytics                   │
-│  ├── Workflow Analytics                │
-│  └── Network Analytics                 │
-├─────────────────────────────────────────┤
-│  Metrics Layer                         │
-│  ├── Metrics Collection                │
-│  ├── Metrics Aggregation               │
-│  └── Metrics Storage                   │
-├─────────────────────────────────────────┤
-│  Data Layer                            │
-│  ├── Time-Series Database              │
-│  ├── Data Warehouse                    │
-│  └── Real-time Stream                  │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  BusinessInfinity Analytics (Business Layer)            │
+│  • Business KPIs and metrics                            │
+│  • Agent performance analytics                          │
+│  • Workflow analytics                                    │
+│  • Business dashboards and reports                      │
+├──────────────────────────────────────────────────────────┤
+│  Presentation Layer (BI)                                 │
+│  ├── Business Dashboards (strategic, operational)       │
+│  ├── Executive Reports (decisions, risks, KPIs)         │
+│  └── Business Visualizations (charts, graphs)           │
+├──────────────────────────────────────────────────────────┤
+│  Analytics Layer (BI)                                    │
+│  ├── Business Analytics (revenue, growth, efficiency)   │
+│  ├── Agent Analytics (decisions, performance, accuracy) │
+│  ├── Workflow Analytics (completion, duration, success) │
+│  └── Network Analytics (covenant compliance, peers)     │
+├──────────────────────────────────────────────────────────┤
+│  AOS Observability Infrastructure                        │
+│  ├── Metrics Collection (counters, gauges, histograms)  │
+│  ├── Metrics Aggregation and storage                    │
+│  ├── Structured Logging with correlation IDs            │
+│  ├── Distributed Tracing across services                │
+│  └── Alerting and notification system                   │
+├──────────────────────────────────────────────────────────┤
+│  Data Layer (AOS + Azure)                                │
+│  ├── Time-Series Database (Azure Monitor, App Insights) │
+│  ├── Data Warehouse (Azure Synapse Analytics)           │
+│  ├── Real-time Streams (Azure Stream Analytics)         │
+│  └── Storage (Azure Table, Cosmos DB)                   │
+└──────────────────────────────────────────────────────────┘
 ```
+
+**Layer Responsibilities**:
+
+| Layer | Responsibility | Provided By |
+|-------|---------------|-------------|
+| **Business** | Business KPIs, agent performance metrics, business reports | BusinessInfinity |
+| **Business** | Business-specific dashboards and visualizations | BusinessInfinity |
+| **Infrastructure** | Metrics collection (counters, gauges, histograms) | AgentOperatingSystem |
+| **Infrastructure** | Structured logging, distributed tracing | AgentOperatingSystem |
+| **Infrastructure** | Alerting engine, notification system | AgentOperatingSystem |
+| **Azure** | Time-series DB, data warehouse, monitoring | Microsoft Azure |
+
+> **See Also**:
+> - [AOS Observability Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/observability.md) for system observability
+> - [AOS Reliability Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/reliability.md) for health checks and monitoring
 
 ## 3. Business Analytics
 

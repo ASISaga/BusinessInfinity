@@ -15,12 +15,14 @@ This specification defines external system integrations, MCP server connections,
 
 This specification covers:
 
-- MCP server integrations
-- External API integrations
+- MCP server integrations (business-specific)
+- External API integrations (business systems)
 - Integration architecture
 - Data exchange formats
 - Error handling and resilience
 - Integration monitoring
+
+> **AOS MCP Infrastructure**: BusinessInfinity leverages the [AOS MCP Integration Service](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/mcp.md) for Model Context Protocol infrastructure. This specification focuses on **business-specific MCP servers and integrations**. For MCP protocol implementation, client lifecycle, and tool discovery, refer to the AOS MCP specification.
 
 ## 2. Integration Architecture
 
@@ -37,24 +39,49 @@ This specification covers:
 ### 2.2 Integration Layers
 
 ```
-┌─────────────────────────────────────────┐
-│  Business Logic Layer                  │
-├─────────────────────────────────────────┤
-│  Integration Adapters                  │
-│  ├── MCP Adapter                       │
-│  ├── API Adapter                       │
-│  ├── Event Adapter                     │
-│  └── Batch Adapter                     │
-├─────────────────────────────────────────┤
-│  Protocol Layer                        │
-│  ├── HTTP/HTTPS                        │
-│  ├── WebSocket                         │
-│  ├── Service Bus                       │
-│  └── File Transfer                     │
-├─────────────────────────────────────────┤
-│  External Systems                      │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  BusinessInfinity Application Layer                    │
+│  • Business-specific integrations                      │
+│  • Business data transformations                       │
+│  • Business logic and validations                      │
+├─────────────────────────────────────────────────────────┤
+│  Integration Adapters (Business Layer)                 │
+│  ├── LinkedIn MCP Adapter (professional verification)  │
+│  ├── ERPNext MCP Adapter (ERP operations)             │
+│  ├── CRM API Adapter (customer management)            │
+│  └── Business Event Adapters                          │
+├─────────────────────────────────────────────────────────┤
+│  AOS Infrastructure Layer                              │
+│  • MCP Client (protocol implementation)               │
+│  • Service Bus Manager (messaging infrastructure)     │
+│  • HTTP/WebSocket clients                             │
+│  • Reliability patterns (retry, circuit breaker)      │
+├─────────────────────────────────────────────────────────┤
+│  Protocol Layer (AOS + Azure)                          │
+│  ├── HTTP/HTTPS                                        │
+│  ├── WebSocket                                         │
+│  ├── Azure Service Bus                                │
+│  └── File Transfer                                     │
+├─────────────────────────────────────────────────────────┤
+│  External Systems                                      │
+│  • LinkedIn API                                        │
+│  • ERPNext                                             │
+│  • CRM Systems                                         │
+│  • Other Business Systems                             │
+└─────────────────────────────────────────────────────────┘
 ```
+
+**Layer Responsibilities**:
+
+| Layer | Responsibility | Provided By |
+|-------|---------------|-------------|
+| **Business** | Business-specific MCP servers, business data models | BusinessInfinity |
+| **Business** | Business integration adapters, transformations | BusinessInfinity |
+| **Infrastructure** | MCP protocol, client lifecycle, tool discovery | AgentOperatingSystem |
+| **Infrastructure** | Messaging, reliability patterns, observability | AgentOperatingSystem |
+| **Azure** | Service Bus, HTTP clients, networking | Microsoft Azure |
+
+> **See Also**: [AOS MCP Specification](https://github.com/ASISaga/AgentOperatingSystem/blob/main/docs/specifications/mcp.md) for MCP infrastructure details.
 
 ## 3. MCP Server Integrations
 
