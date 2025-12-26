@@ -1,17 +1,31 @@
 """
 Service Interfaces for Business Infinity
 
-Provides clean service interfaces that wrap AOS infrastructure services,
-enabling better testability, decoupling, and future-proofing.
+REFACTORED: Now imports from AgentOperatingSystem infrastructure layer.
 
-Following AOS_UTILIZATION_ANALYSIS.md Priority 1 recommendations.
+This module imports generic service interfaces from AOS and provides
+AOS-specific concrete implementations for BusinessInfinity.
 """
 
-from typing import Dict, Any, List, Optional, Protocol
-from abc import ABC, abstractmethod
+# Import generic interfaces from AOS
+try:
+    from AgentOperatingSystem.service_interfaces import (
+        IStorageService,
+        IMessagingService,
+        IWorkflowService,
+        IAuthService
+    )
+    
+    AOS_AVAILABLE = True
+    
+except ImportError:
+    # Fallback to local definitions if AOS not available yet
+    AOS_AVAILABLE = False
+    from typing import Dict, Any, List, Optional, Protocol
+    from abc import ABC, abstractmethod
 
 
-class IStorageService(Protocol):
+    class IStorageService(Protocol):
     """
     Storage Service Interface
     

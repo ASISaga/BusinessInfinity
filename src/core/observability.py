@@ -1,31 +1,61 @@
 """
 Observability for Business Infinity
 
-Implements enhanced observability as recommended in AOS_UTILIZATION_ANALYSIS.md:
-- Structured logging with correlation IDs
-- Distributed tracing
-- Metrics collection (counters, gauges, histograms)
-- Health checks and readiness probes
+REFACTORED: Now imports from AgentOperatingSystem infrastructure layer.
 
-These capabilities provide visibility into system behavior and performance.
+This module re-exports observability components from AOS for backward compatibility.
+All infrastructure implementations are now in AOS, while business-specific
+usage remains in BusinessInfinity.
 """
 
-import logging
-import time
-import uuid
-from typing import Dict, Any, Optional, List
-from datetime import datetime
-from contextlib import contextmanager
-from collections import defaultdict
-import json
+# Import everything from AOS observability module
+try:
+    from AgentOperatingSystem.observability import (
+        CorrelationContext,
+        get_correlation_context,
+        set_correlation_context,
+        correlation_scope,
+        StructuredLogger,
+        MetricsCollector,
+        HealthCheck,
+        get_metrics_collector,
+        get_health_check,
+        create_structured_logger
+    )
+    
+    # Re-export for backward compatibility
+    __all__ = [
+        'CorrelationContext',
+        'get_correlation_context',
+        'set_correlation_context',
+        'correlation_scope',
+        'StructuredLogger',
+        'MetricsCollector',
+        'HealthCheck',
+        'get_metrics_collector',
+        'get_health_check',
+        'create_structured_logger'
+    ]
+
+except ImportError:
+    # Fallback to local implementation if AOS not available yet
+    # This allows gradual migration
+    import logging
+    import time
+    import uuid
+    from typing import Dict, Any, Optional, List
+    from datetime import datetime
+    from contextlib import contextmanager
+    from collections import defaultdict
+    import json
 
 
-# Thread-local storage for correlation context
-import threading
-_correlation_context = threading.local()
+    # Thread-local storage for correlation context
+    import threading
+    _correlation_context = threading.local()
 
 
-class CorrelationContext:
+    class CorrelationContext:
     """
     Correlation Context for Distributed Tracing
     
