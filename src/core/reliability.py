@@ -1,33 +1,57 @@
 """
 Reliability Patterns for Business Infinity
 
-Implements reliability patterns as recommended in AOS_UTILIZATION_ANALYSIS.md:
-- Circuit breaker pattern
-- Retry logic with exponential backoff
-- Idempotency handling
-- Backpressure management
+REFACTORED: Now imports from AgentOperatingSystem infrastructure layer.
 
-These patterns ensure robust fault tolerance and resilience.
+This module re-exports reliability patterns from AOS for backward compatibility.
+All infrastructure implementations are now in AOS, while business-specific
+usage remains in BusinessInfinity.
 """
 
-import asyncio
-import logging
-import time
-from typing import Callable, Any, Optional, Dict
-from enum import Enum
-from functools import wraps
-from datetime import datetime, timedelta
-import random
+# Import everything from AOS reliability module
+try:
+    from AgentOperatingSystem.reliability import (
+        CircuitBreaker,
+        RetryPolicy,
+        IdempotencyHandler,
+        CircuitState,
+        with_circuit_breaker,
+        with_retry,
+        with_idempotency
+    )
+    
+    # Re-export for backward compatibility
+    __all__ = [
+        'CircuitBreaker',
+        'RetryPolicy',
+        'IdempotencyHandler',
+        'CircuitState',
+        'with_circuit_breaker',
+        'with_retry',
+        'with_idempotency'
+    ]
+
+except ImportError:
+    # Fallback to local implementation if AOS not available yet
+    # This allows gradual migration
+    import asyncio
+    import logging
+    import time
+    from typing import Callable, Any, Optional, Dict
+    from enum import Enum
+    from functools import wraps
+    from datetime import datetime, timedelta
+    import random
 
 
-class CircuitState(Enum):
-    """Circuit breaker states."""
-    CLOSED = "closed"  # Normal operation
-    OPEN = "open"  # Failing, reject requests
-    HALF_OPEN = "half_open"  # Testing if service recovered
+    class CircuitState(Enum):
+        """Circuit breaker states."""
+        CLOSED = "closed"  # Normal operation
+        OPEN = "open"  # Failing, reject requests
+        HALF_OPEN = "half_open"  # Testing if service recovered
 
 
-class CircuitBreaker:
+    class CircuitBreaker:
     """
     Circuit Breaker Pattern Implementation
     

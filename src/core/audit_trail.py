@@ -1,6 +1,19 @@
 """
-Comprehensive Audit Trail Manager for Business Infinity
+Business-Specific Audit Trail for Business Infinity
 
+NOTE: After AOS migration, this file should be refactored to extend
+AgentOperatingSystem.audit_trail.AuditTrailManager base class.
+
+See /temp/aos_migration/audit_trail.py for the generic infrastructure
+that should be moved to AOS.
+
+TODO Post-AOS Migration:
+1. Import base classes from AOS: AuditTrailManager, AuditEvent, AuditSeverity
+2. Keep business-specific AuditEventType enum
+3. Extend AuditTrailManager to add business-specific log methods
+4. Remove generic infrastructure code duplicated in AOS
+
+Current Implementation:
 Provides rigorous audit logging for:
 - Boardroom agent actions and decisions
 - MCP server interactions (LinkedIn, Reddit, ERPNext, etc.)
