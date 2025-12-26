@@ -17,6 +17,7 @@ from typing import Callable, Any, Optional, Dict
 from enum import Enum
 from functools import wraps
 from datetime import datetime, timedelta
+import random
 
 
 class CircuitState(Enum):
@@ -156,7 +157,6 @@ class RetryPolicy:
         
         # Add jitter to prevent thundering herd
         if self.jitter:
-            import random
             delay = delay * (0.5 + random.random())
         
         return delay

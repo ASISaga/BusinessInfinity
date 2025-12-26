@@ -100,9 +100,18 @@ class BusinessInfinity:
         
         # Wrap AOS services with clean interfaces (Priority 1: Adopt Service Interfaces)
         self.storage_service: IStorageService = AOSStorageService(self.storage_manager)
-        # Messaging and workflow services will be initialized when available
-        self.messaging_service: Optional[IMessagingService] = None
-        self.workflow_service: Optional[IWorkflowService] = None
+        
+        # Initialize messaging and workflow services if available
+        # These will be properly initialized when AOS components are available
+        if hasattr(self.aos, 'messaging_manager'):
+            self.messaging_service: IMessagingService = AOSMessagingService(self.aos.messaging_manager)
+        else:
+            self.messaging_service: Optional[IMessagingService] = None
+        
+        if hasattr(self.aos, 'orchestration_engine'):
+            self.workflow_service: IWorkflowService = AOSWorkflowService(self.aos.orchestration_engine)
+        else:
+            self.workflow_service: Optional[IWorkflowService] = None
         
         # Initialize reliability patterns (Priority 1: Implement Reliability Patterns)
         self.circuit_breaker = CircuitBreaker(

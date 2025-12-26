@@ -264,8 +264,7 @@ class MetricsCollector:
         self.histograms.clear()
         self.last_reset = time.time()
     
-    @staticmethod
-    def _make_key(name: str, tags: Optional[Dict[str, str]]) -> str:
+    def _make_key(self, name: str, tags: Optional[Dict[str, str]]) -> str:
         """Create metric key with tags."""
         if not tags:
             return name
