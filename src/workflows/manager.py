@@ -2,8 +2,8 @@
 Business Workflow Manager
 
 Manages business workflows and strategic decision-making processes
-using the AOS orchestration infrastructure.            ]
-        ]"""
+using the AOS orchestration infrastructure.
+"""
 
 import asyncio
 import logging
@@ -15,6 +15,9 @@ from AgentOperatingSystem import AgentOperatingSystem
 from AgentOperatingSystem.orchestration import OrchestrationEngine, WorkflowStep
 
 from core.config import BusinessInfinityConfig
+# Import AOS utilization improvements (Priority 1)
+from core.observability import create_structured_logger, correlation_scope, get_metrics_collector
+from core.reliability import with_circuit_breaker, with_retry
 
 # Create placeholder classes for orchestration
 class WorkflowStep:
@@ -62,7 +65,10 @@ class BusinessWorkflowManager:
         """Initialize Business Workflow Manager."""
         self.aos = aos
         self.config = config
-        self.logger = logger
+        # Use structured logger (Priority 1: Enhanced Observability)
+        self.logger = create_structured_logger(__name__)
+        # Get metrics collector
+        self.metrics = get_metrics_collector()
         
         # Workflow registry
         self.workflows: Dict[str, Dict[str, Any]] = {}
@@ -77,24 +83,32 @@ class BusinessWorkflowManager:
 
     async def initialize(self):
         """Initialize workflow manager."""
-        try:
-            self.logger.info("Initializing Business Workflow Manager...")
-            
-            # Ensure AOS has required orchestration engine
-            if not hasattr(self.aos, 'orchestration_engine'):
-                self.aos.orchestration_engine = self._create_mock_orchestration_engine()
-            
-            # Register business workflow templates
-            await self._register_workflow_templates()
-            
-            # Start monitoring
-            self._monitoring_task = asyncio.create_task(self._monitoring_loop())
-            
-            self.logger.info("Business Workflow Manager initialized")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to initialize Business Workflow Manager: {e}")
-            raise
+        with correlation_scope(operation_name="workflow_manager_initialization"):
+            try:
+                self.logger.info("Initializing Business Workflow Manager",
+                               component="WorkflowManager")
+                self.metrics.increment_counter("workflow_manager.initialization.started")
+                
+                # Ensure AOS has required orchestration engine
+                if not hasattr(self.aos, 'orchestration_engine'):
+                    self.aos.orchestration_engine = self._create_mock_orchestration_engine()
+                
+                # Register business workflow templates
+                await self._register_workflow_templates()
+                
+                # Start monitoring
+                self._monitoring_task = asyncio.create_task(self._monitoring_loop())
+                
+                self.metrics.increment_counter("workflow_manager.initialization.success")
+                self.logger.info("Business Workflow Manager initialized",
+                               templates_count=len(self.workflow_templates))
+                
+            except Exception as e:
+                self.metrics.increment_counter("workflow_manager.initialization.failed")
+                self.logger.error("Failed to initialize Business Workflow Manager",
+                                error=str(e),
+                                error_type=type(e).__name__)
+                raise
 
     async def _register_workflow_templates(self):
         """Register business workflow templates."""
@@ -227,10 +241,15 @@ class BusinessWorkflowManager:
         """Monitor active workflows."""
         while True:
             try:
-                await self._check_workflow_health()
+                with correlation_scope(operation_name="workflow_monitoring"):
+                    await self._check_workflow_health()
+                    self.metrics.increment_counter("workflow_manager.monitoring.completed")
                 await asyncio.sleep(60)  # Check every minute
             except Exception as e:
-                self.logger.error(f"Workflow monitoring error: {e}")
+                self.metrics.increment_counter("workflow_manager.monitoring.failed")
+                self.logger.error("Workflow monitoring error",
+                                error=str(e),
+                                error_type=type(e).__name__)
                 await asyncio.sleep(30)
 
     async def _check_workflow_health(self):
@@ -244,12 +263,21 @@ class BusinessWorkflowManager:
                 workflow_data["status"] = workflow_status.get("status", "unknown")
                 workflow_data["last_health_check"] = datetime.utcnow()
                 
+                # Track workflow status metric
+                self.metrics.set_gauge(
+                    "workflow_manager.workflow.status",
+                    1.0 if workflow_status.get("status") == "running" else 0.0,
+                    tags={"workflow_id": workflow_id}
+                )
+                
                 # Clean up completed workflows
                 if workflow_status.get("status") in ["completed", "failed", "cancelled"]:
                     await self._handle_workflow_completion(workflow_id, workflow_data)
                     
             except Exception as e:
-                self.logger.error(f"Health check failed for workflow {workflow_id}: {e}")
+                self.logger.error("Health check failed for workflow",
+                                workflow_id=workflow_id,
+                                error=str(e))
 
     async def _handle_workflow_completion(self, workflow_id: str, workflow_data: Dict[str, Any]):
         """Handle workflow completion."""
@@ -258,132 +286,171 @@ class BusinessWorkflowManager:
             if workflow_id not in self.workflow_metrics:
                 self.workflow_metrics[workflow_id] = {}
             
+            duration = (datetime.utcnow() - workflow_data.get("started_at", datetime.utcnow())).total_seconds()
+            
             self.workflow_metrics[workflow_id].update({
                 "completion_time": datetime.utcnow(),
-                "duration_seconds": (datetime.utcnow() - workflow_data.get("started_at", datetime.utcnow())).total_seconds(),
+                "duration_seconds": duration,
                 "final_status": workflow_data["status"]
             })
+            
+            # Record metrics
+            self.metrics.increment_counter(
+                "workflow_manager.workflow.completed",
+                tags={"status": workflow_data["status"]}
+            )
+            self.metrics.record_histogram(
+                "workflow_manager.workflow.duration",
+                duration,
+                tags={"workflow_type": workflow_data.get("type")}
+            )
             
             # Archive workflow
             self.workflows[workflow_id] = workflow_data
             del self.active_workflows[workflow_id]
             
-            self.logger.info(f"Workflow {workflow_id} completed with status: {workflow_data['status']}")
+            self.logger.info("Workflow completed",
+                           workflow_id=workflow_id,
+                           status=workflow_data["status"],
+                           duration_seconds=duration)
             
         except Exception as e:
-            self.logger.error(f"Error handling workflow completion for {workflow_id}: {e}")
+            self.logger.error("Error handling workflow completion",
+                            workflow_id=workflow_id,
+                            error=str(e))
 
+    @with_retry(max_retries=3, base_delay=2.0)
     async def make_strategic_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute strategic decision workflow."""
-        try:
-            workflow_id = f"strategic_decision_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
-            
-            # Create workflow context
-            workflow_context = {
-                "workflow_id": workflow_id,
-                "workflow_type": "strategic_decision",
-                "decision_context": decision_context,
-                "initiated_by": decision_context.get("initiated_by", "system"),
-                "priority": decision_context.get("priority", "high")
-            }
-            
-            # Execute workflow using AOS orchestration
-            workflow_result = await self.aos.orchestration_engine.execute_workflow(
-                workflow_id=workflow_id,
-                steps=self.workflow_templates["strategic_decision"],
-                context=workflow_context
-            )
-            
-            # Track active workflow
-            self.active_workflows[workflow_id] = {
-                "workflow_id": workflow_id,
-                "type": "strategic_decision",
-                "status": WorkflowStatus.RUNNING.value,
-                "started_at": datetime.utcnow(),
-                "context": workflow_context,
-                "result": workflow_result
-            }
-            
-            return {
-                "workflow_id": workflow_id,
-                "status": "initiated",
-                "decision_context": decision_context,
-                "estimated_completion": "15-30 minutes",
-                "tracking_url": f"/workflows/{workflow_id}"
-            }
-            
-        except Exception as e:
-            self.logger.error(f"Strategic decision workflow failed: {e}")
-            return {
-                "error": str(e),
-                "status": "failed",
-                "decision_context": decision_context
-            }
+        """Execute strategic decision workflow with retry logic."""
+        with correlation_scope(operation_name="make_strategic_decision"):
+            try:
+                workflow_id = f"strategic_decision_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+                
+                self.logger.info("Executing strategic decision workflow",
+                               workflow_id=workflow_id,
+                               decision_type=decision_context.get("type"))
+                self.metrics.increment_counter("workflow_manager.strategic_decision.started")
+                
+                # Create workflow context
+                workflow_context = {
+                    "workflow_id": workflow_id,
+                    "workflow_type": "strategic_decision",
+                    "decision_context": decision_context,
+                    "initiated_by": decision_context.get("initiated_by", "system"),
+                    "priority": decision_context.get("priority", "high")
+                }
+                
+                # Execute workflow using AOS orchestration
+                workflow_result = await self.aos.orchestration_engine.execute_workflow(
+                    workflow_id=workflow_id,
+                    steps=self.workflow_templates["strategic_decision"],
+                    context=workflow_context
+                )
+                
+                # Track active workflow
+                self.active_workflows[workflow_id] = {
+                    "workflow_id": workflow_id,
+                    "type": "strategic_decision",
+                    "status": WorkflowStatus.RUNNING.value,
+                    "started_at": datetime.utcnow(),
+                    "context": workflow_context,
+                    "result": workflow_result
+                }
+                
+                self.metrics.increment_counter("workflow_manager.strategic_decision.success")
+                return {
+                    "workflow_id": workflow_id,
+                    "status": "initiated",
+                    "decision_context": decision_context,
+                    "estimated_completion": "15-30 minutes",
+                    "tracking_url": f"/workflows/{workflow_id}",
+                    "result": workflow_result
+                }
+                
+            except Exception as e:
+                self.metrics.increment_counter("workflow_manager.strategic_decision.failed")
+                self.logger.error("Strategic decision workflow failed",
+                                error=str(e),
+                                error_type=type(e).__name__)
+                raise
 
+    @with_retry(max_retries=2, base_delay=1.0)
     async def execute_business_workflow(self, workflow_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute a named business workflow."""
-        try:
-            if workflow_name not in self.workflow_templates:
-                raise ValueError(f"Unknown workflow template: {workflow_name}")
-            
-            workflow_id = f"{workflow_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
-            
-            # Create workflow context
-            workflow_context = {
-                "workflow_id": workflow_id,
-                "workflow_type": workflow_name,
-                "parameters": parameters,
-                "initiated_by": parameters.get("initiated_by", "system"),
-                "priority": parameters.get("priority", "normal")
-            }
-            
-            # Execute workflow
-            workflow_result = await self.aos.orchestration_engine.execute_workflow(
-                workflow_id=workflow_id,
-                steps=self.workflow_templates[workflow_name],
-                context=workflow_context
-            )
-            
-            # Track active workflow
-            self.active_workflows[workflow_id] = {
-                "workflow_id": workflow_id,
-                "type": workflow_name,
-                "status": WorkflowStatus.RUNNING.value,
-                "started_at": datetime.utcnow(),
-                "context": workflow_context,
-                "result": workflow_result
-            }
-            
-            return {
-                "workflow_id": workflow_id,
-                "workflow_name": workflow_name,
-                "status": "initiated",
-                "parameters": parameters,
-                "tracking_url": f"/workflows/{workflow_id}"
-            }
-            
-        except Exception as e:
-            self.logger.error(f"Business workflow {workflow_name} failed: {e}")
-            return {
-                "error": str(e),
-                "workflow_name": workflow_name,
-                "status": "failed",
-                "parameters": parameters
-            }
+        """Execute a named business workflow with retry logic."""
+        with correlation_scope(operation_name="execute_business_workflow"):
+            try:
+                if workflow_name not in self.workflow_templates:
+                    raise ValueError(f"Unknown workflow template: {workflow_name}")
+                
+                workflow_id = f"{workflow_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+                
+                self.logger.info("Executing business workflow",
+                               workflow_id=workflow_id,
+                               workflow_name=workflow_name)
+                self.metrics.increment_counter("workflow_manager.workflow.started",
+                                              tags={"workflow": workflow_name})
+                
+                # Create workflow context
+                workflow_context = {
+                    "workflow_id": workflow_id,
+                    "workflow_type": workflow_name,
+                    "parameters": parameters,
+                    "initiated_by": parameters.get("initiated_by", "system"),
+                    "priority": parameters.get("priority", "normal")
+                }
+                
+                # Execute workflow
+                workflow_result = await self.aos.orchestration_engine.execute_workflow(
+                    workflow_id=workflow_id,
+                    steps=self.workflow_templates[workflow_name],
+                    context=workflow_context
+                )
+                
+                # Track active workflow
+                self.active_workflows[workflow_id] = {
+                    "workflow_id": workflow_id,
+                    "type": workflow_name,
+                    "status": WorkflowStatus.RUNNING.value,
+                    "started_at": datetime.utcnow(),
+                    "context": workflow_context,
+                    "result": workflow_result
+                }
+                
+                self.metrics.increment_counter("workflow_manager.workflow.success",
+                                              tags={"workflow": workflow_name})
+                return {
+                    "workflow_id": workflow_id,
+                    "workflow_name": workflow_name,
+                    "status": "initiated",
+                    "parameters": parameters,
+                    "tracking_url": f"/workflows/{workflow_id}",
+                    "result": workflow_result
+                }
+                
+            except Exception as e:
+                self.metrics.increment_counter("workflow_manager.workflow.failed",
+                                              tags={"workflow": workflow_name})
+                self.logger.error("Business workflow failed",
+                                workflow_name=workflow_name,
+                                error=str(e),
+                                error_type=type(e).__name__)
+                raise
 
     async def run_strategic_planning(self):
         """Run strategic planning process."""
-        if not self.config.enable_strategic_planning:
-            return
-        
-        try:
-            self.logger.info("Running strategic planning process...")
+        with correlation_scope(operation_name="run_strategic_planning"):
+            if not self.config.enable_strategic_planning:
+                return
             
-            # Create strategic planning context
-            planning_context = {
-                "planning_type": "strategic",
-                "horizon": "quarterly",
-                "initiated_by": "system",
+            try:
+                self.logger.info("Running strategic planning process")
+                self.metrics.increment_counter("workflow_manager.strategic_planning.started")
+                
+                # Create strategic planning context
+                planning_context = {
+                    "planning_type": "strategic",
+                    "horizon": "quarterly",
+                    "initiated_by": "system",
                 "priority": "high"
             }
             
