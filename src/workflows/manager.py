@@ -461,16 +461,20 @@ class BusinessWorkflowManager:
                     "planning_type": "strategic",
                     "horizon": "quarterly",
                     "initiated_by": "system",
-                "priority": "high"
-            }
-            
-            # Execute strategic decision workflow
-            result = await self.make_strategic_decision(planning_context)
-            
-            self.logger.info(f"Strategic planning initiated: {result.get('workflow_id', 'unknown')}")
-            
-        except Exception as e:
-            self.logger.error(f"Strategic planning failed: {e}")
+                    "priority": "high"
+                }
+                
+                # Execute strategic decision workflow
+                result = await self.make_strategic_decision(planning_context)
+                
+                self.logger.info("Strategic planning initiated",
+                               workflow_id=result.get('workflow_id', 'unknown'))
+                
+            except Exception as e:
+                self.metrics.increment_counter("workflow_manager.strategic_planning.failed")
+                self.logger.error("Strategic planning failed",
+                                error=str(e),
+                                error_type=type(e).__name__)
 
     async def get_workflows_status(self) -> Dict[str, Any]:
         """Get status of all workflows."""
