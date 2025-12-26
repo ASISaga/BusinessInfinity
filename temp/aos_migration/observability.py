@@ -9,6 +9,9 @@ This module provides generic, reusable observability capabilities for any agent-
 
 These capabilities provide visibility into system behavior and performance.
 
+NOTE: For async applications, consider using contextvars instead of threading.local()
+for correlation context to properly handle async/await patterns.
+
 Usage:
     from AgentOperatingSystem.observability import (
         correlation_scope, StructuredLogger, get_metrics_collector
@@ -36,6 +39,8 @@ import json
 
 
 # Thread-local storage for correlation context
+# NOTE: For async applications using asyncio, consider using contextvars.ContextVar
+# instead of threading.local() for proper async context propagation
 import threading
 _correlation_context = threading.local()
 
@@ -307,11 +312,17 @@ class MetricsCollector:
         self.last_reset = time.time()
     
     def _make_key(self, name: str, tags: Optional[Dict[str, str]]) -> str:
-        """Create metric key with tags."""
+        """
+        Create metric key with tags.
+        
+        Uses colon-separated format to avoid conflicts with metric systems
+        that use special characters like square brackets for labels.
+        Format: metric_name:tag1=value1,tag2=value2
+        """
         if not tags:
             return name
         tag_str = ",".join(f"{k}={v}" for k, v in sorted(tags.items()))
-        return f"{name}[{tag_str}]"
+        return f"{name}:{tag_str}"
 
 
 class HealthCheck:

@@ -103,8 +103,14 @@ class AuditEvent:
         if 'compliance_tags' in data:
             data['compliance_tags'] = list(data['compliance_tags'])
         
+        # Convert datetime objects to ISO format for deterministic serialization
+        if 'timestamp' in data and isinstance(data['timestamp'], datetime):
+            data['timestamp'] = data['timestamp'].isoformat()
+        if 'retention_until' in data and data['retention_until'] and isinstance(data['retention_until'], datetime):
+            data['retention_until'] = data['retention_until'].isoformat()
+        
         # Serialize to JSON string with deterministic ordering
-        json_str = json.dumps(data, sort_keys=True, default=str)
+        json_str = json.dumps(data, sort_keys=True)
         return hashlib.sha256(json_str.encode()).hexdigest()
     
     def verify_integrity(self) -> bool:
