@@ -2,58 +2,51 @@
 
 Business Infinity is a comprehensive enterprise business application built on the **Agent Operating System (AOS)** infrastructure. It provides strategic decision-making, operational execution, and growth management capabilities through AI-powered C-Suite agents, Founder, and Investor agents.
 
-> **🏗️ Built on AOS**: BusinessInfinity leverages the [Agent Operating System](https://github.com/ASISaga/AgentOperatingSystem) as its foundational infrastructure layer, providing agent lifecycle management, messaging, storage, ML pipelines, and observability. See [AOS Integration](#aos-integration) for details.
+> **🏗️ Built on Generic Runtime**: BusinessInfinity now uses a **generic, reusable runtime environment** that separates infrastructure from business logic. The `runtime/` package can be used to build **any application** on AgentOperatingSystem, not just BusinessInfinity. See [Runtime Architecture](#runtime-architecture) for details.
+
+> **🔧 Configuration-Driven**: BusinessInfinity is now primarily **configuration-driven** with minimal custom code. Most behavior is controlled through `src/bi_config.py` and environment variables.
 
 ## Architecture Overview
 
-BusinessInfinity follows a clean layered architecture where business logic is completely separated from infrastructure:
+BusinessInfinity now uses a **three-layer architecture** with clear separation between business logic, generic runtime, and infrastructure:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Business Infinity (BI)                  │
-│                   Business Application Layer                │
+│                 BusinessInfinity Application               │
+│  (Business-specific configuration and logic)               │
 ├─────────────────────────────────────────────────────────────┤
-│  • Business logic and workflows                           │
-│  • Business-specific agents (CEO, CFO, CTO, etc.)         │
-│  • Business analytics and KPIs                            │
-│  • Strategic decision-making processes                    │
-│  • Business workflow orchestration                        │
-│  • External business system integrations                  │
-│  • Risk management and knowledge base                     │
-│  • Global boardroom network and compliance                │
+│  • src/bi_config.py - Configuration (not code!)            │
+│  • Business agents (CEO, CFO, CTO, etc.)                   │
+│  • Business workflows and analytics                        │
+│  • Business-specific routes and handlers                   │
+│  • Covenant and network management                         │
+│  • Risk management and knowledge base                      │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              │ depends on (via clean interfaces)
-                              ▼
+                          ▼ uses
 ┌─────────────────────────────────────────────────────────────┐
-│               Agent Operating System (AOS)                 │
-│                  Infrastructure Layer                       │
+│           Generic Runtime (runtime/)                       │
+│  (Reusable for ANY app on AOS)                             │
 ├─────────────────────────────────────────────────────────────┤
-│  Core Kernel Services:                                    │
-│  • Orchestration Engine    • Agent Lifecycle Manager      │
-│  • Message Bus             • State Machine Manager        │
-│                                                            │
-│  System Services:                                         │
-│  • Storage (Blob, Table, Queue)  • ML Pipeline           │
-│  • Messaging (Service Bus)       • MCP Integration        │
-│  • Auth & Security               • Governance             │
-│  • Reliability (Circuit Breaker) • Observability          │
-│  • Knowledge Management          • Learning Pipeline      │
-│                                                            │
-│  Base Infrastructure:                                     │
-│  • BaseAgent, LeadershipAgent classes                    │
-│  • Service interfaces (IStorage, IMessaging, etc.)       │
-│  • Reliability patterns (Retry, Circuit Breaker)         │
-│  • Observability (Structured logs, Metrics, Tracing)     │
+│  • AzureFunctionsRuntime - HTTP handling                   │
+│  • ServiceBusRuntime - Message handling                    │
+│  • RouteRegistry - Route management                        │
+│  • RuntimeConfig - Configuration                           │
+│  • Storage & Messaging - Abstractions                      │
+│  • AgentFrameworkRuntime - Agent lifecycle                 │
+└─────────────────────────────────────────────────────────────┘
+                          ▼ uses
+┌─────────────────────────────────────────────────────────────┐
+│        AgentOperatingSystem (Infrastructure)               │
+│  (Storage, Messaging, ML, Observability, etc.)             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Design Principles
 
-1. **Separation of Concerns**: Business logic (BI) is completely separated from infrastructure (AOS)
-2. **Dependency Direction**: BI depends on AOS, never the reverse
-3. **Interface-Based**: BI uses AOS through clean service interfaces
-4. **Reusability**: AOS is domain-agnostic and can support multiple business applications
+1. **Generic Runtime**: The `runtime/` package is reusable infrastructure that can power ANY application
+2. **Configuration Over Code**: BusinessInfinity behavior is controlled via configuration, not implementation
+3. **Clear Separation**: Business logic → Runtime → Infrastructure (one-way dependencies)
+4. **Reusability**: Same runtime can support multiple apps (BI, CRM, ERP, etc.)
 
 ### Clean Architecture Files
 
