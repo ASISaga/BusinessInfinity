@@ -1,9 +1,11 @@
 """
 Business Infinity - Enterprise Business Application
 
+REFACTORED: Now uses runtime abstractions with fallback to AOS
+
 This module provides the main Business Infinity application built on top of the
 Agent Operating System (AOS). It focuses purely on business logic, workflows,
-and business-specific agent orchestration while leveraging AOS for all
+and business-specific agent orchestration while leveraging runtime and AOS for all
 infrastructure needs.
 
 Enhanced with Covenant-Based Compliance for the Global Boardroom Network.
@@ -40,10 +42,24 @@ from .agents.chief_technology_officer import ChiefTechnologyOfficer
 from .founder_agent import FounderAgent
 from .investor_agent import InvestorAgent
 
+# Try to import from runtime first
+try:
+    from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
+    RUNTIME_AVAILABLE = True
+except ImportError:
+    RUNTIME_AVAILABLE = False
+
 # Import AOS and UnifiedStorageManager
-from AgentOperatingSystem import AgentOperatingSystem
-from AgentOperatingSystem.storage.manager import UnifiedStorageManager
-from AgentOperatingSystem.environment import UnifiedEnvManager
+try:
+    from AgentOperatingSystem import AgentOperatingSystem
+    from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+    from AgentOperatingSystem.environment import UnifiedEnvManager
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    AgentOperatingSystem = None
+    UnifiedStorageManager = None
+    UnifiedEnvManager = None
 
 # Modular managers
 from config.business_infinity_config import BusinessInfinityConfig
@@ -89,101 +105,79 @@ class BusinessInfinity:
     Business Infinity - Enterprise Business Application
     
     Orchestrates C-Suite agents, strategic decision-making, business operations, and compliance using modular managers.
+    Uses runtime abstractions with fallback to AOS.
     """
-    """
-    Business Infinity - Enterprise Business Application
     
-    Orchestrates C-Suite agents, strategic decision-making, business operations, and compliance using modular managers.
-    """
     def __init__(self, config: BusinessInfinityConfig = None):
         # Background process tasks
         self._strategic_planning_task = None
         self._performance_monitoring_task = None
         self._autonomous_boardroom_task = None
+        
         # MCP Servers registry (metadata and endpoints) loaded from JSON file
         mcp_servers_path = os.path.join(os.path.dirname(__file__), "mcp_servers.json")
-        with open(mcp_servers_path, "r", encoding="utf-8") as f:
-            self.mcp_servers = json.load(f)
+        try:
+            with open(mcp_servers_path, "r", encoding="utf-8") as f:
+                self.mcp_servers = json.load(f)
+        except FileNotFoundError:
+            self.mcp_servers = {}
+            
         self.config = config or BusinessInfinityConfig()
         self.logger = logging.getLogger(__name__)
-        # Initialize AOS as the foundation
-        self.aos = AgentOperatingSystem(getattr(self.config, 'aos_config', None))
-        # Initialize unified storage manager
-        self.storage_manager = UnifiedStorageManager()
-        # Initialize unified environment manager
-        self.env_manager = UnifiedEnvManager()
+        
+        # Initialize AOS as the foundation if available
+        if AOS_AVAILABLE:
+            self.aos = AgentOperatingSystem(getattr(self.config, 'aos_config', None))
+            # Initialize unified storage manager
+            self.storage_manager = UnifiedStorageManager() if UnifiedStorageManager else None
+            # Initialize unified environment manager
+            self.env_manager = UnifiedEnvManager() if UnifiedEnvManager else None
+        else:
+            self.aos = None
+            self.storage_manager = None
+            self.env_manager = None
+            
         # Initialize MCP Service Bus Client
-        servicebus_conn_str = self.env_manager.get_azure_connection_string("servicebus")
-        servicebus_topic = self.env_manager.get("SERVICEBUS_TOPIC", "mcp-topic")
-        servicebus_subscription = self.env_manager.get("SERVICEBUS_SUBSCRIPTION", None)
-        try:
-            from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
-            self.mcp_servicebus_client = MCPServiceBusClient(
-                servicebus_conn_str,
-                servicebus_topic,
-                servicebus_subscription
-            )
-        except ImportError:
+        if self.env_manager:
+            servicebus_conn_str = self.env_manager.get_azure_connection_string("servicebus")
+            servicebus_topic = self.env_manager.get("SERVICEBUS_TOPIC", "mcp-topic")
+            servicebus_subscription = self.env_manager.get("SERVICEBUS_SUBSCRIPTION", None)
+            try:
+                from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
+                self.mcp_servicebus_client = MCPServiceBusClient(
+                    servicebus_conn_str,
+                    servicebus_topic,
+                    servicebus_subscription
+                )
+            except ImportError:
+                self.mcp_servicebus_client = None
+                self.logger.warning("MCPServiceBusClient could not be imported. Service Bus integration is disabled.")
+        else:
             self.mcp_servicebus_client = None
-            self.logger.warning("MCPServiceBusClient could not be imported. Service Bus integration is disabled.")
+            
         # Initialize managers (delegating logic to them, pass aos if needed)
         self.agent_manager = BusinessAgentManager(self.config, self.logger)
         self.workflow_manager = BusinessWorkflowManager(self.config, self.logger)
         self.analytics_manager = BusinessAnalyticsManager(self.config, self.logger)
         self.covenant_manager = BusinessCovenantManager(self.config, self.logger)
         self.conversation_manager = BusinessConversationManager(self.config, self.logger)
+        
         # Business state
         self.business_context = self.agent_manager.get_business_context()
+        
         # Async initialization
         self._initialize_task = asyncio.create_task(self._initialize())
 
     def list_mcp_servers(self) -> dict:
         """Return metadata and endpoints for all registered MCP servers."""
         return self.mcp_servers
-    """
-    Business Infinity - Enterprise Business Application
-    
-    Orchestrates C-Suite agents, strategic decision-making, business operations, and compliance using modular managers.
-    """
-    def __init__(self, config: BusinessInfinityConfig = None):
-        self.config = config or BusinessInfinityConfig()
-        self.logger = logging.getLogger(__name__)
-        # Initialize AOS as the foundation
-        self.aos = AgentOperatingSystem(getattr(self.config, 'aos_config', None))
-        # Initialize unified storage manager
-        self.storage_manager = UnifiedStorageManager()
-        # Initialize unified environment manager
-        self.env_manager = UnifiedEnvManager()
-        # Initialize MCP Service Bus Client
-        servicebus_conn_str = self.env_manager.get_azure_connection_string("servicebus")
-        servicebus_topic = self.env_manager.get("SERVICEBUS_TOPIC", "mcp-topic")
-        servicebus_subscription = self.env_manager.get("SERVICEBUS_SUBSCRIPTION", None)
-        try:
-            from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
-            self.mcp_servicebus_client = MCPServiceBusClient(
-                servicebus_conn_str,
-                servicebus_topic,
-                servicebus_subscription
-            )
-        except ImportError:
-            self.mcp_servicebus_client = None
-            self.logger.warning("MCPServiceBusClient could not be imported. Service Bus integration is disabled.")
-        # Initialize managers (delegating logic to them, pass aos if needed)
-        self.agent_manager = BusinessAgentManager(self.config, self.logger)
-        self.workflow_manager = BusinessWorkflowManager(self.config, self.logger)
-        self.analytics_manager = BusinessAnalyticsManager(self.config, self.logger)
-        self.covenant_manager = BusinessCovenantManager(self.config, self.logger)
-        self.conversation_manager = BusinessConversationManager(self.config, self.logger)
-        # Business state
-        self.business_context = self.agent_manager.get_business_context()
-        # Async initialization
-        self._initialize_task = asyncio.create_task(self._initialize())
     
     async def _initialize(self):
         try:
             self.logger.info("Initializing Business Infinity application...")
-            # Start AOS infrastructure
-            await self.aos.start()
+            # Start AOS infrastructure if available
+            if self.aos:
+                await self.aos.start()
             # Delegate initialization to managers
             await self.agent_manager.initialize()
             await self.workflow_manager.initialize()
