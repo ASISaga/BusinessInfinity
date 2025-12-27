@@ -1,8 +1,10 @@
 """
 Business Workflow Manager
 
+REFACTORED: Now uses runtime abstractions with fallback to AOS
+
 Manages business workflows and strategic decision-making processes
-using the AOS orchestration infrastructure.
+using the runtime and AOS orchestration infrastructure.
 """
 
 import asyncio
@@ -11,14 +13,32 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from enum import Enum
 
-from AgentOperatingSystem import AgentOperatingSystem
-# Note: WorkflowStep and OrchestrationEngine are imported from AOS
-# but we provide placeholder implementations for when AOS versions are not available
+# Try to import from runtime first
 try:
-    from AgentOperatingSystem.orchestration import OrchestrationEngine as AOSOrchestrationEngine, WorkflowStep as AOSWorkflowStep
-    _AOS_ORCHESTRATION_AVAILABLE = True
+    from runtime import RuntimeConfig, IStorageProvider
+    RUNTIME_AVAILABLE = True
 except ImportError:
+    RUNTIME_AVAILABLE = False
+
+# Import AOS from existing structure
+try:
+    from AgentOperatingSystem import AgentOperatingSystem
+    # Note: WorkflowStep and OrchestrationEngine are imported from AOS
+    # but we provide placeholder implementations for when AOS versions are not available
+    try:
+        from AgentOperatingSystem.orchestration import OrchestrationEngine as AOSOrchestrationEngine, WorkflowStep as AOSWorkflowStep
+        _AOS_ORCHESTRATION_AVAILABLE = True
+    except ImportError:
+        _AOS_ORCHESTRATION_AVAILABLE = False
+        AOSOrchestrationEngine = None
+        AOSWorkflowStep = None
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    AgentOperatingSystem = None
     _AOS_ORCHESTRATION_AVAILABLE = False
+    AOSOrchestrationEngine = None
+    AOSWorkflowStep = None
 
 from core.config import BusinessInfinityConfig
 # Import AOS utilization improvements (Priority 1)

@@ -3,6 +3,14 @@ import json, os
 from datetime import datetime
 from .state import founder_state, investor_state, finance_state, tech_state, ops_state
 from .prompts import APPROVAL_PROMPT
+import logging
+
+# Try to import from runtime first
+try:
+    from runtime import RuntimeConfig
+    RUNTIME_AVAILABLE = True
+except ImportError:
+    RUNTIME_AVAILABLE = False
 
 # Import AOS Agent Framework system instead of Semantic Kernel
 try:
@@ -10,7 +18,6 @@ try:
     AGENT_FRAMEWORK_AVAILABLE = True
 except ImportError:
     AGENT_FRAMEWORK_AVAILABLE = False
-    import logging
     logging.warning("AOS Agent Framework not available in dashboard handlers")
 
 # Import MCP Access Control
@@ -19,7 +26,6 @@ try:
     ACCESS_CONTROL_AVAILABLE = True
 except ImportError:
     ACCESS_CONTROL_AVAILABLE = False
-    import logging
     logging.warning("MCP Access Control not available in dashboard handlers")
 
 # Initialize AOS Agent Framework system for prompt processing
