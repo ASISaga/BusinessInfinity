@@ -1,25 +1,6 @@
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS executor base
-try:
-    from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    # Create placeholder if AOS not available
-    class BaseExecutor:
-        def __init__(self, name):
-            self.name = name
-    class WorkflowContext:
-        pass
-    def handler(func):
-        return func
+from runtime import RuntimeConfig
+from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
 
 
 from ..mcp_clients.erp import create_erp_mcp_client  # You may need to adjust import path
@@ -36,11 +17,11 @@ class ERPExecutor(BaseExecutor):
             "cogs": "finance.cogs"
         }
 
-    async def handle(self, intent: dict, ctx):
+    @handler
+    async def handle(self, intent: dict, ctx: WorkflowContext):
         capability = intent.get("capability")
         if capability not in self.capabilities:
-            if hasattr(ctx, 'yield_output'):
-                await ctx.yield_output({"error": f"Unsupported ERP capability: {capability}"})
+            await ctx.yield_output({"error": f"Unsupported ERP capability: {capability}"})
             return
 
         result = await self.mcp.call(self.capabilities[capability], intent.get("args", {}))
@@ -48,7 +29,6 @@ class ERPExecutor(BaseExecutor):
             "source": "erp",
             "capability": capability,
             "result": result,
-            "timestamp": getattr(ctx, 'now', lambda: None)()
+            "timestamp": ctx.now()
         }
-        if hasattr(ctx, 'yield_output'):
-            await ctx.yield_output(output)
+        await ctx.yield_output(output)

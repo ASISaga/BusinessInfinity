@@ -1,8 +1,6 @@
 """
 Business Analytics Manager
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 Manages business analytics, KPIs, and performance metrics
 using the runtime and AOS monitoring and ML infrastructure.
 """
@@ -13,39 +11,11 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from enum import Enum
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig, IStorageProvider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS from existing structure
-try:
-    from AgentOperatingSystem import AgentOperatingSystem
-    from AgentOperatingSystem.monitoring import SystemMonitor as AOSSystemMonitor
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AgentOperatingSystem = None
-    AOSSystemMonitor = None
+from runtime import RuntimeConfig, IStorageProvider
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.monitoring import SystemMonitor
 
 from core.config import BusinessInfinityConfig
-
-# Create placeholder class for monitoring when AOS not available
-class SystemMonitor:
-    def __init__(self):
-        pass
-    async def get_metrics(self):
-        return {
-            "uptime_percentage": 99.5,
-            "avg_response_time_ms": 150,
-            "error_rate_percentage": 0.05
-        }
-
-# Use AOS monitor if available, otherwise use placeholder
-if AOS_AVAILABLE and AOSSystemMonitor:
-    SystemMonitor = AOSSystemMonitor
 
 class MetricType(Enum):
     """Types of business metrics."""

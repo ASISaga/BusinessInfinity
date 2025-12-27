@@ -1,8 +1,6 @@
 """
 Business Workflow Manager
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 Manages business workflows and strategic decision-making processes
 using the runtime and AOS orchestration infrastructure.
 """
@@ -13,62 +11,14 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from enum import Enum
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig, IStorageProvider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS from existing structure
-try:
-    from AgentOperatingSystem import AgentOperatingSystem
-    # Note: WorkflowStep and OrchestrationEngine are imported from AOS
-    # but we provide placeholder implementations for when AOS versions are not available
-    try:
-        from AgentOperatingSystem.orchestration import OrchestrationEngine as AOSOrchestrationEngine, WorkflowStep as AOSWorkflowStep
-        _AOS_ORCHESTRATION_AVAILABLE = True
-    except ImportError:
-        _AOS_ORCHESTRATION_AVAILABLE = False
-        AOSOrchestrationEngine = None
-        AOSWorkflowStep = None
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AgentOperatingSystem = None
-    _AOS_ORCHESTRATION_AVAILABLE = False
-    AOSOrchestrationEngine = None
-    AOSWorkflowStep = None
+from runtime import RuntimeConfig, IStorageProvider
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.orchestration import OrchestrationEngine, WorkflowStep
 
 from core.config import BusinessInfinityConfig
 # Import AOS utilization improvements (Priority 1)
 from core.observability import create_structured_logger, correlation_scope, get_metrics_collector
 from core.reliability import with_circuit_breaker, with_retry
-
-# Placeholder classes for when AOS orchestration is not available
-class PlaceholderWorkflowStep:
-    def __init__(self, step_id, name, description, agent_requirements=None, dependencies=None, timeout_seconds=300):
-        self.step_id = step_id
-        self.name = name
-        self.description = description
-        self.agent_requirements = agent_requirements or []
-        self.dependencies = dependencies or []
-        self.timeout_seconds = timeout_seconds
-
-class PlaceholderOrchestrationEngine:
-    def __init__(self):
-        pass
-    async def execute_workflow(self, workflow_id, steps, context):
-        return {"status": "completed", "workflow_id": workflow_id}
-    async def get_workflow_status(self, workflow_id):
-        return {"status": "completed"}
-    async def cancel_workflow(self, workflow_id):
-        return True
-
-# Use AOS versions if available, otherwise use placeholders
-WorkflowStep = AOSWorkflowStep if _AOS_ORCHESTRATION_AVAILABLE else PlaceholderWorkflowStep
-OrchestrationEngine = AOSOrchestrationEngine if _AOS_ORCHESTRATION_AVAILABLE else PlaceholderOrchestrationEngine
-
 
 
 class WorkflowStatus(Enum):
