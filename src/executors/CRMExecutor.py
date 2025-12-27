@@ -1,6 +1,25 @@
 
+# Try to import from runtime first
+try:
+    from runtime import RuntimeConfig
+    RUNTIME_AVAILABLE = True
+except ImportError:
+    RUNTIME_AVAILABLE = False
 
-from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
+# Import AOS executor base
+try:
+    from AgentOperatingSystem.executor.base_executor import BaseExecutor, WorkflowContext, handler
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    # Create placeholder if AOS not available
+    class BaseExecutor:
+        def __init__(self, name):
+            self.name = name
+    class WorkflowContext:
+        pass
+    def handler(func):
+        return func
 
 
 from ..mcp_clients.crm import create_crm_mcp_client  # You may need to adjust import path
@@ -17,11 +36,11 @@ class CRMExecutor(BaseExecutor):
             "account_activity": "accounts.activity"
         }
 
-    @handler
-    async def handle(self, intent: dict, ctx: WorkflowContext[dict]):
+    async def handle(self, intent: dict, ctx):
         capability = intent.get("capability")
         if capability not in self.capabilities:
-            await ctx.yield_output({"error": f"Unsupported CRM capability: {capability}"})
+            if hasattr(ctx, 'yield_output'):
+                await ctx.yield_output({"error": f"Unsupported CRM capability: {capability}"})
             return
 
         result = await self.mcp.call(self.capabilities[capability], intent.get("args", {}))
@@ -29,6 +48,7 @@ class CRMExecutor(BaseExecutor):
             "source": "crm",
             "capability": capability,
             "result": result,
-            "timestamp": ctx.now()
+            "timestamp": getattr(ctx, 'now', lambda: None)()
         }
-        await ctx.yield_output(output)
+        if hasattr(ctx, 'yield_output'):
+            await ctx.yield_output(output)
