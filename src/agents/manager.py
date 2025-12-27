@@ -1,8 +1,10 @@
 """
 Business Agent Manager
 
+REFACTORED: Now uses runtime abstractions with fallback to AOS
+
 Manages the lifecycle and coordination of business agents
-using the AOS infrastructure.
+using the runtime and AOS infrastructure.
 """
 
 import asyncio
@@ -10,8 +12,22 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-from AgentOperatingSystem import AgentOperatingSystem
-from AgentOperatingSystem.agents import Agent
+# Try to import from runtime first
+try:
+    from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
+    RUNTIME_AVAILABLE = True
+except ImportError:
+    RUNTIME_AVAILABLE = False
+
+# Import AOS from existing structure
+try:
+    from AgentOperatingSystem import AgentOperatingSystem
+    from AgentOperatingSystem.agents import Agent
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    AgentOperatingSystem = None
+    Agent = None
 
 from CEO import ChiefExecutiveOfficer
 from CTO import ChiefTechnologyOfficer
@@ -21,7 +37,7 @@ from core.config import BusinessInfinityConfig
 
 class BusinessAgentManager:
     """
-    Manages business agents and their coordination using AOS.
+    Manages business agents and their coordination using runtime and AOS.
     
     Provides:
     - Agent lifecycle management
@@ -30,22 +46,22 @@ class BusinessAgentManager:
     - Decision orchestration
     """
     
-    def __init__(self, aos: AgentOperatingSystem, config: BusinessInfinityConfig, logger: logging.Logger):
+    def __init__(self, aos: Optional[Any] = None, config: BusinessInfinityConfig = None, logger: logging.Logger = None):
         """Initialize Business Agent Manager."""
         self.aos = aos
-        self.config = config
-        self.logger = logger
+        self.config = config or BusinessInfinityConfig()
+        self.logger = logger or logging.getLogger(__name__)
         
         # Agent registry
-        self.agents: Dict[str, Agent] = {}
+        self.agents: Dict[str, Any] = {}
         self.agent_configs: Dict[str, Dict[str, Any]] = {}
         
         # Business context
         self.business_context = {
-            "company_name": config.company_name,
-            "company_domain": config.company_domain,
-            "business_model": config.business_model,
-            "industry": config.industry,
+            "company_name": self.config.company_name if hasattr(self.config, 'company_name') else "Business Infinity",
+            "company_domain": self.config.company_domain if hasattr(self.config, 'company_domain') else "businessinfinity.com",
+            "business_model": self.config.business_model if hasattr(self.config, 'business_model') else "enterprise_saas",
+            "industry": self.config.industry if hasattr(self.config, 'industry') else "technology",
             "status": "initializing"
         }
         
@@ -62,13 +78,14 @@ class BusinessAgentManager:
         try:
             self.logger.info("Initializing Business Agent Manager...")
             
-            # Ensure AOS has required attributes
-            if not hasattr(self.aos, 'register_agent'):
-                self.aos.register_agent = self._mock_register_agent
-            if not hasattr(self.aos, 'unregister_agent'):
-                self.aos.unregister_agent = self._mock_unregister_agent
-            if not hasattr(self.aos, 'storage_manager'):
-                self.aos.storage_manager = self._create_mock_storage_manager()
+            # Ensure AOS has required attributes if available
+            if self.aos and AOS_AVAILABLE:
+                if not hasattr(self.aos, 'register_agent'):
+                    self.aos.register_agent = self._mock_register_agent
+                if not hasattr(self.aos, 'unregister_agent'):
+                    self.aos.unregister_agent = self._mock_unregister_agent
+                if not hasattr(self.aos, 'storage_manager'):
+                    self.aos.storage_manager = self._create_mock_storage_manager()
             
             # Create and register agents based on configuration
             await self._create_business_agents()
