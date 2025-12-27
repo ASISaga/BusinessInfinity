@@ -5,20 +5,8 @@ from .state import founder_state, investor_state, finance_state, tech_state, ops
 from .prompts import APPROVAL_PROMPT
 import logging
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS Agent Framework system instead of Semantic Kernel
-try:
-    from AgentOperatingSystem import AgentFrameworkSystem
-    AGENT_FRAMEWORK_AVAILABLE = True
-except ImportError:
-    AGENT_FRAMEWORK_AVAILABLE = False
-    logging.warning("AOS Agent Framework not available in dashboard handlers")
+from runtime import RuntimeConfig
+from AgentOperatingSystem import AgentFrameworkSystem
 
 # Import MCP Access Control
 try:
@@ -30,16 +18,15 @@ except ImportError:
 
 # Initialize AOS Agent Framework system for prompt processing
 agent_framework_system = None
-if AGENT_FRAMEWORK_AVAILABLE:
-    try:
-        agent_framework_system = AgentFrameworkSystem()
-    except Exception as e:
-        # Agent Framework system not available, will handle in the function
-        pass
+try:
+    agent_framework_system = AgentFrameworkSystem()
+except Exception as e:
+    # Agent Framework system not available, will handle in the function
+    pass
 
 async def run_prompt(prompt: str, input_text: str) -> str:
     """Run a prompt using AOS Agent Framework system"""
-    if agent_framework_system and AGENT_FRAMEWORK_AVAILABLE:
+    if agent_framework_system:
         try:
             # Initialize the system if not already done
             if not agent_framework_system.is_initialized:

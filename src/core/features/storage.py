@@ -1,6 +1,6 @@
 """
 Consolidated Storage Management
-Now uses runtime abstractions with fallback to AgentOperatingSystem services
+Now uses runtime abstractions
 """
 
 import os
@@ -9,31 +9,16 @@ import time
 import datetime
 from typing import Dict, Any, List, Optional
 
-# Try to use runtime abstractions first
-try:
-    from runtime import IStorageProvider, IMessagingProvider, create_storage_provider, create_messaging_provider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-    IStorageProvider = None
-    IMessagingProvider = None
-
-# Fallback to direct AOS imports
-try:
-    from AgentOperatingSystem.environment import EnvironmentManager, env_manager
-    from AgentOperatingSystem.storage.manager import StorageManager
-    from AgentOperatingSystem.messaging.servicebus_manager import ServiceBusManager
-    from AgentOperatingSystem.config import StorageConfig
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    EnvironmentManager = None
-    env_manager = None
+from runtime import IStorageProvider, IMessagingProvider, create_storage_provider, create_messaging_provider
+from AgentOperatingSystem.environment import EnvironmentManager, env_manager
+from AgentOperatingSystem.storage.manager import StorageManager
+from AgentOperatingSystem.messaging.servicebus_manager import ServiceBusManager
+from AgentOperatingSystem.config import StorageConfig
 
 
 class UnifiedStorageManager:
     """
-    Business Infinity Storage Manager - uses runtime abstractions with fallback to AOS Azure services for:
+    Business Infinity Storage Manager - uses runtime abstractions and AOS Azure services for:
     - Boardroom decision storage
     - Business metrics and KPI storage
     - Agent collaboration history
@@ -42,60 +27,31 @@ class UnifiedStorageManager:
 
     def __init__(self, env=None, storage_provider=None, messaging_provider=None):
         # Initialize environment manager
-        if AOS_AVAILABLE:
-            env_manager_instance = env or env_manager
-            if isinstance(env_manager_instance, EnvironmentManager):
-                self.env_manager = env_manager_instance
-            else:
-                self.env_manager = env_manager
+        env_manager_instance = env or env_manager
+        if isinstance(env_manager_instance, EnvironmentManager):
+            self.env_manager = env_manager_instance
         else:
-            self.env_manager = None
+            self.env_manager = env_manager
         
         # Business-specific configuration
-        if self.env_manager:
-            self.boardroom_table = self.env_manager.get("BOARDROOM_TABLE_NAME", "BoardroomDecisions")
-            self.metrics_table = self.env_manager.get("METRICS_TABLE_NAME", "BusinessMetrics")
-            self.collaboration_table = self.env_manager.get("COLLABORATION_TABLE_NAME", "AgentCollaboration")
-            self.request_queue = self.env_manager.get("REQUEST_QUEUE_NAME", "agent-requests")
-            self.event_queue = self.env_manager.get("EVENT_QUEUE_NAME", "agent-events")
-        else:
-            self.boardroom_table = os.getenv("BOARDROOM_TABLE_NAME", "BoardroomDecisions")
-            self.metrics_table = os.getenv("METRICS_TABLE_NAME", "BusinessMetrics")
-            self.collaboration_table = os.getenv("COLLABORATION_TABLE_NAME", "AgentCollaboration")
-            self.request_queue = os.getenv("REQUEST_QUEUE_NAME", "agent-requests")
-            self.event_queue = os.getenv("EVENT_QUEUE_NAME", "agent-events")
+        self.boardroom_table = self.env_manager.get("BOARDROOM_TABLE_NAME", "BoardroomDecisions")
+        self.metrics_table = self.env_manager.get("METRICS_TABLE_NAME", "BusinessMetrics")
+        self.collaboration_table = self.env_manager.get("COLLABORATION_TABLE_NAME", "AgentCollaboration")
+        self.request_queue = self.env_manager.get("REQUEST_QUEUE_NAME", "agent-requests")
+        self.event_queue = self.env_manager.get("EVENT_QUEUE_NAME", "agent-events")
         
-        # Use runtime abstractions if provided or available
-        if RUNTIME_AVAILABLE:
-            self.storage_provider = storage_provider or create_storage_provider("memory")
-            self.messaging_provider = messaging_provider or create_messaging_provider("memory")
-            # Keep AOS managers for backward compatibility with business-specific operations
-            if AOS_AVAILABLE and self.env_manager:
-                storage_config = StorageConfig(
-                    storage_type="azure",
-                    connection_string=self.env_manager.get("AZURE_STORAGE_CONNECTION_STRING")
-                )
-                self.storage_manager = StorageManager(storage_config)
-                servicebus_connection = self.env_manager.get("AZURE_SERVICE_BUS_CONNECTION_STRING")
-                self.servicebus_manager = ServiceBusManager(servicebus_connection)
-            else:
-                self.storage_manager = None
-                self.servicebus_manager = None
-        else:
-            # Fallback to AOS if runtime not available
-            if AOS_AVAILABLE and self.env_manager:
-                storage_config = StorageConfig(
-                    storage_type="azure",
-                    connection_string=self.env_manager.get("AZURE_STORAGE_CONNECTION_STRING")
-                )
-                self.storage_manager = StorageManager(storage_config)
-                servicebus_connection = self.env_manager.get("AZURE_SERVICE_BUS_CONNECTION_STRING")
-                self.servicebus_manager = ServiceBusManager(servicebus_connection)
-            else:
-                self.storage_manager = None
-                self.servicebus_manager = None
-            self.storage_provider = None
-            self.messaging_provider = None
+        # Use runtime abstractions if provided
+        self.storage_provider = storage_provider or create_storage_provider("memory")
+        self.messaging_provider = messaging_provider or create_messaging_provider("memory")
+        
+        # AOS managers for business-specific operations
+        storage_config = StorageConfig(
+            storage_type="azure",
+            connection_string=self.env_manager.get("AZURE_STORAGE_CONNECTION_STRING")
+        )
+        self.storage_manager = StorageManager(storage_config)
+        servicebus_connection = self.env_manager.get("AZURE_SERVICE_BUS_CONNECTION_STRING")
+        self.servicebus_manager = ServiceBusManager(servicebus_connection)
         
         # Initialize agent data (will be loaded asynchronously)
         self.agent_dirs = None
@@ -116,26 +72,17 @@ class UnifiedStorageManager:
                 "table_name": self.boardroom_table
             }
             
-            # Use storage manager if available
-            if self.storage_manager:
-                # Use AOS storage manager to store in Azure Table
-                partition_key = enhanced_data.get("PartitionKey", "BoardroomDecisions")
-                row_key = enhanced_data.get("RowKey", f"decision_{int(time.time())}")
-                
-                result = await self.storage_manager.store_table_entity(
-                    table_name=self.boardroom_table,
-                    partition_key=partition_key,
-                    row_key=row_key,
-                    data=enhanced_data
-                )
-                return result.get("success", False)
-            elif self.storage_provider:
-                # Use runtime storage provider
-                key = f"boardroom/{enhanced_data.get('PartitionKey', 'BoardroomDecisions')}/{enhanced_data.get('RowKey', f'decision_{int(time.time())}')}"
-                return await self.storage_provider.set(key, enhanced_data)
-            else:
-                print("No storage backend available")
-                return False
+            # Use AOS storage manager to store in Azure Table
+            partition_key = enhanced_data.get("PartitionKey", "BoardroomDecisions")
+            row_key = enhanced_data.get("RowKey", f"decision_{int(time.time())}")
+            
+            result = await self.storage_manager.store_table_entity(
+                table_name=self.boardroom_table,
+                partition_key=partition_key,
+                row_key=row_key,
+                data=enhanced_data
+            )
+            return result.get("success", False)
         except Exception as e:
             print(f"Error storing boardroom decision: {e}")
             return False
@@ -152,26 +99,17 @@ class UnifiedStorageManager:
                 "table_name": self.metrics_table
             }
             
-            # Use storage manager if available
-            if self.storage_manager:
-                # Use AOS storage manager to store in Azure Table
-                partition_key = agent_id
-                row_key = f"metrics_{int(time.time())}"
-                
-                result = await self.storage_manager.store_table_entity(
-                    table_name=self.metrics_table,
-                    partition_key=partition_key,
-                    row_key=row_key,
-                    data=enhanced_metrics
-                )
-                return result.get("success", False)
-            elif self.storage_provider:
-                # Use runtime storage provider
-                key = f"metrics/{agent_id}/metrics_{int(time.time())}"
-                return await self.storage_provider.set(key, enhanced_metrics)
-            else:
-                print("No storage backend available")
-                return False
+            # Use AOS storage manager to store in Azure Table
+            partition_key = agent_id
+            row_key = f"metrics_{int(time.time())}"
+            
+            result = await self.storage_manager.store_table_entity(
+                table_name=self.metrics_table,
+                partition_key=partition_key,
+                row_key=row_key,
+                data=enhanced_metrics
+            )
+            return result.get("success", False)
         except Exception as e:
             print(f"Error storing business metrics: {e}")
             return False

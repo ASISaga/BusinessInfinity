@@ -1,8 +1,6 @@
 """
 Business Agent Manager
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 Manages the lifecycle and coordination of business agents
 using the runtime and AOS infrastructure.
 """
@@ -12,28 +10,14 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS from existing structure
-try:
-    from AgentOperatingSystem import AgentOperatingSystem
-    from AgentOperatingSystem.agents import Agent
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AgentOperatingSystem = None
-    Agent = None
+from runtime import RuntimeConfig
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.agents import Agent
 
 from CEO import ChiefExecutiveOfficer
 from CTO import ChiefTechnologyOfficer
 from Founder import FounderAgent
 from core.config import BusinessInfinityConfig
-
 
 class BusinessAgentManager:
     """
@@ -46,22 +30,22 @@ class BusinessAgentManager:
     - Decision orchestration
     """
     
-    def __init__(self, aos: Optional[Any] = None, config: BusinessInfinityConfig = None, logger: logging.Logger = None):
+    def __init__(self, aos: AgentOperatingSystem = None, config: BusinessInfinityConfig = None, logger: logging.Logger = None):
         """Initialize Business Agent Manager."""
         self.aos = aos
         self.config = config or BusinessInfinityConfig()
         self.logger = logger or logging.getLogger(__name__)
         
         # Agent registry
-        self.agents: Dict[str, Any] = {}
+        self.agents: Dict[str, Agent] = {}
         self.agent_configs: Dict[str, Dict[str, Any]] = {}
         
         # Business context
         self.business_context = {
-            "company_name": self.config.company_name if hasattr(self.config, 'company_name') else "Business Infinity",
-            "company_domain": self.config.company_domain if hasattr(self.config, 'company_domain') else "businessinfinity.com",
-            "business_model": self.config.business_model if hasattr(self.config, 'business_model') else "enterprise_saas",
-            "industry": self.config.industry if hasattr(self.config, 'industry') else "technology",
+            "company_name": self.config.company_name,
+            "company_domain": self.config.company_domain,
+            "business_model": self.config.business_model,
+            "industry": self.config.industry,
             "status": "initializing"
         }
         
@@ -78,8 +62,8 @@ class BusinessAgentManager:
         try:
             self.logger.info("Initializing Business Agent Manager...")
             
-            # Ensure AOS has required attributes if available
-            if self.aos and AOS_AVAILABLE:
+            # Ensure AOS has required attributes
+            if self.aos:
                 if not hasattr(self.aos, 'register_agent'):
                     self.aos.register_agent = self._mock_register_agent
                 if not hasattr(self.aos, 'unregister_agent'):

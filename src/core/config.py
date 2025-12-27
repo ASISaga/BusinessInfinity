@@ -1,8 +1,6 @@
 """
 Business Infinity Configuration Management
 
-REFACTORED: Now imports from runtime with fallback to AOS
-
 This module provides configuration management for Business Infinity application,
 integrating with runtime configuration system while adding business-specific
 configuration options.
@@ -15,21 +13,8 @@ import os
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-    RuntimeConfig = None
-
-# Fallback to AOS
-try:
-    from AgentOperatingSystem.config import AOSConfig
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AOSConfig = None
+from runtime import RuntimeConfig
+from AgentOperatingSystem.config import AOSConfig
 
 
 @dataclass
@@ -214,10 +199,8 @@ class BusinessInfinityConfig:
         if self.auth_config["provider"] not in valid_providers:
             raise ValueError(f"Auth provider must be one of: {valid_providers}")
     
-    def to_aos_config(self) -> Any:
+    def to_aos_config(self) -> AOSConfig:
         """Convert to AOS configuration object."""
-        if not AOS_AVAILABLE:
-            raise RuntimeError("AgentOperatingSystem is not available")
         return AOSConfig(
             agent_config=self.agent_config,
             messaging_config=self.messaging_config,
@@ -229,10 +212,8 @@ class BusinessInfinityConfig:
             mcp_config=self.mcp_config
         )
     
-    def to_runtime_config(self) -> Any:
+    def to_runtime_config(self) -> RuntimeConfig:
         """Convert to runtime configuration object."""
-        if not RUNTIME_AVAILABLE:
-            raise RuntimeError("Runtime is not available")
         return RuntimeConfig(
             app_name="BusinessInfinity",
             app_version="2.0.0",

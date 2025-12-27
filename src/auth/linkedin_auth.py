@@ -1,31 +1,11 @@
 """
 LinkedIn OAuth endpoints for BusinessInfinity
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 Delegates all logic to the unified handler in AOS (RealmOfAgents/AgentOperatingSystem/aos_auth.py)
 """
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS auth handler
-try:
-    from AgentOperatingSystem.aos_auth import auth_handler
-    AOS_AUTH_AVAILABLE = True
-except ImportError:
-    AOS_AUTH_AVAILABLE = False
-    # Create a minimal placeholder
-    class AuthHandler:
-        def linkedin_auth_url(self, state=None):
-            return "https://linkedin.com/oauth/authorize"
-        def linkedin_exchange_code(self, code):
-            return {"status": 500, "error": "AOS auth not available"}
-    auth_handler = AuthHandler()
+from runtime import RuntimeConfig
+from AgentOperatingSystem.aos_auth import auth_handler
 
 # Azure Functions/FastAPI compatible endpoint for LinkedIn login URL
 def get_linkedin_login_url(req):

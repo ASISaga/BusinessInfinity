@@ -1,8 +1,6 @@
 """
 Business Infinity - Enterprise Business Application
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 This module provides the main Business Infinity application built on top of the
 Agent Operating System (AOS). It focuses purely on business logic, workflows,
 and business-specific agent orchestration while leveraging runtime and AOS for all
@@ -28,27 +26,11 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-    RuntimeConfig = None
-
-# Import AOS from existing structure (will be updated when AOS is fully refactored)
-try:
-    from AgentOperatingSystem import AgentOperatingSystem
-    from AgentOperatingSystem.config import AOSConfig
-    from AgentOperatingSystem.storage.manager import StorageManager
-    from AgentOperatingSystem.environment.manager import EnvironmentManager
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AgentOperatingSystem = None
-    AOSConfig = None
-    StorageManager = None
-    EnvironmentManager = None
+from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.config import AOSConfig
+from AgentOperatingSystem.storage.manager import StorageManager
+from AgentOperatingSystem.environment.manager import EnvironmentManager
 
 from .config import BusinessInfinityConfig
 from .covenant_manager import BusinessCovenantManager
@@ -60,13 +42,8 @@ from analytics.manager import BusinessAnalyticsManager
 # Import new AOS utilization improvements (Priority 1)
 from .service_interfaces import (
     IStorageService, IMessagingService, IWorkflowService,
+    AOSStorageService, AOSMessagingService, AOSWorkflowService
 )
-try:
-    from .service_interfaces import AOSStorageService, AOSMessagingService, AOSWorkflowService
-except ImportError:
-    AOSStorageService = None
-    AOSMessagingService = None
-    AOSWorkflowService = None
 
 from .observability import (
     create_structured_logger, correlation_scope,
@@ -95,36 +72,31 @@ class BusinessInfinity:
         self.health_check = get_health_check()
         
         # Initialize AOS as the foundation
-        if AOS_AVAILABLE:
-            try:
-                # Try to use AOS with configuration if available
-                aos_config = AOSConfig(
-                    agent_config=self.config.agent_config,
-                    messaging_config=self.config.messaging_config,
-                    storage_config=self.config.storage_config,
-                    monitoring_config=self.config.monitoring_config,
-                    ml_config=self.config.ml_config,
-                    auth_config=self.config.auth_config,
-                    environment_config=self.config.environment_config,
-                    mcp_config=self.config.mcp_config
-                )
-                self.aos = AgentOperatingSystem(aos_config)
-            except:
-                # Fall back to simple AOS initialization
-                self.aos = AgentOperatingSystem()
-            
-            # Initialize storage and environment managers
-            try:
-                self.storage_manager = self.aos.storage_manager
-                self.env_manager = self.aos.environment_manager
-            except AttributeError:
-                # Create placeholder managers if not available
-                self.storage_manager = StorageManager() if StorageManager else None
-                self.env_manager = EnvironmentManager() if EnvironmentManager else None
-        else:
-            self.aos = None
-            self.storage_manager = None
-            self.env_manager = None
+        try:
+            # Try to use AOS with configuration if available
+            aos_config = AOSConfig(
+                agent_config=self.config.agent_config,
+                messaging_config=self.config.messaging_config,
+                storage_config=self.config.storage_config,
+                monitoring_config=self.config.monitoring_config,
+                ml_config=self.config.ml_config,
+                auth_config=self.config.auth_config,
+                environment_config=self.config.environment_config,
+                mcp_config=self.config.mcp_config
+            )
+            self.aos = AgentOperatingSystem(aos_config)
+        except:
+            # Fall back to simple AOS initialization
+            self.aos = AgentOperatingSystem()
+        
+        # Initialize storage and environment managers
+        try:
+            self.storage_manager = self.aos.storage_manager
+            self.env_manager = self.aos.environment_manager
+        except AttributeError:
+            # Create placeholder managers if not available
+            self.storage_manager = StorageManager()
+            self.env_manager = EnvironmentManager()
         
         # Wrap AOS services with clean interfaces (Priority 1: Adopt Service Interfaces)
         self.storage_service: IStorageService = AOSStorageService(self.storage_manager)

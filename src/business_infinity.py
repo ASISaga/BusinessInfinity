@@ -1,8 +1,6 @@
 """
 Business Infinity - Enterprise Business Application
 
-REFACTORED: Now uses runtime abstractions with fallback to AOS
-
 This module provides the main Business Infinity application built on top of the
 Agent Operating System (AOS). It focuses purely on business logic, workflows,
 and business-specific agent orchestration while leveraging runtime and AOS for all
@@ -42,24 +40,10 @@ from .agents.chief_technology_officer import ChiefTechnologyOfficer
 from .founder_agent import FounderAgent
 from .investor_agent import InvestorAgent
 
-# Try to import from runtime first
-try:
-    from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
-    RUNTIME_AVAILABLE = True
-except ImportError:
-    RUNTIME_AVAILABLE = False
-
-# Import AOS and UnifiedStorageManager
-try:
-    from AgentOperatingSystem import AgentOperatingSystem
-    from AgentOperatingSystem.storage.manager import UnifiedStorageManager
-    from AgentOperatingSystem.environment import UnifiedEnvManager
-    AOS_AVAILABLE = True
-except ImportError:
-    AOS_AVAILABLE = False
-    AgentOperatingSystem = None
-    UnifiedStorageManager = None
-    UnifiedEnvManager = None
+from runtime import RuntimeConfig, IStorageProvider, IMessagingProvider
+from AgentOperatingSystem import AgentOperatingSystem
+from AgentOperatingSystem.storage.manager import UnifiedStorageManager
+from AgentOperatingSystem.environment import UnifiedEnvManager
 
 # Modular managers
 from config.business_infinity_config import BusinessInfinityConfig
@@ -125,35 +109,27 @@ class BusinessInfinity:
         self.config = config or BusinessInfinityConfig()
         self.logger = logging.getLogger(__name__)
         
-        # Initialize AOS as the foundation if available
-        if AOS_AVAILABLE:
-            self.aos = AgentOperatingSystem(getattr(self.config, 'aos_config', None))
-            # Initialize unified storage manager
-            self.storage_manager = UnifiedStorageManager() if UnifiedStorageManager else None
-            # Initialize unified environment manager
-            self.env_manager = UnifiedEnvManager() if UnifiedEnvManager else None
-        else:
-            self.aos = None
-            self.storage_manager = None
-            self.env_manager = None
+        # Initialize AOS as the foundation
+        self.aos = AgentOperatingSystem(getattr(self.config, 'aos_config', None))
+        # Initialize unified storage manager
+        self.storage_manager = UnifiedStorageManager()
+        # Initialize unified environment manager
+        self.env_manager = UnifiedEnvManager()
             
         # Initialize MCP Service Bus Client
-        if self.env_manager:
-            servicebus_conn_str = self.env_manager.get_azure_connection_string("servicebus")
-            servicebus_topic = self.env_manager.get("SERVICEBUS_TOPIC", "mcp-topic")
-            servicebus_subscription = self.env_manager.get("SERVICEBUS_SUBSCRIPTION", None)
-            try:
-                from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
-                self.mcp_servicebus_client = MCPServiceBusClient(
-                    servicebus_conn_str,
-                    servicebus_topic,
-                    servicebus_subscription
-                )
-            except ImportError:
-                self.mcp_servicebus_client = None
-                self.logger.warning("MCPServiceBusClient could not be imported. Service Bus integration is disabled.")
-        else:
+        servicebus_conn_str = self.env_manager.get_azure_connection_string("servicebus")
+        servicebus_topic = self.env_manager.get("SERVICEBUS_TOPIC", "mcp-topic")
+        servicebus_subscription = self.env_manager.get("SERVICEBUS_SUBSCRIPTION", None)
+        try:
+            from RealmOfAgents.AgentOperatingSystem.mcp_servicebus_client import MCPServiceBusClient
+            self.mcp_servicebus_client = MCPServiceBusClient(
+                servicebus_conn_str,
+                servicebus_topic,
+                servicebus_subscription
+            )
+        except ImportError:
             self.mcp_servicebus_client = None
+            self.logger.warning("MCPServiceBusClient could not be imported. Service Bus integration is disabled.")
             
         # Initialize managers (delegating logic to them, pass aos if needed)
         self.agent_manager = BusinessAgentManager(self.config, self.logger)
@@ -175,9 +151,8 @@ class BusinessInfinity:
     async def _initialize(self):
         try:
             self.logger.info("Initializing Business Infinity application...")
-            # Start AOS infrastructure if available
-            if self.aos:
-                await self.aos.start()
+            # Start AOS infrastructure
+            await self.aos.start()
             # Delegate initialization to managers
             await self.agent_manager.initialize()
             await self.workflow_manager.initialize()
