@@ -1,16 +1,35 @@
 """
 Business Infinity Configuration Management
 
-Provides configuration management for Business Infinity application,
-integrating with AOS configuration system while adding business-specific
+REFACTORED: Now imports from runtime with fallback to AOS
+
+This module provides configuration management for Business Infinity application,
+integrating with runtime configuration system while adding business-specific
 configuration options.
+
+Note: The canonical configuration is in src/bi_config.py which extends runtime.RuntimeConfig.
+This module provides backward compatibility and additional AOS-specific configuration.
 """
 
 import os
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 
-from AgentOperatingSystem.config import AOSConfig
+# Try to import from runtime first
+try:
+    from runtime import RuntimeConfig
+    RUNTIME_AVAILABLE = True
+except ImportError:
+    RUNTIME_AVAILABLE = False
+    RuntimeConfig = None
+
+# Fallback to AOS
+try:
+    from AgentOperatingSystem.config import AOSConfig
+    AOS_AVAILABLE = True
+except ImportError:
+    AOS_AVAILABLE = False
+    AOSConfig = None
 
 
 @dataclass
@@ -195,8 +214,10 @@ class BusinessInfinityConfig:
         if self.auth_config["provider"] not in valid_providers:
             raise ValueError(f"Auth provider must be one of: {valid_providers}")
     
-    def to_aos_config(self) -> AOSConfig:
+    def to_aos_config(self) -> Any:
         """Convert to AOS configuration object."""
+        if not AOS_AVAILABLE:
+            raise RuntimeError("AgentOperatingSystem is not available")
         return AOSConfig(
             agent_config=self.agent_config,
             messaging_config=self.messaging_config,
@@ -206,6 +227,27 @@ class BusinessInfinityConfig:
             auth_config=self.auth_config,
             environment_config=self.environment_config,
             mcp_config=self.mcp_config
+        )
+    
+    def to_runtime_config(self) -> Any:
+        """Convert to runtime configuration object."""
+        if not RUNTIME_AVAILABLE:
+            raise RuntimeError("Runtime is not available")
+        return RuntimeConfig(
+            app_name="BusinessInfinity",
+            app_version="2.0.0",
+            app_environment=self.environment_config.get("environment", "development"),
+            azure_functions_enabled=True,
+            auth_level="FUNCTION",
+            aos_enabled=True,
+            storage_type=self.storage_config.get("backend", "file"),
+            messaging_type="servicebus" if self.azure_integration_enabled else "memory",
+            observability_enabled=self.monitoring_config.get("metrics_enabled", True),
+            log_level=self.monitoring_config.get("logging_level", "INFO"),
+            circuit_breaker_enabled=True,
+            retry_enabled=True,
+            max_retries=self.workflow_config.get("retry_attempts", 3),
+            custom_config=self.get_business_config()
         )
     
     def get_business_config(self) -> Dict[str, Any]:
