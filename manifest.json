@@ -1,7 +1,18 @@
 {
   "name": "BusinessInfinity",
   "alias": "BI",
+  "version": "2.0.0",
   "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making. Enhanced with covenant-based compliance for the Global Boardroom Network.",
+  "architecture": {
+    "type": "azure-functions-app",
+    "runtime": "generic-aos-runtime",
+    "description": "BusinessInfinity now uses a generic, reusable runtime (runtime/) that separates infrastructure from business logic. The runtime can be used by any application built on AgentOperatingSystem, including Azure Functions and Microsoft Agent Framework integration.",
+    "components": {
+      "runtime": "Generic runtime environment for AOS applications (runtime/)",
+      "business_logic": "BusinessInfinity-specific agents, workflows, and configuration (src/)",
+      "infrastructure": "AgentOperatingSystem provides all infrastructure services"
+    }
+  },
   "covenant_compliance": {
     "enabled": true,
     "schema_version": "1.0.0",
