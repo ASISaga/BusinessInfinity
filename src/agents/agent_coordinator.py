@@ -13,12 +13,15 @@ from dataclasses import dataclass
 
 # Import AOS components for agent coordination
 try:
-    from aos.messaging.conversation_system import AOSConversationSystem, ConversationType
-    from aos.orchestration.orchestrator import Orchestrator
-    from aos.monitoring.audit_trail import audit_log, AuditEventType, AuditSeverity
+    from AgentOperatingSystem.messaging import MessageBus
+    from AgentOperatingSystem.orchestration import OrchestrationEngine
+    from AgentOperatingSystem.monitoring import SystemMonitor
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
+    MessageBus = None
+    OrchestrationEngine = None
+    SystemMonitor = None
 
 
 @dataclass 

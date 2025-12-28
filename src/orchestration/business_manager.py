@@ -13,14 +13,15 @@ from dataclasses import dataclass, field
 
 # Import AOS components
 try:
-    from aos.core.boardroom import AutonomousBoardroom
-    from aos.messaging.conversation_system import AOSConversationSystem, ConversationType
-    from aos.orchestration.orchestrator import Orchestrator
-    from aos.monitoring.audit_trail import audit_log, AuditEventType, AuditSeverity
+    from AgentOperatingSystem import AgentOperatingSystem
+    from AgentOperatingSystem.orchestration import OrchestrationEngine
+    from AgentOperatingSystem.messaging import MessageBus
     AOS_AVAILABLE = True
 except ImportError:
     AOS_AVAILABLE = False
-    print("Warning: AOS not available")
+    AgentOperatingSystem = None
+    OrchestrationEngine = None
+    MessageBus = None
 
 
 @dataclass

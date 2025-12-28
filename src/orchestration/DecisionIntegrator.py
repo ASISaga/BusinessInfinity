@@ -1,8 +1,33 @@
 # DecisionIntegrator.py
+"""
+Decision Integrator
+
+Collects assessments and evidence from boardroom agents and tools,
+then produces a structured DecisionArtifact using configurable decision modes.
+Persists each decision into a ledger.
+"""
+
 import time
 import yaml
-from agent_framework import Executor, WorkflowContext, handler
-from DecisionLedger import DecisionLedger
+import logging
+from typing import Dict, Any, List, Set, Optional
+from pathlib import Path
+
+# Try importing agent framework
+try:
+    from agent_framework import Executor, WorkflowContext, handler
+    AGENT_FRAMEWORK_AVAILABLE = True
+except ImportError:
+    AGENT_FRAMEWORK_AVAILABLE = False
+    Executor = object
+    handler = lambda f: f
+    WorkflowContext = Any
+
+# Import local decision ledger
+from .DecisionLedger import DecisionLedger
+
+
+logger = logging.getLogger(__name__)
 
 
 class DecisionIntegrator(Executor):

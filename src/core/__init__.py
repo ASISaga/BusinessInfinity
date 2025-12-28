@@ -1,80 +1,81 @@
 """
 Core Business Infinity System
-Consolidated core functionality for all features
 
-Core components for Business Infinity application including
-configuration, application orchestration, and supporting managers.
+Core supporting components for Business Infinity application.
 
-This module consolidates:
-- Server functionality (FastAPI + WebSocket MCP + Static files)
-- Agent management (Operational, AML, Semantic agents)
-- MCP communication (Multi-Agent Communication Protocol)
-- Orchestration (Workflows, coordination, decision engine)
-- Authentication and authorization
-- Triggers and event processing
-- Azure Functions integration
-- Utilities and governance
-- Feature modules (Storage, ML, Environment, API)
+NOTE: Main application classes (BusinessInfinity, BusinessInfinityConfig) are now 
+defined in src/app.py and src/config.py respectively. This module provides 
+additional supporting functionality.
+
+This module provides:
+- Covenant management (compliance and governance)
+- Conversation management
+- Agent management utilities
+- MCP access control
+- Observability and reliability patterns
+- Service interfaces
 """
 
-from .application import BusinessInfinity, create_business_infinity, get_business_infinity, create_default_business_infinity
-from .config import BusinessInfinityConfig, create_default_config, create_production_config, create_development_config
+# Core supporting managers
 from .covenant_manager import BusinessCovenantManager
 from .conversation_manager import BusinessConversationManager
 
+# Try importing agent utilities
+try:
+    from .agents import UnifiedAgentManager, get_unified_manager, initialize_unified_manager
+    AGENTS_AVAILABLE = True
+except ImportError:
+    AGENTS_AVAILABLE = False
+    UnifiedAgentManager = None
+    get_unified_manager = None
+    initialize_unified_manager = None
 
-# Remove broken imports for missing modules
-# from .server import unified_server, app as server_app
-from .agents import UnifiedAgentManager, get_unified_manager, initialize_unified_manager, ask_agent, get_agent_profiles_json, get_agent_by_name
-# from .mcp import mcp_handler, handle_mcp
-# from .BusinessInfinityOrchestrator import BusinessInfinityOrchestrator, process_decision, coordinate_agents
-# from .auth import auth_handler, UnifiedAuthHandler
-# from .triggers import triggers_manager, UnifiedTriggersManager
-from .utils import utils_manager, UnifiedUtilsManager, validate_request, get_ui_schema
-# from .azure_functions import consolidated_functions, register_consolidated_functions
+# Try importing utilities
+try:
+    from .utils import utils_manager, UnifiedUtilsManager, validate_request, get_ui_schema
+    UTILS_AVAILABLE = True
+except ImportError:
+    UTILS_AVAILABLE = False
+    utils_manager = None
+    UnifiedUtilsManager = None
+    validate_request = None
+    get_ui_schema = None
 
-# Import feature modules correctly
-from .features import storage_manager, env_manager, api_orchestrator
+# Try importing feature modules
+try:
+    from .features import storage_manager, env_manager, api_orchestrator
+    FEATURES_AVAILABLE = True
+except ImportError:
+    FEATURES_AVAILABLE = False
+    storage_manager = None
+    env_manager = None
+    api_orchestrator = None
+
 
 # Export all major components
 __all__ = [
-    # Main Application
-    "BusinessInfinity",
-    "create_business_infinity",
-    "get_business_infinity", 
-    "create_default_business_infinity",
-    
-    # Configuration
-    "BusinessInfinityConfig",
-    "create_default_config",
-    "create_production_config",
-    "create_development_config",
-    
     # Core Managers
     "BusinessCovenantManager",
     "BusinessConversationManager",
-
-    # Audit trail system
-    'audit_trail',
-    'mcp_access_control',
-    'businessinfinity_config_mcp_stub',
-
-    # Agent components
-    'UnifiedAgentManager',
-    'get_unified_manager',
-    'initialize_unified_manager',
-    'ask_agent',
-    'get_agent_profiles_json',
-    'get_agent_by_name',
     
-    # Utilities and governance
-    'utils_manager',
-    'UnifiedUtilsManager',
-    'validate_request',
-    'get_ui_schema',
+    # Agent components (optional)
+    "UnifiedAgentManager",
+    "get_unified_manager",
+    "initialize_unified_manager",
     
-    # Feature modules
-    'storage_manager',
-    'env_manager',
-    'api_orchestrator'
+    # Utilities (optional)
+    "utils_manager",
+    "UnifiedUtilsManager",
+    "validate_request",
+    "get_ui_schema",
+    
+    # Feature modules (optional)
+    "storage_manager",
+    "env_manager",
+    "api_orchestrator",
+    
+    # Availability flags
+    "AGENTS_AVAILABLE",
+    "UTILS_AVAILABLE",
+    "FEATURES_AVAILABLE",
 ]

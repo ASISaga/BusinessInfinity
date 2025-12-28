@@ -1,22 +1,53 @@
 """
 Business Infinity Agents
 
-Business-specific agent implementations that extend AOS Agent
-with business intelligence and domain expertise.
+Business-specific agent implementations that extend the BusinessAgent base class
+with specialized C-Suite capabilities.
+
+Architecture:
+    ┌───────────────────────────────────┐
+    │      BusinessInfinity Agents      │
+    │  CEO, CTO, Founder (specialized)  │
+    └───────────────────────────────────┘
+                    ▼
+    ┌───────────────────────────────────┐
+    │         BusinessAgent             │
+    │  (external package - Boardroom)   │
+    └───────────────────────────────────┘
+                    ▼
+    ┌───────────────────────────────────┐
+    │      AgentOperatingSystem         │
+    │  (core infrastructure)            │
+    └───────────────────────────────────┘
 """
 
-from BusinessAgent import BusinessAgent
-from CEO import ChiefExecutiveOfficer
-from CTO import ChiefTechnologyOfficer
-from Founder import FounderAgent
+# Agent coordinator (local module)
 from .agent_coordinator import AgentCoordinator, AgentQuery, AgentResponse
 
+# Specialized C-Suite agents (local implementations)
+from .ceo import ChiefExecutiveOfficer
+from .cto import ChiefTechnologyOfficer
+from .founder import FounderAgent
+
+# Try importing external BusinessAgent package
+try:
+    from BusinessAgent import BusinessAgent
+    BUSINESS_AGENT_AVAILABLE = True
+except ImportError:
+    BusinessAgent = None
+    BUSINESS_AGENT_AVAILABLE = False
+
+
 __all__ = [
+    # Coordination
     "AgentCoordinator",
     "AgentQuery",
     "AgentResponse",
-    "BusinessAgent",
-    "ChiefExecutiveOfficer", 
+    # C-Suite agents
+    "ChiefExecutiveOfficer",
     "ChiefTechnologyOfficer",
-    "FounderAgent"
+    "FounderAgent",
+    # External package (optional)
+    "BusinessAgent",
+    "BUSINESS_AGENT_AVAILABLE",
 ]

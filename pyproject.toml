@@ -8,6 +8,7 @@ authors = [ { name = "ASISaga" } ]
 requires-python = ">=3.8"
 dependencies = [
     "azure-functions",
+    "azure-servicebus>=7.11.0",
     "fastapi>=0.112.2",
     "pydantic>=2.8.2",
     "uvicorn>=0.30.5",

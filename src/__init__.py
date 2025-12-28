@@ -1,128 +1,80 @@
 """
-Business Infinity - Enterprise Business Application
+BusinessInfinity - Enterprise Business Application
 
-Business Infinity is an enterprise business application built on top of the
+BusinessInfinity is an enterprise business application built on top of the
 Agent Operating System (AOS). It provides business-specific functionality
 including C-Suite agents, workflow orchestration, analytics, and governance.
 
+This package uses the generic runtime layer for all infrastructure concerns
+and focuses purely on business logic.
+
 Key Components:
-- BusinessInfinity: Main application orchestrator
-- Business Agents: C-Suite agents with domain expertise
-- Workflow Management: Strategic decision-making processes
-- Analytics Engine: KPIs, metrics, and business intelligence
-- Covenant Management: Governance and compliance
+    - BusinessInfinity: Main application orchestrator
+    - BusinessInfinityConfig: Application configuration
+    - Handlers: HTTP route handlers
+    - Agents: C-Suite agents with domain expertise
+    - AOSServiceBusClient: Client for communicating with AOS via Service Bus
 """
 
-from ...src.orchestration.business_manager import create_business_manager, BusinessManager, BusinessAgent, BusinessTask
-
-# Import from new business_infinity package
-from .business_infinity import (
-    # Core Application
+from .app import (
+    AgentInfo,
     BusinessInfinity,
-    BusinessInfinityConfig,
+    WorkflowInfo,
     create_business_infinity,
     get_business_infinity,
-    create_default_business_infinity,
-    
-    # Configuration
+    set_business_infinity,
+)
+from .config import (
+    BusinessInfinityConfig,
     create_default_config,
-    create_production_config,
     create_development_config,
-    
-    # Business Agents
-    BusinessAgent,
-    ChiefExecutiveOfficer,
-    ChiefTechnologyOfficer,
-    FounderAgent,
-    
-    # Workflow Management
-    BusinessWorkflowManager,
-    WorkflowStatus,
-    
-    # Analytics
-    BusinessAnalyticsManager,
-    BusinessMetric,
-    MetricType,
-    
-    # Convenience Functions
-    create_default_business_app,
-    create_production_business_app,
-    create_development_business_app,
-    
-    # Metadata
-    __version__,
-    __author__,
-    __description__
+    create_production_config,
+    load_bi_config,
+)
+from .handlers import (
+    AgentsHandler,
+    HealthHandler,
+    MCPHandler,
+    WorkflowsHandler,
+    register_routes,
 )
 
-# Convenience functions for quick setup (from 1.py)
-def create_default_business_app():
-    """Create a Business Infinity application with default configuration."""
-    config = create_default_config()
-    return create_business_infinity(config)
+# AOS Service Bus Client (for distributed deployment)
+try:
+    from .aos_client import AOSServiceBusClient, AOS_CLIENT_AVAILABLE
+except ImportError:
+    AOS_CLIENT_AVAILABLE = False
+    AOSServiceBusClient = None  # type: ignore
 
-def create_production_business_app():
-    """Create a Business Infinity application with production configuration."""
-    config = create_production_config()
-    return create_business_infinity(config)
+__version__ = "2.0.0"
+__author__ = "ASISaga"
+__description__ = "Enterprise Business Application on AgentOperatingSystem"
 
-def create_development_business_app():
-    """Create a Business Infinity application with development configuration."""
-    config = create_development_config()
-    return create_business_infinity(config)
-
-# Backward compatibility imports for existing code
-# These maintain compatibility with the old structure
-from .business_infinity.core.application import BusinessInfinity as BusinessInfinity_Legacy
-from .business_infinity.core.config import BusinessInfinityConfig as BusinessInfinityConfig_Legacy
-
-# Export everything for backward compatibility and public API (merged from 1.py and previous __all__)
 __all__ = [
-    "create_business_manager",
-    "BusinessManager",
-    "BusinessAgent", 
-    "BusinessTask",
-    
+    # Version info
+    "__version__",
+    "__author__",
+    "__description__",
     # Core Application
     "BusinessInfinity",
-    "BusinessInfinityConfig",
+    "AgentInfo",
+    "WorkflowInfo",
     "create_business_infinity",
     "get_business_infinity",
-    "create_default_business_infinity",
-
-    # Configuration Factory Functions
+    "set_business_infinity",
+    # Configuration
+    "BusinessInfinityConfig",
+    "load_bi_config",
     "create_default_config",
     "create_production_config",
     "create_development_config",
-
-    # Business Agents
-    "BusinessAgent",
-    "ChiefExecutiveOfficer",
-    "ChiefTechnologyOfficer",
-    "FounderAgent",
-
-    # Workflow Management
-    "BusinessWorkflowManager",
-    "WorkflowStatus",
-
-    # Analytics
-    "BusinessAnalyticsManager",
-    "BusinessMetric",
-    "MetricType",
-
-    # Convenience Functions
-    "create_default_business_app",
-    "create_production_business_app",
-    "create_development_business_app",
-
-    # Legacy compatibility
-    "BusinessInfinity_Legacy",
-    "BusinessInfinityConfig_Legacy",
-
-    # Metadata
-    "__version__",
-    "__author__",
-    "__description__"
+    # Handlers
+    "HealthHandler",
+    "AgentsHandler",
+    "WorkflowsHandler",
+    "MCPHandler",
+    "register_routes",
+    # AOS Service Bus Client
+    "AOSServiceBusClient",
+    "AOS_CLIENT_AVAILABLE",
 ]
-
-# Package metadata (already imported from .business_infinity)

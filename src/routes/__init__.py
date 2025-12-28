@@ -1,13 +1,14 @@
 """
 BusinessInfinity Routes Module
 
-HTTP API routes and endpoints for business operations.
+NOTE: Legacy route files have been moved to .archive/
+All HTTP routes are now defined in src/handlers.py and registered
+through the runtime's RouteRegistry.
+
+See: src/handlers.py for current route implementations.
 """
 
-from agents import create_agents_api, AgentsEndpoint
+# Routes are now handled by src/handlers.py with runtime.RouteRegistry
+# This module is kept for backward compatibility
 
-    
-__all__ = [
-    "create_agents_api",
-    "AgentsEndpoint"
-]
+__all__ = []
