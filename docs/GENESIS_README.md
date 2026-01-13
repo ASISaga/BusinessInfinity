@@ -7,7 +7,21 @@
 
 ## 📋 Available Documents
 
-### 1. Substrate Independence Analysis (Conceptual - RECOMMENDED START HERE) ⭐
+### 0. Quick Answer to Issue #59 (Start Here for Issue Context) 🎯
+**File:** [GENESIS_ANALYSIS_SUMMARY.md](./GENESIS_ANALYSIS_SUMMARY.md)  
+**Length:** ~7 pages  
+**Read Time:** 5-10 minutes  
+**Best For:** Quick answer to "Can Genesis build BI without going to substrate level?"
+
+**Contents:**
+- Direct answer to issue #59
+- The critical distinction (business logic vs infrastructure)
+- What can be Genesis vs what must be Python
+- Concrete Genesis example
+- Benefits of substrate independence
+- Final recommendation
+
+### 1. Substrate Independence Analysis (Conceptual - DEEP DIVE) ⭐
 **File:** [GENESIS_SUBSTRATE_INDEPENDENCE_ANALYSIS.md](./GENESIS_SUBSTRATE_INDEPENDENCE_ANALYSIS.md)  
 **Length:** ~35 pages  
 **Read Time:** 30-45 minutes  
