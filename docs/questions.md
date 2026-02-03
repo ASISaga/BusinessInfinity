@@ -10,7 +10,8 @@ Why is now the right time for this idea?
 What are you going to build first?
 What is new or innovative about what you’re doing?
 If your company had a headline in a major newspaper in 5 years, what would it say?
-Category 2: The Problem & Solution (The “Why”)
+
+## Category 2: The Problem & Solution (The “Why”)
 What problem are you solving?
 Who has this problem? Be specific.
 How do you know it’s a real problem? What’s your evidence?
@@ -18,7 +19,8 @@ How are people solving this problem now (without your product)?
 What is your unique insight into this problem? What do you understand that others don’t?
 Why is this a must-have solution, not just a nice-to-have?
 What have you learned from your early users about the problem?
-Category 3: Traction & Metrics (The “Proof”)
+
+## Category 3: Traction & Metrics (The “Proof”)
 What is your progress so far?
 How many users do you have?
 What is your revenue?
@@ -31,7 +33,8 @@ Tell me about your best users. What makes them the best?
 If you have no users, what have you done to validate the idea?
 What is the top thing users are asking for?
 What have you learned from your metrics so far?
-Category 4: Go-to-Market & Growth (The “How”)
+
+## Category 4: Go-to-Market & Growth (The “How”)
 How will you get your first 1,000 users?
 What is the one, specific, repeatable channel that is working for you right now?
 How will you scale your user acquisition?
@@ -39,12 +42,6 @@ What’s the biggest challenge to your growth?
 What’s your plan for the 3 months of YC? What’s your goal?
 How could you make $100K in MRR? What would that take?
 Why haven’t you grown faster?
-
-
-doola logo
-The Easiest Way to Start and Scale Your U.S. Business.
-Book a Demoright arrow
-
 
 Entrepreneurship
 The Ultimate Y Cominator Interview Prep List: 50+ Questions
