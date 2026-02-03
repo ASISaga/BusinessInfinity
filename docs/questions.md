@@ -43,8 +43,6 @@ How could you make $100K in MRR? What would that take?
 Why haven’t you grown faster?
 The next chapter of your business starts with one call.
 
-The Ultimate Y Cominator Interview Prep List: 50+ Questions
-
 ## Category 5: Market & Competition (The “Where”)
 Who are your top competitors?
 How are you different from them?
