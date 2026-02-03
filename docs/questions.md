@@ -1,6 +1,6 @@
 This comprehensive guide features 50+ actual YC interview questions organized into seven critical categories, from company vision and market fit to team dynamics and those curveball questions designed to test your thinking.
 
-# Category 1: The Company & Vision (The “What”)
+## Category 1: The Company & Vision (The “What”)
 
 So, what are you working on?
 Explain what you do in one clear, jargon-free sentence.
