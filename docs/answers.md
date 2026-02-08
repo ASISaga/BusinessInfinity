@@ -219,7 +219,7 @@ Goal: $100K in committed annual contracts by Demo Day.
 
 ### How could you make $100K in MRR? What would that take?
 
-$100K MRR = $1.2M ARR. At $50K/year per customer = 24 paying customers.
+$100K MRR = $1.2M ARR. At $50K/year per customer, that's $1.2M ÷ $50K = 24 paying customers.
 
 That requires:
 - Product mature enough for daily use by non-technical founders.
@@ -275,7 +275,7 @@ Also: Genesis. No one else is building a declarative language for substrate-inde
 
 ### What is the total addressable market size? How did you calculate that?
 
-- **Startups globally**: ~150 million small businesses, ~500K funded startups. At $50K/year, the funded startup market alone is $25B.
+- **Startups globally**: ~150 million small businesses, ~500K funded startups. At $50K/year, the funded startup segment alone = 500K × $50K = $25B.
 - **Family businesses**: ~400 million worldwide. Even at 1% penetration and $20K/year, that's $800M.
 - **Fractional C-suite replacement**: $15B market growing 20% annually.
 - **Enterprise board automation**: $5B market (BoardEffect, Diligent).
