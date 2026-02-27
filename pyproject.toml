@@ -15,7 +15,7 @@ authors = [ { name = "ASISaga" } ]
 requires-python = ">=3.10"
 
 dependencies = [
-    "aos-client-sdk[azure]>=4.0.0",
+    "aos-client-sdk[azure]>=5.0.0",
 ]
 
 [project.optional-dependencies]
