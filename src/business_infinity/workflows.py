@@ -81,7 +81,7 @@ async def c_suite_orchestration(
     agents = await select_c_suite_agents(request.client)
     agent_ids = [a.agent_id for a in agents if agent_filter(a)]
     if not agent_ids:
-        raise ValueError("No matching agents available in the catalog")
+        raise ValueError(f"No matching agents available for '{purpose}'")
     status = await request.client.start_orchestration(
         agent_ids=agent_ids,
         purpose=purpose,
@@ -390,6 +390,6 @@ async def handle_strategic_review_update(update) -> None:
 
 
 @app.mcp_tool("erp-search")
-async def erp_search(request) -> Any:
+async def erp_search(request: WorkflowRequest) -> Any:
     """Search ERP via MCP server."""
     return await request.client.call_mcp_tool("erpnext", "search", request.body)
