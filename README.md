@@ -1,196 +1,181 @@
 # BusinessInfinity
 
-Enterprise Business Application built on the **AgentOperatingSystem Runtime**.
+A lean Azure Functions application that uses the **Agent Operating System** as an infrastructure service. BusinessInfinity contains only business logic — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the `aos-client-sdk`.
 
 ## Architecture
 
-BusinessInfinity uses a clean three-layer architecture:
-
 ```
-┌─────────────────────────────────────────────────┐
-│         BusinessInfinity Application            │
-│  • src/config.py - Configuration                │
-│  • src/app.py - Core business logic             │
-│  • src/handlers.py - HTTP route handlers        │
-└─────────────────────────────────────────────────┘
-                       ▼
-┌─────────────────────────────────────────────────┐
-│         Generic Runtime Layer                   │
-│  • runtime/azure_functions_runtime.py           │
-│  • runtime/routes_registry.py                   │
-│  • runtime/config_loader.py                     │
-│  • runtime/storage.py & messaging.py            │
-└─────────────────────────────────────────────────┘
-                       ▼
-┌─────────────────────────────────────────────────┐
-│       AgentOperatingSystem (AOS)                │
-│  • Storage, Messaging, ML Pipeline              │
-│  • Observability, Reliability, Security         │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  BusinessInfinity (this app)                        │
+│  ┌───────────────────────────────────────────────┐  │
+│  │  workflows.py       @app.workflow decorators  │  │
+│  │  function_app.py    app.get_functions()       │  │
+│  │    └─ aos-client-sdk handles everything else  │  │
+│  └───────────────────────────────────────────────┘  │
+│  Zero Azure Functions boilerplate.                  │
+│  Zero agent code. Zero infrastructure code.         │
+└──────────────┬───────────────────┬──────────────────┘
+               │ HTTPS             │ Azure Service Bus
+               ▼                   ▼
+┌─────────────────────────────────────────────────────┐
+│  Agent Operating System (infrastructure)            │
+│  ┌──────────────────┐  ┌─────────────────────────┐  │
+│  │ aos-function-app  │  │ aos-realm-of-agents     │  │
+│  │ Orchestration API │  │ Agent catalog:          │  │
+│  │ + Service Bus     │  │  CEO · CFO · CMO · CSO  │  │
+│  │   triggers        │  │  COO · CTO · CHRO       │  │
+│  └──────────────────┘  └─────────────────────────┘  │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ aos-kernel                                      │ │
+│  │ Orchestration · Messaging · Storage · Auth      │ │
+│  └────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+## Key Principle
 
-### Prerequisites
+> **BusinessInfinity focuses only on business logic.  The SDK handles the rest.**
 
-- Python 3.8+
-- Azure Functions Core Tools
-- Azure subscription (for deployment)
+| Concern | Owner |
+|---------|-------|
+| Business workflows (strategic review, market analysis, budget approval, etc.) | BusinessInfinity |
+| Azure Functions scaffolding, HTTP/Service Bus triggers, auth | aos-client-sdk |
+| Agent lifecycle, perpetual orchestration, messaging, storage, monitoring | AOS |
+| Agent catalog (C-suite agents, capabilities, LoRA adapters) | RealmOfAgents |
 
-### Local Development
+## Workflows
 
-1. **Install dependencies:**
-   ```bash
-   pip install -e .
-   ```
+### Define workflows with decorators
 
-2. **Configure environment:**
-   ```bash
-   cp local.settings.json.example local.settings.json
-   # Edit local.settings.json with your settings
-   ```
+```python
+# src/business_infinity/workflows.py
+from aos_client import AOSApp, WorkflowRequest
 
-3. **Run locally:**
-   ```bash
-   func start
-   ```
+app = AOSApp(name="business-infinity")
 
-### Configuration
+@app.workflow("strategic-review")
+async def strategic_review(request: WorkflowRequest):
+    agents = await request.client.list_agents()
+    c_suite = [a.agent_id for a in agents if a.agent_type in ("LeadershipAgent", "CMOAgent")]
+    return await request.client.start_orchestration(
+        agent_ids=c_suite,
+        purpose="Drive strategic review and continuous organisational improvement",
+        context=request.body,
+    )
+```
 
-BusinessInfinity is **configuration-driven**. All settings are in `src/config.py` and loaded from environment variables or JSON files.
+### Azure Functions entry point (zero boilerplate)
 
-Key configuration options:
+```python
+# function_app.py
+from business_infinity.workflows import app
+functions = app.get_functions()
+```
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `COMPANY_NAME` | "Business Infinity" | Company name |
-| `BOARDROOM_ENABLED` | true | Enable boardroom features |
-| `WORKFLOWS_ENABLED` | true | Enable workflow engine |
-| `ANALYTICS_ENABLED` | true | Enable analytics |
-| `MENTOR_MODE_ENABLED` | true | Enable mentor mode |
+### Available Workflows
 
-## API Endpoints
+| Workflow | Agents | Purpose |
+|----------|--------|---------|
+| `strategic-review` | All C-suite | Strategic alignment and cross-functional coordination |
+| `market-analysis` | CMO + CEO + CSO | Market intelligence and competitive insights |
+| `budget-approval` | CEO + CFO | Budget governance and fiscal responsibility |
+| `risk-assessment` | CSO + CTO + COO | Enterprise risk monitoring and mitigation |
+| `boardroom-session` | All C-suite | Autonomous boardroom with perpetual governance |
+| `covenant-compliance` | CEO + COO + CSO | Covenant compliance and governance adherence |
+| `talent-management` | CHRO + CEO + COO | Talent strategy and organizational development |
+| `technology-review` | CTO + CEO + CSO | Technology strategy and architecture excellence |
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health check |
-| `/status` | GET | Detailed status |
-| `/agents` | GET | List all agents |
-| `/agents/{role}/ask` | POST | Ask an agent |
-| `/workflows/{name}` | POST | Execute workflow |
-| `/mcp/servers` | GET | List MCP servers |
+### Invoke via HTTP
+
+```bash
+# Strategic Review
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/strategic-review \
+  -H "Content-Type: application/json" \
+  -d '{"quarter": "Q1-2026", "focus_areas": ["revenue", "growth", "efficiency"]}'
+
+# Market Analysis
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/market-analysis \
+  -H "Content-Type: application/json" \
+  -d '{"market": "EU SaaS", "competitors": ["AcmeCorp", "Globex"]}'
+
+# Budget Approval
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/budget-approval \
+  -H "Content-Type: application/json" \
+  -d '{"department": "Marketing", "amount": 500000, "justification": "Q2 brand campaign"}'
+```
+
+All responses follow the perpetual orchestration pattern:
+```json
+{"orchestration_id": "...", "status": "active"}
+```
+
+## Registration with AOS
+
+Register this app with AOS to provision Service Bus infrastructure:
+
+```python
+from aos_client import AOSRegistration
+
+async with AOSRegistration(aos_endpoint="https://my-aos.azurewebsites.net") as reg:
+    info = await reg.register_app(
+        app_name="business-infinity",
+        workflows=[
+            "strategic-review", "market-analysis", "budget-approval",
+            "risk-assessment", "boardroom-session", "covenant-compliance",
+            "talent-management", "technology-review",
+        ],
+    )
+```
+
+## Local Development
+
+```bash
+pip install -e ".[dev]"
+func start
+```
+
+Set environment variables:
+```
+AOS_ENDPOINT=http://localhost:7071       # AOS Function App
+REALM_ENDPOINT=http://localhost:7072     # RealmOfAgents (if separate)
+SERVICE_BUS_CONNECTION=                  # Service Bus (optional for local dev)
+```
+
+## Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `aos-client-sdk[azure]` | SDK + Azure Functions + Service Bus + Auth |
+
+**No AOS kernel, agent, or infrastructure dependencies.** BusinessInfinity knows nothing about agent internals.
 
 ## Project Structure
 
 ```
 BusinessInfinity/
-├── function_app.py          # Azure Functions entry point
-├── pyproject.toml           # Package configuration
-├── runtime/                  # Generic runtime (reusable)
-│   ├── __init__.py          # Runtime exports (v2.0.0)
-│   ├── azure_functions_runtime.py
-│   ├── routes_registry.py
-│   ├── config_loader.py
-│   ├── storage.py
-│   └── messaging.py
-├── src/                      # BusinessInfinity source
-│   ├── __init__.py          # Package exports (v2.0.0)
-│   ├── app.py               # Main BusinessInfinity class
-│   ├── config.py            # BusinessInfinityConfig
-│   ├── handlers.py          # HTTP route handlers
-│   ├── agents/              # C-Suite agents
-│   │   ├── base.py          # BusinessAgent base class
-│   │   ├── ceo.py           # ChiefExecutiveOfficer
-│   │   ├── cto.py           # ChiefTechnologyOfficer
-│   │   ├── founder.py       # FounderAgent
-│   │   └── agent_coordinator.py
-│   ├── orchestration/       # Workflow orchestration
-│   │   ├── BusinessBoardroomOrchestrator.py
-│   │   ├── DecisionIntegrator.py
-│   │   └── DecisionLedger.py
-│   ├── executors/           # MCP executors
-│   │   ├── ERPExecutor.py
-│   │   ├── CRMExecutor.py
-│   │   └── LinkedInExecutor.py
-│   └── core/                # Supporting utilities
-├── .archive/                 # Archived legacy files
-└── docs/                     # Documentation
+├── function_app.py                  # Azure Functions entry point (2 lines)
+├── pyproject.toml                   # Depends only on aos-client-sdk[azure]
+├── host.json                        # Azure Functions config
+├── manifest.json                    # System architecture map
+├── src/
+│   └── business_infinity/
+│       ├── __init__.py              # Package init
+│       └── workflows.py             # All business workflows (@app.workflow)
+├── tests/
+│   └── test_workflows.py            # Workflow tests
+└── docs/
+    └── AOS_ENHANCEMENT_REQUESTS.md  # SDK enhancement requests
 ```
 
-## Key Concepts
+## Related Repositories
 
-### Runtime Layer
-
-The `runtime/` package provides generic infrastructure that can be reused by any application:
-
-- **RouteRegistry**: Framework-agnostic route registration
-- **RuntimeConfig**: Configuration loading from env/JSON
-- **AzureFunctionsRuntime**: Azure Functions integration
-- **ServiceBusRuntime**: Message handling
-- **Storage/Messaging**: Abstractions over AOS
-
-### Application Layer
-
-The `src/` package contains BusinessInfinity-specific code:
-
-- **BusinessInfinity**: Main application orchestrator
-- **BusinessInfinityConfig**: Business configuration
-- **Handlers**: HTTP route handlers
-- **Agents**: C-Suite agent implementations
-
-## Development
-
-### Running Tests
-
-```bash
-pytest tests/
-```
-
-### Code Style
-
-```bash
-# Format code
-black .
-
-# Type checking
-mypy src/
-```
-
-### Adding New Routes
-
-1. Create a handler in `src/handlers.py`
-2. Register in `register_routes()` function
-3. Routes are automatically registered with Azure Functions
-
-### Adding New Agents
-
-1. Add agent configuration to `BusinessInfinityConfig`
-2. Add agent initialization in `BusinessInfinity._initialize_agents()`
-3. Implement agent-specific logic
-
-## Deployment
-
-### Azure Functions
-
-```bash
-func azure functionapp publish <app-name>
-```
-
-### Environment Variables
-
-Set these in Azure Functions Application Settings:
-
-- `APP_ENVIRONMENT`: production/development
-- `STORAGE_CONNECTION_STRING`: Azure Storage connection
-- `MESSAGING_CONNECTION_STRING`: Service Bus connection
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: App Insights
+- [AgentOperatingSystem](https://github.com/ASISaga/AgentOperatingSystem) — AOS meta-repository
+- [aos-client-sdk](https://github.com/ASISaga/aos-client-sdk) — Client SDK & App Framework
+- [aos-function-app](https://github.com/ASISaga/aos-function-app) — AOS orchestration API
+- [aos-realm-of-agents](https://github.com/ASISaga/aos-realm-of-agents) — Agent catalog
+- [aos-kernel](https://github.com/ASISaga/aos-kernel) — OS kernel
+- [businessinfinity.asisaga.com](https://github.com/ASISaga/businessinfinity.asisaga.com) — Web frontend
 
 ## License
 
-See [LICENSE](LICENSE) for details.
-
-## Related Projects
-
-- [AgentOperatingSystem](../AgentOperatingSystem/) - Core infrastructure
-- [Boardroom](../Boardroom/) - C-Suite agent implementations
-- [MCP](../MCP/) - Model Context Protocol servers
+MIT License — see [LICENSE](LICENSE)
