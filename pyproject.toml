@@ -1,61 +1,36 @@
 # NOTE: This is an Azure Functions app, not a pip-installable Python package.
 # Do not add this app as a dependency in other pyproject.toml files.
+
+[build-system]
+requires = ["setuptools>=75.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "BusinessInfinity"
-version = "2.0.0"
-description = "Business Infinity - Enterprise Business Application built on Agent Operating System (AOS). Implements C-Suite agents, workflow orchestration, analytics, and governance with business-specific capabilities."
+name = "business-infinity"
+version = "3.0.0"
+description = "Lean Azure Functions client app powered by the Agent Operating System"
+readme = "README.md"
+license = {text = "Apache-2.0"}
 authors = [ { name = "ASISaga" } ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+
 dependencies = [
-    "azure-functions",
-    "azure-servicebus>=7.11.0",
-    "fastapi>=0.112.2",
-    "pydantic>=2.8.2",
-    "uvicorn>=0.30.5",
-    "websockets>=12.0",
-    "http-router",
-    "agent-framework>=1.0.0b251218",
-    "openai",
-    "chromadb",
-    "transformers",
-    "requests",
-    "python-dotenv>=1.0.1",
-    "jsonschema>=4.23.0",
-    "httpx",
-    "opentelemetry-api",
-    "opentelemetry-sdk", 
-    "opentelemetry-exporter-otlp-proto-grpc",
-    "opentelemetry-instrumentation-fastapi",
-    "PossibilityAgent @ git+https://github.com/ASISaga/PossibilityAgent.git",
-    "LeadershipAgent @ git+https://github.com/ASISaga/LeadershipAgent.git",
-    "BusinessAgent @ git+https://github.com/ASISaga/BusinessAgent.git",
-    "Founder @ git+https://github.com/ASISaga/Founder.git",
-    "Investor @ git+https://github.com/ASISaga/Investor.git",
-    "CSO @ git+https://github.com/ASISaga/CSO.git",
-    "CEO @ git+https://github.com/ASISaga/CEO.git",
-    "CMO @ git+https://github.com/ASISaga/CMO.git",
-    "CFO @ git+https://github.com/ASISaga/CFO.git",
-    "COO @ git+https://github.com/ASISaga/COO.git",
-    "CHRO @ git+https://github.com/ASISaga/CHRO.git",
-    "CTO @ git+https://github.com/ASISaga/CTO.git",
-    "AgentOperatingSystem[azure] @ git+https://github.com/ASISaga/AgentOperatingSystem.git"
+    "aos-client-sdk[azure]>=2.0.0",
 ]
 
-# Entry points removed - not needed for Azure Functions
-
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pylint>=3.0.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-dir]
-"" = "src"
-
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+testpaths = ["tests"]
 
 [tool.businessinfinity]
 type = "azure-functions-app"
