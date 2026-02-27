@@ -79,6 +79,11 @@ class TestAOSAppEnterpriseFeatures:
     def test_update_handler_registered(self):
         assert "strategic-review" in app.get_update_handler_names()
 
+    def test_boardroom_update_handlers_registered(self):
+        handlers = app.get_update_handler_names()
+        assert "boardroom-session" in handlers
+        assert "create-conversation" in handlers
+
     def test_mcp_tool_registered(self):
         assert "erp-search" in app.get_mcp_tool_names()
 

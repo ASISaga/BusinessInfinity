@@ -103,7 +103,7 @@ async def ask_agent_workflow(request: WorkflowRequest) -> Dict[str, Any]:
     return response.model_dump(mode="json")
 
 
-# ── Orchestration Update Handler (Enhancement #5) ───────────────────────────
+# ── Orchestration Update Handlers ───────────────────────────────────────────
 
 
 @app.on_orchestration_update("strategic-review")
@@ -111,6 +111,26 @@ async def handle_strategic_review_update(update) -> None:
     """Handle intermediate updates from strategic review orchestrations."""
     logger.info(
         "Strategic review update from agent %s: %s",
+        getattr(update, "agent_id", "unknown"),
+        getattr(update, "output", ""),
+    )
+
+
+@app.on_orchestration_update("boardroom-session")
+async def handle_boardroom_session_update(update) -> None:
+    """Handle intermediate updates from boardroom session orchestrations."""
+    logger.info(
+        "Boardroom session update from agent %s: %s",
+        getattr(update, "agent_id", "unknown"),
+        getattr(update, "output", ""),
+    )
+
+
+@app.on_orchestration_update("create-conversation")
+async def handle_boardroom_conversation_update(update) -> None:
+    """Handle intermediate updates from boardroom conversation orchestrations."""
+    logger.info(
+        "Boardroom conversation update from agent %s: %s",
         getattr(update, "agent_id", "unknown"),
         getattr(update, "output", ""),
     )
