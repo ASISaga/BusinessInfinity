@@ -5,6 +5,11 @@
 **Date:** 2026-02-27  
 **Context:** After integrating all 26 enhancements (14 in v4.0.0 + 12 in v5.0.0) into BusinessInfinity, we've identified additional improvements for production-hardening and the Global Boardroom Network rollout. These emerge from exercising the v5.0.0 APIs in production-style workflows with the full C-suite agent ensemble.
 
+> **Note:** Until the AOS Client SDK implements these enhancements natively,
+> BusinessInfinity implements them directly in
+> `src/business_infinity/workflows.py`.  Each item below links to its local
+> implementation.
+
 ---
 
 ## Priority 1 — Critical for Production Hardening
@@ -224,19 +229,19 @@ aos docs serve --port 8080
 
 ## Summary
 
-| # | Enhancement | Priority | Impact |
-|---|-------------|----------|--------|
-| 1 | End-to-End Encryption | P1 | Data security for sensitive workflows |
-| 2 | Rate Limiting & Quotas | P1 | Resource protection in production |
-| 3 | Workflow Dependency Chains | P1 | Ordered workflow pipelines |
-| 4 | Bulk Orchestration Management | P1 | Boardroom session lifecycle |
-| 5 | Agent Capability Matching | P2 | Dynamic agent selection |
-| 6 | Orchestration Checkpointing | P2 | Durability for perpetual orchestrations |
-| 7 | Conditional Webhooks | P2 | Alert fatigue prevention |
-| 8 | Audit Trail Tamper Detection | P2 | Regulatory integrity proof |
-| 9 | SDK Plugin Architecture | P3 | Extensibility without SDK changes |
-| 10 | Workflow Documentation Generation | P3 | API discoverability |
+| # | Enhancement | Priority | Impact | Local Implementation |
+|---|-------------|----------|--------|----------------------|
+| 1 | End-to-End Encryption | P1 | Data security for sensitive workflows | `encrypt_sensitive_fields` / `decrypt_sensitive_fields` |
+| 2 | Rate Limiting & Quotas | P1 | Resource protection in production | `RateLimiter` / `default_rate_limiter` |
+| 3 | Workflow Dependency Chains | P1 | Ordered workflow pipelines | `WORKFLOW_DEPENDENCIES` / `start-workflow-chain` |
+| 4 | Bulk Orchestration Management | P1 | Boardroom session lifecycle | `start-orchestration-group` / `get-group-status` / `stop-orchestration-group` |
+| 5 | Agent Capability Matching | P2 | Dynamic agent selection | `find-agents` workflow |
+| 6 | Orchestration Checkpointing | P2 | Durability for perpetual orchestrations | `checkpoint-orchestration` / `resume-orchestration` |
+| 7 | Conditional Webhooks | P2 | Alert fatigue prevention | `register-conditional-webhook` / `evaluate_webhook_filter` |
+| 8 | Audit Trail Tamper Detection | P2 | Regulatory integrity proof | `verify-audit-integrity` workflow |
+| 9 | SDK Plugin Architecture | P3 | Extensibility without SDK changes | `use_middleware` / `_MIDDLEWARE` |
+| 10 | Workflow Documentation Generation | P3 | API discoverability | `generate-api-docs` workflow |
 
 ---
 
-*This document captures enhancement requests that emerged after integrating AOS Client SDK v5.0.0 into BusinessInfinity v5.0.0. Each enhancement represents a production-hardening gap or strategic capability for the Global Boardroom Network rollout.*
+*This document captures enhancement requests that emerged after integrating AOS Client SDK v5.0.0 into BusinessInfinity v5.0.0. Each enhancement represents a production-hardening gap or strategic capability for the Global Boardroom Network rollout. All 10 enhancements are implemented locally in BusinessInfinity until the SDK provides native support.*

@@ -22,6 +22,23 @@ Enterprise capabilities (v5.0.0):
 - Orchestration status streaming via SDK
 - Webhook support for external notifications via SDK
 
+Beyond-SDK capabilities (implemented locally, not yet in the AOS SDK):
+
+- :class:`~business_infinity.workflows.RateLimiter` — token-bucket rate limiter
+- :func:`~business_infinity.workflows.encrypt_sensitive_fields` — field-level encryption
+- :func:`~business_infinity.workflows.decrypt_sensitive_fields` — field-level decryption
+- ``WORKFLOW_DEPENDENCIES`` — workflow dependency chain metadata
+- ``find-agents`` workflow — capability-based agent matching
+- ``start-orchestration-group`` / ``get-group-status`` / ``stop-orchestration-group``
+  workflows — bulk orchestration group management
+- ``checkpoint-orchestration`` / ``resume-orchestration`` workflows — checkpointing
+- ``register-conditional-webhook`` workflow — webhooks with event filters
+- :func:`~business_infinity.workflows.evaluate_webhook_filter` — filter evaluation
+- ``verify-audit-integrity`` workflow — SHA-256 hash-chain tamper detection
+- ``start-workflow-chain`` workflow — dependency-aware workflow launch
+- ``generate-api-docs`` workflow — auto-generated workflow documentation
+- :func:`~business_infinity.workflows.use_middleware` — lightweight middleware support
+
 Usage::
 
     from business_infinity.workflows import app
