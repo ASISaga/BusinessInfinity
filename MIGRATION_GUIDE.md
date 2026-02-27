@@ -1,8 +1,23 @@
-# Migration Guide: BusinessInfinity v3.0 — AOS Client SDK
+# Migration Guide: BusinessInfinity — AOS Client SDK
 
 ## Overview
 
-BusinessInfinity v3.0 is a complete rewrite that uses the `aos-client-sdk` framework. All Azure Functions scaffolding, Service Bus communication, authentication, and deployment are now handled by the SDK. BusinessInfinity contains **only business workflow definitions**.
+BusinessInfinity is a lean Azure Functions app powered by the `aos-client-sdk`. All Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the SDK. BusinessInfinity contains **only business workflow definitions**.
+
+### v4.0.0 — Enterprise Capabilities (current)
+
+v4.0.0 integrates all 14 AOS Client SDK enhancements:
+
+- **ObservabilityConfig** — structured logging, correlation tracking, health checks
+- **workflow_template** — reusable orchestration patterns (`c_suite_orchestration`)
+- **6 new enterprise workflows** — knowledge-search, risk-register, risk-assess, log-decision, covenant-create, ask-agent
+- **Orchestration update handler** — `@app.on_orchestration_update("strategic-review")`
+- **MCP tool integration** — `@app.mcp_tool("erp-search")`
+- **14 total workflows** (up from 8 in v3.0)
+
+### v3.0 — SDK-Only Rewrite
+
+v3.0 was a complete rewrite from custom runtime to `aos-client-sdk`. All infrastructure code was removed and archived to `.archive/pre-sdk-refactor/`.
 
 ## Architecture Change
 
