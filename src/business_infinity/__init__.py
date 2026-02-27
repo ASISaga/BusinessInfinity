@@ -39,6 +39,46 @@ Beyond-SDK capabilities (implemented locally, not yet in the AOS SDK):
 - ``generate-api-docs`` workflow — auto-generated workflow documentation
 - :func:`~business_infinity.workflows.use_middleware` — lightweight middleware support
 
+Restored route-layer capabilities (conversations, mentor mode, network management,
+onboarding, health, and analytics — not provided by the SDK):
+
+Conversations:
+
+- ``list-conversations`` — list boardroom conversations from the knowledge base
+- ``create-conversation`` — create a new boardroom conversation
+- ``sign-conversation`` — sign a conversation
+- ``create-a2a-message`` — agent-to-agent communication
+- ``get-conversation-events`` — recent conversation events for web clients
+
+Mentor Mode:
+
+- ``mentor-list-agents`` — list agents with LoRA / fine-tuning metadata
+- ``mentor-chat`` — direct chat with a specific agent in mentor mode
+- ``mentor-fine-tune`` — start a LoRA fine-tuning job
+- ``mentor-training-logs`` — retrieve training logs for a job
+- ``mentor-deploy-adapter`` — deploy a trained LoRA adapter
+
+Network Management:
+
+- ``network-status`` — local node status and peer count
+- ``join-network`` — join the Global Boardroom Network
+- ``discover-boardrooms`` — find peer boardrooms
+- ``create-negotiation`` — create a peer negotiation record
+- ``sign-agreement`` — sign a network agreement / covenant
+
+Onboarding:
+
+- ``onboarding-parse-website`` — extract company profile from a public URL
+- ``onboarding-connect-system`` — generate OAuth URL to connect an external system
+- ``onboarding-voice-profile`` — generate a founder voice profile via CMO agent
+- ``onboarding-export-data`` — GDPR data-portability export
+- ``onboarding-delete-data`` — GDPR right-to-erasure request
+
+Health & Analytics:
+
+- ``system-health`` — service health check
+- ``business-analytics`` — business KPIs and agent summary
+
 Usage::
 
     from business_infinity.workflows import app
