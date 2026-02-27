@@ -64,7 +64,7 @@ class TestAOSAppWorkflows:
         assert "register-webhook" in names
 
     def test_workflow_count(self):
-        assert len(app.get_workflow_names()) == 29
+        assert len(app.get_workflow_names()) == 51
 
     def test_all_workflow_names_are_kebab_case(self):
         for name in app.get_workflow_names():
@@ -328,3 +328,152 @@ class TestBeyondSDKWorkflowCount:
         names = app.get_workflow_names()
         registered = [w for w in self.BEYOND_SDK_WORKFLOWS if w in names]
         assert len(registered) == 10
+
+
+# ── Restored Route Tests ─────────────────────────────────────────────────────
+
+from business_infinity.workflows import (
+    _CONVERSATION_DOC_TYPE,
+    _TRAINING_JOB_DOC_TYPE,
+    _NEGOTIATION_DOC_TYPE,
+    _ONBOARDING_CONSENT_DOC_TYPE,
+    _OAUTH_URLS,
+)
+
+
+class TestConversationsWorkflows:
+    """Restored conversations route workflows."""
+
+    CONVERSATION_WORKFLOWS = [
+        "list-conversations",
+        "create-conversation",
+        "sign-conversation",
+        "create-a2a-message",
+        "get-conversation-events",
+    ]
+
+    def test_all_conversation_workflows_registered(self):
+        names = app.get_workflow_names()
+        for wf in self.CONVERSATION_WORKFLOWS:
+            assert wf in names, f"Missing conversation workflow: {wf}"
+
+    def test_conversation_doc_type(self):
+        assert _CONVERSATION_DOC_TYPE == "boardroom-conversation"
+
+
+class TestMentorModeWorkflows:
+    """Restored mentor-mode route workflows."""
+
+    MENTOR_WORKFLOWS = [
+        "mentor-list-agents",
+        "mentor-chat",
+        "mentor-fine-tune",
+        "mentor-training-logs",
+        "mentor-deploy-adapter",
+    ]
+
+    def test_all_mentor_workflows_registered(self):
+        names = app.get_workflow_names()
+        for wf in self.MENTOR_WORKFLOWS:
+            assert wf in names, f"Missing mentor workflow: {wf}"
+
+    def test_training_job_doc_type(self):
+        assert _TRAINING_JOB_DOC_TYPE == "mentor-training-job"
+
+
+class TestNetworkManagementWorkflows:
+    """Restored network-management route workflows."""
+
+    NETWORK_WORKFLOWS = [
+        "network-status",
+        "join-network",
+        "discover-boardrooms",
+        "create-negotiation",
+        "sign-agreement",
+    ]
+
+    def test_all_network_workflows_registered(self):
+        names = app.get_workflow_names()
+        for wf in self.NETWORK_WORKFLOWS:
+            assert wf in names, f"Missing network workflow: {wf}"
+
+    def test_negotiation_doc_type(self):
+        assert _NEGOTIATION_DOC_TYPE == "network-negotiation"
+
+
+class TestOnboardingWorkflows:
+    """Restored onboarding route workflows."""
+
+    ONBOARDING_WORKFLOWS = [
+        "onboarding-parse-website",
+        "onboarding-connect-system",
+        "onboarding-voice-profile",
+        "onboarding-export-data",
+        "onboarding-delete-data",
+    ]
+
+    def test_all_onboarding_workflows_registered(self):
+        names = app.get_workflow_names()
+        for wf in self.ONBOARDING_WORKFLOWS:
+            assert wf in names, f"Missing onboarding workflow: {wf}"
+
+    def test_oauth_urls_populated(self):
+        assert "salesforce" in _OAUTH_URLS
+        assert "hubspot" in _OAUTH_URLS
+        assert "slack" in _OAUTH_URLS
+        for url in _OAUTH_URLS.values():
+            assert url.startswith("https://"), f"OAuth URL should be HTTPS: {url}"
+
+
+class TestHealthAndAnalyticsWorkflows:
+    """Restored health and analytics route workflows."""
+
+    def test_system_health_registered(self):
+        assert "system-health" in app.get_workflow_names()
+
+    def test_business_analytics_registered(self):
+        assert "business-analytics" in app.get_workflow_names()
+
+
+class TestRestoredRouteWorkflowCount:
+    """Ensure all 22 restored route workflows are registered."""
+
+    RESTORED_WORKFLOWS = [
+        # Conversations (5)
+        "list-conversations",
+        "create-conversation",
+        "sign-conversation",
+        "create-a2a-message",
+        "get-conversation-events",
+        # Mentor mode (5)
+        "mentor-list-agents",
+        "mentor-chat",
+        "mentor-fine-tune",
+        "mentor-training-logs",
+        "mentor-deploy-adapter",
+        # Network (5)
+        "network-status",
+        "join-network",
+        "discover-boardrooms",
+        "create-negotiation",
+        "sign-agreement",
+        # Onboarding (5)
+        "onboarding-parse-website",
+        "onboarding-connect-system",
+        "onboarding-voice-profile",
+        "onboarding-export-data",
+        "onboarding-delete-data",
+        # Health & analytics (2)
+        "system-health",
+        "business-analytics",
+    ]
+
+    def test_all_restored_workflows_registered(self):
+        names = app.get_workflow_names()
+        missing = [wf for wf in self.RESTORED_WORKFLOWS if wf not in names]
+        assert not missing, f"Missing restored workflows: {missing}"
+
+    def test_restored_workflow_count(self):
+        names = app.get_workflow_names()
+        registered = [wf for wf in self.RESTORED_WORKFLOWS if wf in names]
+        assert len(registered) == 22

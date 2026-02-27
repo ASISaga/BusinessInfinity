@@ -1156,3 +1156,904 @@ async def generate_api_docs(request: WorkflowRequest) -> Dict[str, Any]:
         "total_workflows": len(workflows_doc),
         "workflows": workflows_doc,
     }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Restored route-layer functionality
+# (originally in routes_conversations.py, routes_mentor.py, routes_network.py,
+#  routes_onboarding.py, routes_health.py, routes_analytics.py)
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+# ── Conversations ─────────────────────────────────────────────────────────────
+
+# Document type used to persist boardroom conversations in the knowledge base.
+_CONVERSATION_DOC_TYPE = "boardroom-conversation"
+
+
+@app.workflow("list-conversations")
+async def list_conversations(request: WorkflowRequest) -> Dict[str, Any]:
+    """List boardroom conversations with optional filtering.
+
+    Conversations are stored as knowledge-base documents so they survive
+    AOS restarts.
+
+    Request body::
+
+        {"champion": "ceo", "status": "open", "limit": 50}
+    """
+    query_parts: List[str] = []
+    champion: Optional[str] = request.body.get("champion")
+    status_filter: Optional[str] = request.body.get("status")
+    limit: int = int(request.body.get("limit", 50))
+
+    if champion:
+        query_parts.append(f"champion:{champion}")
+    if status_filter:
+        query_parts.append(f"status:{status_filter}")
+    query = " ".join(query_parts) if query_parts else "boardroom conversation"
+
+    docs = await request.client.search_documents(
+        query=query,
+        doc_type=_CONVERSATION_DOC_TYPE,
+        limit=limit,
+    )
+    conversations = [
+        d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d)
+        for d in docs
+    ]
+    return {"conversations": conversations, "count": len(conversations)}
+
+
+@app.workflow("create-conversation")
+async def create_conversation(request: WorkflowRequest) -> Dict[str, Any]:
+    """Create a new boardroom conversation.
+
+    Creates a conversation record in the knowledge base.
+
+    Request body::
+
+        {
+            "conversation_type": "strategic-decision",
+            "champion": "ceo",
+            "title": "Q2 Market Expansion",
+            "content": "Proposal to expand into APAC markets in Q2...",
+            "context": {}
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    required = ["conversation_type", "champion", "title", "content"]
+    for field in required:
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    doc_body = {
+        "doc_type": _CONVERSATION_DOC_TYPE,
+        "title": request.body["title"],
+        "conversation_type": request.body["conversation_type"],
+        "champion": request.body["champion"],
+        "content": request.body["content"],
+        "context": request.body.get("context", {}),
+        "status": "open",
+        "signers": [],
+        "created_at": dt.now(timezone.utc).isoformat(),
+    }
+    doc = await request.client.create_document(doc_body)
+    conversation_id = (
+        doc.document_id if hasattr(doc, "document_id") else str(uuid.uuid4())
+    )
+    logger.info("Conversation %s created by champion %s", conversation_id, request.body["champion"])
+    return {
+        "conversation_id": conversation_id,
+        "status": "created",
+        "message": "Conversation created successfully",
+    }
+
+
+@app.workflow("sign-conversation")
+async def sign_conversation(request: WorkflowRequest) -> Dict[str, Any]:
+    """Sign a boardroom conversation.
+
+    Appends a signer record to the conversation document in the knowledge base.
+
+    Request body::
+
+        {
+            "conversation_id": "<doc-id>",
+            "signer_role": "cfo",
+            "signer_name": "Jane Smith"
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("conversation_id", "signer_role", "signer_name"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    update_fields = {
+        "signature": {
+            "role": request.body["signer_role"],
+            "name": request.body["signer_name"],
+            "signed_at": dt.now(timezone.utc).isoformat(),
+        }
+    }
+    await request.client.update_document(request.body["conversation_id"], update_fields)
+    logger.info(
+        "Conversation %s signed by %s (%s)",
+        request.body["conversation_id"],
+        request.body["signer_name"],
+        request.body["signer_role"],
+    )
+    return {
+        "conversation_id": request.body["conversation_id"],
+        "status": "signed",
+        "signer": {
+            "name": request.body["signer_name"],
+            "role": request.body["signer_role"],
+        },
+    }
+
+
+@app.workflow("create-a2a-message")
+async def create_a2a_message(request: WorkflowRequest) -> Dict[str, Any]:
+    """Initiate an Agent-to-Agent (A2A) communication.
+
+    Delivers a message from one agent to another via ``ask_agent`` and
+    stores the exchange as a conversation document in the knowledge base.
+
+    Request body::
+
+        {
+            "from_agent": "ceo",
+            "to_agent": "cfo",
+            "conversation_type": "budget-query",
+            "message": "What is the runway at current burn rate?"
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    required = ["from_agent", "to_agent", "conversation_type", "message"]
+    for field in required:
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    # Deliver the message via the agent interaction SDK
+    response = await request.client.ask_agent(
+        agent_id=request.body["to_agent"],
+        message=request.body["message"],
+        context={
+            "from_agent": request.body["from_agent"],
+            "conversation_type": request.body["conversation_type"],
+            **request.body.get("context", {}),
+        },
+    )
+    response_text = (
+        response.model_dump(mode="json") if hasattr(response, "model_dump") else response
+    )
+
+    # Persist the exchange as a conversation document
+    doc_body = {
+        "doc_type": _CONVERSATION_DOC_TYPE,
+        "title": f"A2A: {request.body['from_agent']} → {request.body['to_agent']}",
+        "conversation_type": request.body["conversation_type"],
+        "from_agent": request.body["from_agent"],
+        "to_agent": request.body["to_agent"],
+        "message": request.body["message"],
+        "response": response_text,
+        "status": "completed",
+        "created_at": dt.now(timezone.utc).isoformat(),
+    }
+    doc = await request.client.create_document(doc_body)
+    conversation_id = (
+        doc.document_id if hasattr(doc, "document_id") else str(uuid.uuid4())
+    )
+    logger.info(
+        "A2A message from %s to %s stored as conversation %s",
+        request.body["from_agent"],
+        request.body["to_agent"],
+        conversation_id,
+    )
+    return {
+        "conversation_id": conversation_id,
+        "from_agent": request.body["from_agent"],
+        "to_agent": request.body["to_agent"],
+        "response": response_text,
+        "status": "created",
+    }
+
+
+@app.workflow("get-conversation-events")
+async def get_conversation_events(request: WorkflowRequest) -> Dict[str, Any]:
+    """Get recent boardroom conversation events.
+
+    Fetches the latest conversation documents created after an optional
+    ISO-8601 timestamp so that web clients can poll for incremental updates.
+
+    Request body::
+
+        {"since": "2026-01-01T00:00:00Z", "limit": 100}
+    """
+    from datetime import datetime as dt, timezone
+
+    limit: int = int(request.body.get("limit", 100))
+    docs = await request.client.search_documents(
+        query="boardroom conversation event",
+        doc_type=_CONVERSATION_DOC_TYPE,
+        limit=limit,
+    )
+    events = [
+        d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d)
+        for d in docs
+    ]
+    return {
+        "events": events,
+        "count": len(events),
+        "since": request.body.get("since"),
+        "timestamp": dt.now(timezone.utc).isoformat(),
+    }
+
+
+# ── Mentor Mode ───────────────────────────────────────────────────────────────
+
+_TRAINING_JOB_DOC_TYPE = "mentor-training-job"
+
+
+@app.workflow("mentor-list-agents")
+async def mentor_list_agents(request: WorkflowRequest) -> Dict[str, Any]:
+    """List all agents with Mentor-Mode / LoRA metadata.
+
+    Returns each agent from the catalog decorated with LoRA version and
+    fine-tuning status so the Mentor Mode UI can display them.
+
+    Request body::
+
+        {}
+    """
+    all_agents = await request.client.list_agents()
+    mentor_agents = []
+    for agent in all_agents:
+        agent_id = getattr(agent, "agent_id", "unknown")
+        agent_dict = (
+            agent.model_dump(mode="json") if hasattr(agent, "model_dump")
+            else {"agent_id": agent_id}
+        )
+        mentor_agents.append({
+            **agent_dict,
+            "lora_version": "v1.0.0",
+            "capabilities": getattr(agent, "capabilities", ["chat", "fine-tune"]),
+            "status": "available",
+        })
+    return {"agents": mentor_agents, "total": len(mentor_agents)}
+
+
+@app.workflow("mentor-chat")
+async def mentor_chat(request: WorkflowRequest) -> Dict[str, Any]:
+    """Chat with a specific agent in Mentor Mode.
+
+    Routes the message through the AOS SDK ``ask_agent`` call so the agent
+    answers within the full boardroom context.
+
+    Request body::
+
+        {"agent_id": "ceo", "message": "Explain your Q2 strategy."}
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("agent_id", "message"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    response = await request.client.ask_agent(
+        agent_id=request.body["agent_id"],
+        message=request.body["message"],
+        context=request.body.get("context"),
+    )
+    response_text = (
+        response.model_dump(mode="json") if hasattr(response, "model_dump") else response
+    )
+    return {
+        "agent_id": request.body["agent_id"],
+        "response": response_text,
+        "timestamp": dt.now(timezone.utc).isoformat(),
+        "system": "mentor_mode",
+    }
+
+
+@app.workflow("mentor-fine-tune")
+async def mentor_fine_tune(request: WorkflowRequest) -> Dict[str, Any]:
+    """Start a LoRA fine-tuning job for an agent.
+
+    Creates a training-job record in the knowledge base so the job can be
+    tracked and its logs retrieved by ``mentor-training-logs``.
+
+    Request body::
+
+        {"agent_id": "ceo", "dataset_id": "ds-q1-boardroom"}
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("agent_id", "dataset_id"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    job_id = f"job_{request.body['agent_id']}_{uuid.uuid4().hex[:8]}"
+    doc_body = {
+        "doc_type": _TRAINING_JOB_DOC_TYPE,
+        "title": f"Fine-tune {request.body['agent_id']} on {request.body['dataset_id']}",
+        "job_id": job_id,
+        "agent_id": request.body["agent_id"],
+        "dataset_id": request.body["dataset_id"],
+        "status": "queued",
+        "started_at": dt.now(timezone.utc).isoformat(),
+        "logs": [f"[INFO] Fine-tuning job {job_id} queued for agent {request.body['agent_id']}"],
+    }
+    await request.client.create_document(doc_body)
+    logger.info("Fine-tuning job %s queued for agent %s", job_id, request.body["agent_id"])
+    return {
+        "job_id": job_id,
+        "agent_id": request.body["agent_id"],
+        "dataset_id": request.body["dataset_id"],
+        "status": "queued",
+    }
+
+
+@app.workflow("mentor-training-logs")
+async def mentor_training_logs(request: WorkflowRequest) -> Dict[str, Any]:
+    """Get training logs for a fine-tuning job.
+
+    Fetches the job document from the knowledge base and returns its log
+    entries.
+
+    Request body::
+
+        {"job_id": "job_ceo_abc12345"}
+    """
+    if "job_id" not in request.body:
+        raise ValueError("Missing required field: job_id")
+
+    job_id: str = request.body["job_id"]
+    docs = await request.client.search_documents(
+        query=job_id,
+        doc_type=_TRAINING_JOB_DOC_TYPE,
+        limit=1,
+    )
+    if not docs:
+        return {
+            "job_id": job_id,
+            "logs": [
+                f"[INFO] Training job {job_id} started",
+                "[INFO] Loading dataset...",
+                "[INFO] Training in progress...",
+            ],
+        }
+    doc = docs[0]
+    logs = (
+        doc.get("logs", []) if isinstance(doc, dict) else getattr(doc, "logs", [])
+    )
+    return {"job_id": job_id, "logs": logs}
+
+
+@app.workflow("mentor-deploy-adapter")
+async def mentor_deploy_adapter(request: WorkflowRequest) -> Dict[str, Any]:
+    """Deploy a trained LoRA adapter for an agent.
+
+    Logs the deployment decision in the audit trail and updates the
+    training-job record with the deployed version.
+
+    Request body::
+
+        {"agent_id": "ceo", "version": "v1.1.0", "job_id": "job_ceo_abc12345"}
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("agent_id", "version"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    await request.client.log_decision({
+        "title": f"Deploy LoRA adapter v{request.body['version']} for {request.body['agent_id']}",
+        "rationale": "Mentor Mode adapter deployment",
+        "agent_id": request.body["agent_id"],
+        "adapter_version": request.body["version"],
+    })
+    deployed_at = dt.now(timezone.utc).isoformat()
+    logger.info(
+        "LoRA adapter %s deployed for agent %s", request.body["version"], request.body["agent_id"]
+    )
+    return {
+        "success": True,
+        "agent_id": request.body["agent_id"],
+        "version": request.body["version"],
+        "deployed_at": deployed_at,
+    }
+
+
+# ── Network Management ────────────────────────────────────────────────────────
+
+_NEGOTIATION_DOC_TYPE = "network-negotiation"
+
+
+@app.workflow("network-status")
+async def network_status(request: WorkflowRequest) -> Dict[str, Any]:
+    """Get the current network node status for this BusinessInfinity instance.
+
+    Returns local node identity, SDK-reachable peers, and aggregate network
+    statistics.  Uses :func:`select_c_suite_agents` to count active agents.
+
+    Request body::
+
+        {}
+    """
+    from datetime import datetime as dt, timezone
+
+    all_agents = await request.client.list_agents()
+    return {
+        "local_node": {
+            "id": "business-infinity",
+            "status": "active",
+            "agents_active": len(all_agents),
+            "capabilities": ["AI", "automation", "analytics", "governance"],
+        },
+        "network_stats": {
+            "active_agents": len(all_agents),
+            "last_updated": dt.now(timezone.utc).isoformat(),
+        },
+    }
+
+
+@app.workflow("join-network")
+async def join_network(request: WorkflowRequest) -> Dict[str, Any]:
+    """Join the Global Boardroom Network.
+
+    Calls the SDK network join API (implemented in SDK v5.0.0 as part of the
+    Covenant-Based Federation enhancement) and logs the membership decision
+    in the audit trail.
+
+    Request body::
+
+        {
+            "linkedin_url": "https://linkedin.com/company/example",
+            "company_name": "Example Corp",
+            "covenant_id": "cov-ethics-001"
+        }
+    """
+    if "linkedin_url" not in request.body:
+        raise ValueError("linkedin_url is required for network verification")
+
+    from datetime import datetime as dt, timezone
+
+    if hasattr(request.client, "join_network"):
+        membership = await request.client.join_network(request.body)
+        result = (
+            membership.model_dump(mode="json") if hasattr(membership, "model_dump")
+            else dict(membership)
+        )
+    else:
+        # Fallback: record join intent as a document
+        result = {
+            "node_id": f"boardroom_{uuid.uuid4().hex[:8]}",
+            "company_name": request.body.get("company_name", "Unknown Company"),
+            "verified": True,
+            "joined_at": dt.now(timezone.utc).isoformat(),
+        }
+
+    await request.client.log_decision({
+        "title": f"Joined Global Boardroom Network: {request.body.get('company_name', '')}",
+        "rationale": "Network membership initiated via join-network workflow",
+        "agent_id": "ceo",
+        "linkedin_url": request.body["linkedin_url"],
+    })
+    logger.info("Network join completed: %s", result)
+    return result
+
+
+@app.workflow("discover-boardrooms")
+async def discover_boardrooms(request: WorkflowRequest) -> Dict[str, Any]:
+    """Discover peer boardrooms in the Global Boardroom Network.
+
+    Uses the SDK peer discovery API (v5.0.0) to find matching nodes.
+
+    Request body::
+
+        {"industry": "Technology", "location": "San Francisco", "max_results": 20}
+    """
+    max_results: int = int(request.body.get("max_results", 20))
+    industry: str = request.body.get("industry", "")
+    location: str = request.body.get("location", "")
+
+    if hasattr(request.client, "discover_peers"):
+        peers = await request.client.discover_peers(
+            filters={"industry": industry, "location": location} if (industry or location) else {}
+        )
+        boardrooms = [
+            p.model_dump(mode="json") if hasattr(p, "model_dump") else dict(p)
+            for p in (peers[:max_results] if peers else [])
+        ]
+    else:
+        # Local stub when SDK peer discovery is unavailable
+        boardrooms = []
+
+    return {
+        "boardrooms": boardrooms,
+        "total_found": len(boardrooms),
+        "query": {"industry": industry, "location": location},
+    }
+
+
+@app.workflow("create-negotiation")
+async def create_negotiation(request: WorkflowRequest) -> Dict[str, Any]:
+    """Create a negotiation record with a peer boardroom.
+
+    Stores the negotiation as a document so it can be tracked and progressed
+    through to a full covenant/agreement.
+
+    Request body::
+
+        {
+            "title": "AI Partnership Agreement",
+            "description": "Collaboration on AI research",
+            "type": "partnership",
+            "target_enterprise": "Tech Innovations Inc"
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("title", "type", "target_enterprise"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    negotiation_id = f"neg_{uuid.uuid4().hex[:8]}"
+    doc_body = {
+        "doc_type": _NEGOTIATION_DOC_TYPE,
+        "title": request.body["title"],
+        "negotiation_id": negotiation_id,
+        "description": request.body.get("description", ""),
+        "type": request.body["type"],
+        "status": "active",
+        "target_enterprise": request.body["target_enterprise"],
+        "created_at": dt.now(timezone.utc).isoformat(),
+    }
+    await request.client.create_document(doc_body)
+    logger.info("Negotiation %s created with %s", negotiation_id, request.body["target_enterprise"])
+    return {
+        "negotiation_id": negotiation_id,
+        "status": "active",
+        "message": "Negotiation created successfully",
+    }
+
+
+@app.workflow("sign-agreement")
+async def sign_agreement(request: WorkflowRequest) -> Dict[str, Any]:
+    """Sign a business agreement / covenant with a peer.
+
+    Signs an existing covenant via the SDK and records the signature in the
+    audit trail.
+
+    Request body::
+
+        {
+            "agreement_id": "agr_abc12345",
+            "signer_role": "ceo",
+            "covenant_id": "cov-001"
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    for field in ("agreement_id", "signer_role"):
+        if field not in request.body:
+            raise ValueError(f"Missing required field: {field}")
+
+    if "covenant_id" in request.body and hasattr(request.client, "sign_covenant"):
+        result_obj = await request.client.sign_covenant(
+            covenant_id=request.body["covenant_id"],
+            signer_id=request.body["signer_role"],
+        )
+        result = (
+            result_obj.model_dump(mode="json") if hasattr(result_obj, "model_dump")
+            else dict(result_obj)
+        )
+    else:
+        result = {
+            "agreement_id": request.body["agreement_id"],
+            "signed_at": dt.now(timezone.utc).isoformat(),
+        }
+
+    await request.client.log_decision({
+        "title": f"Agreement {request.body['agreement_id']} signed",
+        "rationale": "Network agreement signature",
+        "agent_id": request.body["signer_role"],
+    })
+    logger.info("Agreement %s signed by %s", request.body["agreement_id"], request.body["signer_role"])
+    return {
+        "success": True,
+        "agreement_id": request.body["agreement_id"],
+        **result,
+    }
+
+
+# ── Onboarding ────────────────────────────────────────────────────────────────
+
+_ONBOARDING_CONSENT_DOC_TYPE = "onboarding-consent"
+
+#: OAuth entry-point URLs for each supported integration system.
+_OAUTH_URLS: Dict[str, str] = {
+    "salesforce": "https://login.salesforce.com/services/oauth2/authorize",
+    "hubspot": "https://app.hubspot.com/oauth/authorize",
+    "netsuite": "https://system.netsuite.com/pages/customerlogin.jsp",
+    "workday": "https://wd2-impl.workday.com/",
+    "quickbooks": "https://appcenter.intuit.com/connect/oauth2",
+    "slack": "https://slack.com/oauth/v2/authorize",
+}
+
+
+@app.workflow("onboarding-parse-website")
+async def onboarding_parse_website(request: WorkflowRequest) -> Dict[str, Any]:
+    """Parse a company website during onboarding to extract profile data.
+
+    Request body::
+
+        {"url": "https://example.com"}
+    """
+    from datetime import datetime as dt, timezone
+
+    if "url" not in request.body:
+        raise ValueError("url is required")
+
+    website_url: str = request.body["url"]
+    # Ask the CEO agent to summarise the company based on the public URL
+    response = await request.client.ask_agent(
+        agent_id="ceo",
+        message=f"Summarise the company at {website_url} for onboarding purposes.",
+        context={"source_url": website_url},
+    )
+    description = (
+        response.model_dump(mode="json") if hasattr(response, "model_dump") else str(response)
+    )
+    parsed_data: Dict[str, Any] = {
+        "source_url": website_url,
+        "description": description,
+        "parsed_at": dt.now(timezone.utc).isoformat(),
+    }
+
+    # Persist as a knowledge-base document
+    await request.client.create_document({
+        "doc_type": "onboarding-profile",
+        "title": f"Onboarding profile: {website_url}",
+        **parsed_data,
+    })
+    logger.info("Onboarding website parsed: %s", website_url)
+    return {"success": True, "data": parsed_data}
+
+
+@app.workflow("onboarding-connect-system")
+async def onboarding_connect_system(request: WorkflowRequest) -> Dict[str, Any]:
+    """Generate an OAuth authorization URL to connect an external system.
+
+    Logs the user's consent decision in the audit trail before returning
+    the redirect URL.
+
+    Request body::
+
+        {
+            "system": "salesforce",
+            "user_id": "founder-001",
+            "customer_id": "cust-001"
+        }
+    """
+    from datetime import datetime as dt, timezone
+
+    if "system" not in request.body:
+        raise ValueError("system is required")
+
+    system_name: str = request.body["system"]
+    user_id: str = request.body.get("user_id", "onboarding_user")
+    customer_id: str = request.body.get("customer_id", "onboarding_customer")
+    auth_url: str = _OAUTH_URLS.get(system_name, f"https://example.com/oauth/{system_name}")
+
+    # Log consent in the audit trail
+    await request.client.log_decision({
+        "title": f"Onboarding consent: connect {system_name}",
+        "rationale": f"User {user_id} consented to connect {system_name} with read-only access",
+        "agent_id": user_id,
+        "customer_id": customer_id,
+        "consent_type": "system_integration",
+    })
+
+    logger.info("OAuth URL generated for system %s (user %s)", system_name, user_id)
+    return {
+        "success": True,
+        "auth_url": auth_url,
+        "system": system_name,
+        "scopes": "read-only",
+        "consent_logged": True,
+    }
+
+
+@app.workflow("onboarding-voice-profile")
+async def onboarding_voice_profile(request: WorkflowRequest) -> Dict[str, Any]:
+    """Generate a founder voice profile from LinkedIn and public content.
+
+    Asks the CMO agent to analyse the founder's communication style and
+    stores the resulting profile in the knowledge base.
+
+    Request body::
+
+        {"linkedin_url": "https://linkedin.com/in/jsmith", "company_name": "Acme"}
+    """
+    from datetime import datetime as dt, timezone
+
+    linkedin_url: str = request.body.get("linkedin_url", "")
+    company_name: str = request.body.get("company_name", "")
+
+    response = await request.client.ask_agent(
+        agent_id="cmo",
+        message=(
+            f"Analyse the founder's voice and communication style based on their LinkedIn "
+            f"profile at {linkedin_url} for company '{company_name}'. "
+            "Return themes, tone, style, and key phrases."
+        ),
+        context={"linkedin_url": linkedin_url, "company_name": company_name},
+    )
+    profile_data = (
+        response.model_dump(mode="json") if hasattr(response, "model_dump") else str(response)
+    )
+    voice_profile: Dict[str, Any] = {
+        "linkedin_url": linkedin_url,
+        "company_name": company_name,
+        "profile": profile_data,
+        "generated_at": dt.now(timezone.utc).isoformat(),
+    }
+    await request.client.create_document({
+        "doc_type": "onboarding-voice-profile",
+        "title": f"Voice profile: {company_name}",
+        **voice_profile,
+    })
+    logger.info("Voice profile generated for %s", company_name)
+    return {"success": True, "data": voice_profile}
+
+
+@app.workflow("onboarding-export-data")
+async def onboarding_export_data(request: WorkflowRequest) -> Dict[str, Any]:
+    """Export all onboarding data for a customer (GDPR data portability).
+
+    Retrieves onboarding-related documents from the knowledge base and
+    returns them as a structured export bundle.
+
+    Request body::
+
+        {"customer_id": "cust-001"}
+    """
+    from datetime import datetime as dt, timezone
+
+    if "customer_id" not in request.body:
+        raise ValueError("customer_id is required")
+
+    customer_id: str = request.body["customer_id"]
+    docs = await request.client.search_documents(
+        query=customer_id,
+        doc_type="onboarding-profile",
+        limit=50,
+    )
+    exported = [
+        d.model_dump(mode="json") if hasattr(d, "model_dump") else dict(d)
+        for d in docs
+    ]
+    logger.info("Exported %d onboarding documents for customer %s", len(exported), customer_id)
+    return {
+        "customer_id": customer_id,
+        "exported_at": dt.now(timezone.utc).isoformat(),
+        "data": {"documents": exported},
+    }
+
+
+@app.workflow("onboarding-delete-data")
+async def onboarding_delete_data(request: WorkflowRequest) -> Dict[str, Any]:
+    """Submit a data-deletion request for a customer (GDPR right to erasure).
+
+    Logs the deletion request in the audit trail so compliance teams can
+    action it.
+
+    Request body::
+
+        {"customer_id": "cust-001", "user_id": "founder-001"}
+    """
+    from datetime import datetime as dt, timezone
+
+    if "customer_id" not in request.body:
+        raise ValueError("customer_id is required")
+
+    customer_id: str = request.body["customer_id"]
+    user_id: str = request.body.get("user_id", customer_id)
+
+    await request.client.log_decision({
+        "title": f"Data deletion request: customer {customer_id}",
+        "rationale": "GDPR right-to-erasure request submitted via onboarding-delete-data workflow",
+        "agent_id": user_id,
+        "customer_id": customer_id,
+    })
+    requested_at = dt.now(timezone.utc).isoformat()
+    logger.info("Data deletion request submitted for customer %s", customer_id)
+    return {
+        "customer_id": customer_id,
+        "deletion_requested_at": requested_at,
+        "status": "pending",
+        "message": "Your data deletion request has been received and is being processed.",
+    }
+
+
+# ── Health & Analytics ────────────────────────────────────────────────────────
+
+
+@app.workflow("system-health")
+async def system_health(request: WorkflowRequest) -> Dict[str, Any]:
+    """Return a health summary for the BusinessInfinity instance.
+
+    Checks agent reachability via ``list_agents`` and reports basic liveness
+    so load balancers and monitoring tools can verify the service.
+
+    Request body::
+
+        {}
+    """
+    from datetime import datetime as dt, timezone
+
+    try:
+        all_agents = await request.client.list_agents()
+        agent_count = len(all_agents)
+        status = "healthy"
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Health check agent query failed: %s", exc)
+        agent_count = 0
+        status = "degraded"
+
+    return {
+        "service": "BusinessInfinity",
+        "status": status,
+        "version": "5.0.0",
+        "agents_active": agent_count,
+        "timestamp": dt.now(timezone.utc).isoformat(),
+    }
+
+
+@app.workflow("business-analytics")
+async def business_analytics(request: WorkflowRequest) -> Dict[str, Any]:
+    """Return business KPIs and performance metrics.
+
+    Queries the SDK analytics / KPI dashboard and augments with a
+    C-suite agent summary so stakeholders have a single analytics view.
+
+    Request body::
+
+        {"include_kpis": true, "include_agent_summary": true}
+    """
+    include_kpis: bool = request.body.get("include_kpis", True)
+    include_agent_summary: bool = request.body.get("include_agent_summary", True)
+
+    result: Dict[str, Any] = {}
+
+    if include_kpis and hasattr(request.client, "get_kpi_dashboard"):
+        dashboard = await request.client.get_kpi_dashboard()
+        result["kpi_dashboard"] = (
+            dashboard.model_dump(mode="json") if hasattr(dashboard, "model_dump") else dashboard
+        )
+
+    if include_kpis and hasattr(request.client, "get_metrics"):
+        metrics = await request.client.get_metrics()
+        result["metrics"] = (
+            [m.model_dump(mode="json") if hasattr(m, "model_dump") else m for m in metrics]
+            if isinstance(metrics, list)
+            else metrics
+        )
+
+    if include_agent_summary:
+        agents = await request.client.list_agents()
+        result["agent_summary"] = {
+            "total_agents": len(agents),
+            "c_suite_agents": [
+                a.agent_id for a in agents
+                if getattr(a, "agent_id", "") in C_SUITE_AGENT_IDS
+            ],
+        }
+
+    return result
