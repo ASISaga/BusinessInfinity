@@ -94,11 +94,11 @@ functions = app.get_functions()
 
 | Workflow | Agents | Purpose |
 |----------|--------|---------|
+| `boardroom-session` | All C-suite | **Primary**: autonomous boardroom with perpetual governance |
 | `strategic-review` | All C-suite | Strategic alignment and cross-functional coordination |
 | `market-analysis` | CMO + CEO + CSO | Market intelligence and competitive insights |
 | `budget-approval` | CEO + CFO | Budget governance and fiscal responsibility |
 | `risk-assessment` | CSO + CTO + COO | Enterprise risk monitoring and mitigation |
-| `boardroom-session` | All C-suite | Autonomous boardroom with perpetual governance |
 | `covenant-compliance` | CEO + COO + CSO | Covenant compliance and governance adherence |
 | `talent-management` | CHRO + CEO + COO | Talent strategy and organizational development |
 | `technology-review` | CTO + CEO + CSO | Technology strategy and architecture excellence |
@@ -138,6 +138,11 @@ functions = app.get_functions()
 ### Invoke via HTTP
 
 ```bash
+# Boardroom Session (primary perpetual orchestration)
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/boardroom-session \
+  -H "Content-Type: application/json" \
+  -d '{"agenda": ["Q1 review", "hiring plan"], "mode": "autonomous"}'
+
 # Strategic Review
 curl -X POST https://business-infinity.azurewebsites.net/api/workflows/strategic-review \
   -H "Content-Type: application/json" \
@@ -223,8 +228,9 @@ async with AOSRegistration(aos_endpoint="https://my-aos.azurewebsites.net") as r
     info = await reg.register_app(
         app_name="business-infinity",
         workflows=[
+            "boardroom-session",
             "strategic-review", "market-analysis", "budget-approval",
-            "risk-assessment", "boardroom-session", "covenant-compliance",
+            "risk-assessment", "covenant-compliance",
             "talent-management", "technology-review",
             "knowledge-search", "risk-register", "risk-assess",
             "log-decision", "covenant-create", "ask-agent",

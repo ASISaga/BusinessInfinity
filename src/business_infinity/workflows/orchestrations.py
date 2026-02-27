@@ -1,5 +1,11 @@
 """Purpose-driven perpetual orchestrations for BusinessInfinity.
 
+The **boardroom session** is the primary perpetual orchestration — a continuous
+autonomous boardroom where all C-suite agents collaborate on strategic decisions,
+operational reviews, and governance indefinitely.  All other orchestrations are
+specialised sub-sessions that can be initiated from within the boardroom or
+independently.
+
 Each workflow starts an ongoing orchestration guided by a purpose.  Agents
 work toward the purpose continuously — there is no finite task to complete.
 """
@@ -13,7 +19,31 @@ from aos_client import AgentDescriptor, WorkflowRequest
 from ._app import app, c_suite_orchestration, logger, select_c_suite_agents
 
 
-# ── Purpose-Driven Orchestrations ────────────────────────────────────────────
+# ── Primary Perpetual Orchestration ──────────────────────────────────────────
+
+
+@app.workflow("boardroom-session")
+async def boardroom_session(request: WorkflowRequest) -> Dict[str, Any]:
+    """Start the primary perpetual autonomous boardroom session.
+
+    This is the central orchestration of BusinessInfinity.  The boardroom
+    runs continuously — all C-suite agents collaborate on strategic decisions,
+    operational reviews, and governance indefinitely.  All other orchestrations
+    originate from, or feed back into, the boardroom.
+
+    Request body::
+
+        {"agenda": ["Q1 review", "hiring plan"], "mode": "autonomous"}
+    """
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: True,
+        purpose="Run autonomous boardroom with perpetual strategic governance and decision-making",
+        purpose_scope="Full C-suite collaboration, strategic planning, operational reviews, and covenant compliance",
+    )
+
+
+# ── Specialised Perpetual Orchestrations ─────────────────────────────────────
 
 
 @app.workflow("strategic-review")
@@ -127,25 +157,6 @@ async def risk_assessment(request: WorkflowRequest) -> Dict[str, Any]:
         agent_filter=lambda a: a.agent_id in ("cso", "cto", "coo"),
         purpose="Continuously monitor, assess, and mitigate enterprise risks",
         purpose_scope="Risk identification, assessment, mitigation, and governance across all domains",
-    )
-
-
-@app.workflow("boardroom-session")
-async def boardroom_session(request: WorkflowRequest) -> Dict[str, Any]:
-    """Start a perpetual autonomous boardroom session with all C-suite agents.
-
-    The orchestration runs a continuous boardroom where all C-suite agents
-    collaborate on strategic decisions, operational reviews, and governance.
-
-    Request body::
-
-        {"agenda": ["Q1 review", "hiring plan"], "mode": "autonomous"}
-    """
-    return await c_suite_orchestration(
-        request,
-        agent_filter=lambda a: True,
-        purpose="Run autonomous boardroom with perpetual strategic governance and decision-making",
-        purpose_scope="Full C-suite collaboration, strategic planning, operational reviews, and covenant compliance",
     )
 
 
