@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "business-infinity"
-version = "4.0.0"
+version = "5.0.0"
 description = "Lean Azure Functions client app powered by the Agent Operating System"
 readme = "README.md"
 license = {text = "Apache-2.0"}

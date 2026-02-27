@@ -8,9 +8,12 @@ Orchestrations are **perpetual and purpose-driven**: each workflow starts an
 ongoing orchestration guided by a purpose.  Agents work toward the purpose
 continuously — there is no finite task to complete.
 
-Enterprise capabilities (v4.0.0) demonstrate the new SDK APIs for knowledge
-management, risk registry, audit trails, covenants, analytics, MCP
-integration, agent interaction, and network discovery.
+Enterprise capabilities (v5.0.0) demonstrate the new SDK APIs for knowledge
+management, risk registry (including heatmaps and analytics), audit trails
+(including compliance reports), covenants (including lifecycle events),
+analytics (including alerts), MCP integration (including bidirectional events),
+agent interaction, network discovery, orchestration streaming, multi-tenant
+support, and webhook notifications.
 """
 
 from __future__ import annotations
@@ -393,3 +396,131 @@ async def handle_strategic_review_update(update) -> None:
 async def erp_search(request: WorkflowRequest) -> Any:
     """Search ERP via MCP server."""
     return await request.client.call_mcp_tool("erpnext", "search", request.body)
+
+
+# ── v5.0.0 Enterprise Workflows ─────────────────────────────────────────────
+
+
+@app.workflow("risk-heatmap")
+async def risk_heatmap(request: WorkflowRequest) -> Dict[str, Any]:
+    """Get risk heatmap for the boardroom.
+
+    Request body::
+
+        {"category": "operational"}
+    """
+    heatmap = await request.client.get_risk_heatmap(
+        category=request.body.get("category"),
+    )
+    return heatmap.model_dump(mode="json")
+
+
+@app.workflow("risk-summary")
+async def risk_summary(request: WorkflowRequest) -> Dict[str, Any]:
+    """Get aggregate risk summary.
+
+    Request body::
+
+        {"category": "financial"}
+    """
+    summary = await request.client.get_risk_summary(
+        category=request.body.get("category"),
+    )
+    return summary.model_dump(mode="json")
+
+
+@app.workflow("compliance-report")
+async def compliance_report(request: WorkflowRequest) -> Dict[str, Any]:
+    """Generate a compliance report for regulatory submissions.
+
+    Request body::
+
+        {"start_time": "2026-01-01T00:00:00", "end_time": "2026-03-31T23:59:59",
+         "report_type": "decisions"}
+    """
+    from datetime import datetime as dt
+
+    report = await request.client.generate_compliance_report(
+        start_time=dt.fromisoformat(request.body["start_time"]),
+        end_time=dt.fromisoformat(request.body["end_time"]),
+        report_type=request.body.get("report_type", "decisions"),
+    )
+    return report.model_dump(mode="json")
+
+
+@app.workflow("create-alert")
+async def create_alert_workflow(request: WorkflowRequest) -> Dict[str, Any]:
+    """Create a metric alert.
+
+    Request body::
+
+        {"metric_name": "risk_score", "threshold": 8.0, "condition": "gt"}
+    """
+    alert = await request.client.create_alert(
+        metric_name=request.body["metric_name"],
+        threshold=request.body["threshold"],
+        condition=request.body.get("condition", "gt"),
+    )
+    return alert.model_dump(mode="json")
+
+
+@app.workflow("register-webhook")
+async def register_webhook_workflow(request: WorkflowRequest) -> Dict[str, Any]:
+    """Register a webhook for external notifications.
+
+    Request body::
+
+        {"url": "https://hooks.slack.com/...", "events": ["decision.created"]}
+    """
+    webhook = await request.client.register_webhook(
+        url=request.body["url"],
+        events=request.body["events"],
+    )
+    return webhook.model_dump(mode="json")
+
+
+# ── Covenant Event Handlers (v5.0.0 Enhancement #3) ─────────────────────────
+
+
+@app.on_covenant_event("violated")
+async def handle_covenant_violation(event) -> None:
+    """Handle covenant violation events."""
+    logger.warning(
+        "Covenant %s violated: %s",
+        getattr(event, "covenant_id", "unknown"),
+        getattr(event, "details", {}),
+    )
+
+
+@app.on_covenant_event("expiring")
+async def handle_covenant_expiring(event) -> None:
+    """Handle covenant expiration warnings."""
+    logger.info(
+        "Covenant %s nearing expiration: %s",
+        getattr(event, "covenant_id", "unknown"),
+        getattr(event, "details", {}),
+    )
+
+
+# ── MCP Event Handlers (v5.0.0 Enhancement #8) ──────────────────────────────
+
+
+@app.on_mcp_event("erpnext", "order_created")
+async def handle_erp_order(event) -> None:
+    """Handle ERP order creation events."""
+    logger.info(
+        "ERP order created: %s",
+        getattr(event, "payload", {}),
+    )
+
+
+# ── Webhook Handler (v5.0.0 Enhancement #12) ────────────────────────────────
+
+
+@app.webhook("slack-notifications")
+async def notify_slack(event) -> None:
+    """Send notification to Slack when significant events occur."""
+    logger.info(
+        "Slack notification: %s",
+        getattr(event, "payload", {}),
+    )
