@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "business-infinity"
-version = "3.0.0"
+version = "4.0.0"
 description = "Lean Azure Functions client app powered by the Agent Operating System"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -15,7 +15,7 @@ authors = [ { name = "ASISaga" } ]
 requires-python = ">=3.10"
 
 dependencies = [
-    "aos-client-sdk[azure]>=2.0.0",
+    "aos-client-sdk[azure]>=4.0.0",
 ]
 
 [project.optional-dependencies]

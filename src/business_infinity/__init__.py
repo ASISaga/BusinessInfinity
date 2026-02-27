@@ -8,6 +8,17 @@ The ``aos-client-sdk`` provides the ``AOSApp`` framework that handles all
 Azure Functions scaffolding, Service Bus communication, authentication,
 and deployment.  BusinessInfinity just defines workflows.
 
+Enterprise capabilities (v4.0.0):
+
+- Knowledge base search via SDK
+- Risk registry (register, assess) via SDK
+- Audit trail / decision logging via SDK
+- Covenant creation via SDK
+- Direct agent interaction via SDK
+- MCP tool integration via SDK
+- Observability (structured logging, correlation tracking)
+- Workflow templates for code reuse
+
 Usage::
 
     from business_infinity.workflows import app
@@ -16,4 +27,4 @@ Usage::
     functions = app.get_functions()
 """
 
-__version__ = "3.0.0"
+__version__ = "4.0.0"

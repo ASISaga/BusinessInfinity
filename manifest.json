@@ -1,15 +1,15 @@
 {
   "name": "BusinessInfinity",
   "alias": "BI",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "purpose": "Perpetual, fully autonomous boardroom of legendary AI agents with strategic voting and continuous decision-making. Enhanced with covenant-based compliance for the Global Boardroom Network.",
   "architecture": {
     "type": "azure-functions-app",
     "runtime": "aos-client-sdk",
-    "description": "BusinessInfinity is a lean Azure Functions app powered by the aos-client-sdk. It contains only business workflows — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the SDK. Agents, orchestration, messaging, and storage are handled by AOS.",
+    "description": "BusinessInfinity is a lean Azure Functions app powered by the aos-client-sdk v4.0.0. It contains only business workflows — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the SDK. Enterprise capabilities include knowledge base, risk registry, audit trails, covenants, analytics, MCP integration, observability, reliability patterns, and local development mocks.",
     "components": {
-      "sdk": "aos-client-sdk provides AOSApp framework, AOSClient, AOSAuth, AOSServiceBus, AOSRegistration, AOSDeployer",
-      "business_logic": "BusinessInfinity-specific workflows defined via @app.workflow decorators (src/business_infinity/workflows.py)",
+      "sdk": "aos-client-sdk v4.0.0 provides AOSApp framework, AOSClient, AOSAuth, AOSServiceBus, AOSRegistration, AOSDeployer, ObservabilityConfig, CircuitBreaker, RetryPolicy, MockAOSClient, workflow_template",
+      "business_logic": "BusinessInfinity-specific workflows defined via @app.workflow, @app.on_orchestration_update, @app.mcp_tool decorators (src/business_infinity/workflows.py)",
       "infrastructure": "AgentOperatingSystem provides all infrastructure services (orchestration, messaging, storage, auth, monitoring)"
     }
   },
