@@ -1,12 +1,14 @@
-"""BusinessInfinity workflows — purpose-driven perpetual orchestrations.
+"""BusinessInfinity workflows — boardroom-driven perpetual orchestrations.
+
+The **boardroom session** is the primary perpetual orchestration that sits at
+the heart of BusinessInfinity.  All C-suite agents collaborate in a continuous
+autonomous boardroom on strategic decisions, operational reviews, and governance.
+Specialised orchestrations (strategic review, market analysis, etc.) and
+enterprise capability workflows are sub-concerns that support the boardroom.
 
 Each workflow function is decorated with ``@app.workflow`` from the AOS Client
 SDK.  The SDK handles all Azure Functions scaffolding (HTTP triggers,
 Service Bus triggers, authentication, health endpoints).
-
-Orchestrations are **perpetual and purpose-driven**: each workflow starts an
-ongoing orchestration guided by a purpose.  Agents work toward the purpose
-continuously — there is no finite task to complete.
 
 **Package layout**
 
@@ -14,7 +16,7 @@ continuously — there is no finite task to complete.
 
     workflows/
       _app.py            — AOSApp singleton + shared utilities
-      orchestrations.py  — 8 purpose-driven perpetual orchestrations
+      orchestrations.py  — primary boardroom + 7 specialised perpetual orchestrations
       enterprise.py      — enterprise SDK capabilities + event handlers
       beyond_sdk.py      — 10 beyond-SDK enhancement workflows
       conversations.py   — 5 boardroom conversation workflows
@@ -56,14 +58,14 @@ from ._app import (
 # registering every workflow with the `app` singleton defined in `_app`.
 
 from . import (  # noqa: E402, F401
+    orchestrations,
+    enterprise,
     beyond_sdk,
     conversations,
-    enterprise,
     health,
     mentor,
     network,
     onboarding,
-    orchestrations,
 )
 
 # ── Per-domain public symbols ────────────────────────────────────────────────

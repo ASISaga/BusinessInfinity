@@ -33,6 +33,11 @@ class TestAOSAppWorkflows:
     def test_app_name(self):
         assert app.name == "business-infinity"
 
+    def test_boardroom_session_is_first_workflow(self):
+        """boardroom-session must be the first registered workflow — it is the
+        primary perpetual orchestration, not a secondary concern."""
+        assert app.get_workflow_names()[0] == "boardroom-session"
+
     def test_workflows_registered(self):
         names = app.get_workflow_names()
         assert "strategic-review" in names
