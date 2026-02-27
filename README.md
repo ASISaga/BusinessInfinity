@@ -1,6 +1,6 @@
 # BusinessInfinity
 
-A lean Azure Functions application that uses the **Agent Operating System** as an infrastructure service. BusinessInfinity contains only business logic — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the `aos-client-sdk` v4.0.0.
+A lean Azure Functions application that uses the **Agent Operating System** as an infrastructure service. BusinessInfinity contains only business logic — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the `aos-client-sdk` v5.0.0.
 
 ## Architecture
 
@@ -114,12 +114,26 @@ functions = app.get_functions()
 | `covenant-create` | `create_covenant()` | Create a business covenant |
 | `ask-agent` | `ask_agent()` | Direct 1:1 agent interaction |
 
+#### Advanced Enterprise Workflows (SDK v5.0.0)
+
+| Workflow | SDK API | Purpose |
+|----------|---------|---------|
+| `risk-heatmap` | `get_risk_heatmap()` | Risk heatmap for boardroom strategic view |
+| `risk-summary` | `get_risk_summary()` | Aggregate risk summary by category/severity |
+| `compliance-report` | `generate_compliance_report()` | Compliance report for regulatory submissions |
+| `create-alert` | `create_alert()` | Create metric threshold alerts |
+| `register-webhook` | `register_webhook()` | Register webhook for external notifications |
+
 #### Event Handlers and MCP Tools
 
 | Type | Name | Description |
 |------|------|-------------|
 | Update Handler | `strategic-review` | Handles intermediate orchestration updates |
 | MCP Tool | `erp-search` | Search ERP via MCP server integration |
+| Covenant Event | `violated` | Handles covenant violation events |
+| Covenant Event | `expiring` | Handles covenant expiration warnings |
+| MCP Event | `erpnext:order_created` | Handles ERP order creation events |
+| Webhook | `slack-notifications` | External Slack notification handler |
 
 ### Invoke via HTTP
 
@@ -169,6 +183,35 @@ curl -X POST https://business-infinity.azurewebsites.net/api/workflows/ask-agent
   -d '{"agent_id": "ceo", "message": "What is the Q2 strategy?"}'
 ```
 
+#### v5.0.0 Advanced Capability Examples
+
+```bash
+# Risk Heatmap
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/risk-heatmap \
+  -H "Content-Type: application/json" \
+  -d '{"category": "operational"}'
+
+# Risk Summary
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/risk-summary \
+  -H "Content-Type: application/json" \
+  -d '{"category": "financial"}'
+
+# Compliance Report
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/compliance-report \
+  -H "Content-Type: application/json" \
+  -d '{"start_time": "2026-01-01T00:00:00", "end_time": "2026-03-31T23:59:59", "report_type": "decisions"}'
+
+# Create Alert
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/create-alert \
+  -H "Content-Type: application/json" \
+  -d '{"metric_name": "risk_score", "threshold": 8.0, "condition": "gt"}'
+
+# Register Webhook
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/register-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://hooks.slack.com/...", "events": ["decision.created"]}'
+```
+
 ## Registration with AOS
 
 Register this app with AOS to provision Service Bus infrastructure:
@@ -185,6 +228,8 @@ async with AOSRegistration(aos_endpoint="https://my-aos.azurewebsites.net") as r
             "talent-management", "technology-review",
             "knowledge-search", "risk-register", "risk-assess",
             "log-decision", "covenant-create", "ask-agent",
+            "risk-heatmap", "risk-summary", "compliance-report",
+            "create-alert", "register-webhook",
         ],
     )
 ```
@@ -207,7 +252,7 @@ SERVICE_BUS_CONNECTION=                  # Service Bus (optional for local dev)
 
 | Package | Purpose |
 |---------|---------|
-| `aos-client-sdk[azure]` ≥4.0.0 | SDK + Azure Functions + Service Bus + Auth + Enterprise APIs |
+| `aos-client-sdk[azure]` ≥5.0.0 | SDK + Azure Functions + Service Bus + Auth + Enterprise APIs |
 
 **No AOS kernel, agent, or infrastructure dependencies.** BusinessInfinity knows nothing about agent internals.
 
@@ -216,17 +261,19 @@ SERVICE_BUS_CONNECTION=                  # Service Bus (optional for local dev)
 ```
 BusinessInfinity/
 ├── function_app.py                  # Azure Functions entry point (2 lines)
-├── pyproject.toml                   # Depends only on aos-client-sdk[azure]>=4.0.0
+├── pyproject.toml                   # Depends only on aos-client-sdk[azure]>=5.0.0
 ├── host.json                        # Azure Functions config
 ├── manifest.json                    # System architecture map
 ├── src/
 │   └── business_infinity/
-│       ├── __init__.py              # Package init (v4.0.0)
-│       └── workflows.py             # All business workflows, update handlers, MCP tools
+│       ├── __init__.py              # Package init (v5.0.0)
+│       └── workflows.py             # All business workflows, event handlers, MCP tools, webhooks
 ├── tests/
-│   └── test_workflows.py            # Workflow tests (10 tests)
+│   └── test_workflows.py            # Workflow tests (14 tests)
 └── docs/
-    └── AOS_FURTHER_ENHANCEMENTS.md  # Additional SDK enhancement requests
+    ├── AOS_ENHANCEMENT_REQUESTS.md  # Original SDK enhancement requests (implemented in v4.0.0)
+    ├── AOS_FURTHER_ENHANCEMENTS.md  # Further SDK enhancement requests (implemented in v5.0.0)
+    └── AOS_NEXT_ENHANCEMENTS.md     # Next SDK enhancement requests
 ```
 
 ## Related Repositories

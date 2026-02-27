@@ -45,7 +45,7 @@ class TestAOSAppWorkflows:
         assert "technology-review" in names
 
     def test_enterprise_workflows_registered(self):
-        """Verify new enterprise capability workflows from SDK v4.0.0."""
+        """Verify enterprise capability workflows from SDK v4.0.0."""
         names = app.get_workflow_names()
         assert "knowledge-search" in names
         assert "risk-register" in names
@@ -54,8 +54,17 @@ class TestAOSAppWorkflows:
         assert "covenant-create" in names
         assert "ask-agent" in names
 
+    def test_v5_workflows_registered(self):
+        """Verify new workflows from SDK v5.0.0."""
+        names = app.get_workflow_names()
+        assert "risk-heatmap" in names
+        assert "risk-summary" in names
+        assert "compliance-report" in names
+        assert "create-alert" in names
+        assert "register-webhook" in names
+
     def test_workflow_count(self):
-        assert len(app.get_workflow_names()) == 14
+        assert len(app.get_workflow_names()) == 19
 
     def test_all_workflow_names_are_kebab_case(self):
         for name in app.get_workflow_names():
@@ -75,3 +84,20 @@ class TestAOSAppEnterpriseFeatures:
 
     def test_observability_configured(self):
         assert app.observability is not None
+
+
+class TestAOSAppV5Features:
+    """Test v5.0.0 features: covenant events, MCP events, webhooks."""
+
+    def test_covenant_event_handlers(self):
+        handlers = app.get_covenant_event_handler_names()
+        assert "violated" in handlers
+        assert "expiring" in handlers
+
+    def test_mcp_event_handlers(self):
+        handlers = app.get_mcp_event_handler_names()
+        assert "erpnext:order_created" in handlers
+
+    def test_webhook_handlers(self):
+        handlers = app.get_webhook_names()
+        assert "slack-notifications" in handlers

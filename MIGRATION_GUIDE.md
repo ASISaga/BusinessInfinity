@@ -4,7 +4,17 @@
 
 BusinessInfinity is a lean Azure Functions app powered by the `aos-client-sdk`. All Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the SDK. BusinessInfinity contains **only business workflow definitions**.
 
-### v4.0.0 — Enterprise Capabilities (current)
+### v5.0.0 — Advanced Enterprise Capabilities (current)
+
+v5.0.0 integrates all 12 further AOS Client SDK enhancements:
+
+- **5 new advanced workflows** — risk-heatmap, risk-summary, compliance-report, create-alert, register-webhook
+- **Covenant lifecycle events** — `@app.on_covenant_event("violated")`, `@app.on_covenant_event("expiring")`
+- **MCP bidirectional events** — `@app.on_mcp_event("erpnext", "order_created")`
+- **Webhook handler** — `@app.webhook("slack-notifications")`
+- **19 total workflows** (up from 14 in v4.0.0)
+
+### v4.0.0 — Enterprise Capabilities
 
 v4.0.0 integrates all 14 AOS Client SDK enhancements:
 
