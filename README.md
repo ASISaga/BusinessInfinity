@@ -1,6 +1,6 @@
 # BusinessInfinity
 
-A lean Azure Functions application that uses the **Agent Operating System** as an infrastructure service. BusinessInfinity contains only business logic — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the `aos-client-sdk`.
+A lean Azure Functions application that uses the **Agent Operating System** as an infrastructure service. BusinessInfinity contains only business logic — all Azure Functions scaffolding, Service Bus communication, authentication, and deployment are handled by the `aos-client-sdk` v4.0.0.
 
 ## Architecture
 
@@ -49,18 +49,34 @@ A lean Azure Functions application that uses the **Agent Operating System** as a
 
 ```python
 # src/business_infinity/workflows.py
-from aos_client import AOSApp, WorkflowRequest
+from aos_client import AOSApp, WorkflowRequest, workflow_template
+from aos_client.observability import ObservabilityConfig
 
-app = AOSApp(name="business-infinity")
+app = AOSApp(
+    name="business-infinity",
+    observability=ObservabilityConfig(
+        structured_logging=True,
+        correlation_tracking=True,
+        health_checks=["aos", "service-bus"],
+    ),
+)
+
+@workflow_template
+async def c_suite_orchestration(request, agent_filter, purpose, purpose_scope):
+    agents = await select_c_suite_agents(request.client)
+    agent_ids = [a.agent_id for a in agents if agent_filter(a)]
+    return await request.client.start_orchestration(
+        agent_ids=agent_ids, purpose=purpose, purpose_scope=purpose_scope,
+        context=request.body,
+    )
 
 @app.workflow("strategic-review")
 async def strategic_review(request: WorkflowRequest):
-    agents = await request.client.list_agents()
-    c_suite = [a.agent_id for a in agents if a.agent_type in ("LeadershipAgent", "CMOAgent")]
-    return await request.client.start_orchestration(
-        agent_ids=c_suite,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: True,
         purpose="Drive strategic review and continuous organisational improvement",
-        context=request.body,
+        purpose_scope="C-suite strategic alignment and cross-functional coordination",
     )
 ```
 
@@ -74,6 +90,8 @@ functions = app.get_functions()
 
 ### Available Workflows
 
+#### Orchestration Workflows (perpetual, purpose-driven)
+
 | Workflow | Agents | Purpose |
 |----------|--------|---------|
 | `strategic-review` | All C-suite | Strategic alignment and cross-functional coordination |
@@ -84,6 +102,24 @@ functions = app.get_functions()
 | `covenant-compliance` | CEO + COO + CSO | Covenant compliance and governance adherence |
 | `talent-management` | CHRO + CEO + COO | Talent strategy and organizational development |
 | `technology-review` | CTO + CEO + CSO | Technology strategy and architecture excellence |
+
+#### Enterprise Capability Workflows (SDK v4.0.0)
+
+| Workflow | SDK API | Purpose |
+|----------|---------|---------|
+| `knowledge-search` | `search_documents()` | Search the AOS knowledge base |
+| `risk-register` | `register_risk()` | Register a new risk in the risk registry |
+| `risk-assess` | `assess_risk()` | Assess likelihood/impact of a risk |
+| `log-decision` | `log_decision()` | Log a boardroom decision to audit trail |
+| `covenant-create` | `create_covenant()` | Create a business covenant |
+| `ask-agent` | `ask_agent()` | Direct 1:1 agent interaction |
+
+#### Event Handlers and MCP Tools
+
+| Type | Name | Description |
+|------|------|-------------|
+| Update Handler | `strategic-review` | Handles intermediate orchestration updates |
+| MCP Tool | `erp-search` | Search ERP via MCP server integration |
 
 ### Invoke via HTTP
 
@@ -109,6 +145,30 @@ All responses follow the perpetual orchestration pattern:
 {"orchestration_id": "...", "status": "active"}
 ```
 
+#### Enterprise Capability Examples
+
+```bash
+# Knowledge Search
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/knowledge-search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "sustainability policy", "doc_type": "policy", "limit": 5}'
+
+# Register a Risk
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/risk-register \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Supply chain disruption", "category": "operational", "owner": "coo"}'
+
+# Log a Decision
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/log-decision \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Expand to EU", "rationale": "Market opportunity", "agent_id": "ceo"}'
+
+# Ask an Agent Directly
+curl -X POST https://business-infinity.azurewebsites.net/api/workflows/ask-agent \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id": "ceo", "message": "What is the Q2 strategy?"}'
+```
+
 ## Registration with AOS
 
 Register this app with AOS to provision Service Bus infrastructure:
@@ -123,6 +183,8 @@ async with AOSRegistration(aos_endpoint="https://my-aos.azurewebsites.net") as r
             "strategic-review", "market-analysis", "budget-approval",
             "risk-assessment", "boardroom-session", "covenant-compliance",
             "talent-management", "technology-review",
+            "knowledge-search", "risk-register", "risk-assess",
+            "log-decision", "covenant-create", "ask-agent",
         ],
     )
 ```
@@ -145,7 +207,7 @@ SERVICE_BUS_CONNECTION=                  # Service Bus (optional for local dev)
 
 | Package | Purpose |
 |---------|---------|
-| `aos-client-sdk[azure]` | SDK + Azure Functions + Service Bus + Auth |
+| `aos-client-sdk[azure]` ≥4.0.0 | SDK + Azure Functions + Service Bus + Auth + Enterprise APIs |
 
 **No AOS kernel, agent, or infrastructure dependencies.** BusinessInfinity knows nothing about agent internals.
 
@@ -154,17 +216,17 @@ SERVICE_BUS_CONNECTION=                  # Service Bus (optional for local dev)
 ```
 BusinessInfinity/
 ├── function_app.py                  # Azure Functions entry point (2 lines)
-├── pyproject.toml                   # Depends only on aos-client-sdk[azure]
+├── pyproject.toml                   # Depends only on aos-client-sdk[azure]>=4.0.0
 ├── host.json                        # Azure Functions config
 ├── manifest.json                    # System architecture map
 ├── src/
 │   └── business_infinity/
-│       ├── __init__.py              # Package init
-│       └── workflows.py             # All business workflows (@app.workflow)
+│       ├── __init__.py              # Package init (v4.0.0)
+│       └── workflows.py             # All business workflows, update handlers, MCP tools
 ├── tests/
-│   └── test_workflows.py            # Workflow tests
+│   └── test_workflows.py            # Workflow tests (10 tests)
 └── docs/
-    └── AOS_ENHANCEMENT_REQUESTS.md  # SDK enhancement requests
+    └── AOS_FURTHER_ENHANCEMENTS.md  # Additional SDK enhancement requests
 ```
 
 ## Related Repositories

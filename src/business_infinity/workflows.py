@@ -7,18 +7,36 @@ Service Bus triggers, authentication, health endpoints).
 Orchestrations are **perpetual and purpose-driven**: each workflow starts an
 ongoing orchestration guided by a purpose.  Agents work toward the purpose
 continuously — there is no finite task to complete.
+
+Enterprise capabilities (v4.0.0) demonstrate the new SDK APIs for knowledge
+management, risk registry, audit trails, covenants, analytics, MCP
+integration, agent interaction, and network discovery.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
-from aos_client import AOSApp, AOSClient, AgentDescriptor, WorkflowRequest
+from aos_client import (
+    AOSApp,
+    AOSClient,
+    AgentDescriptor,
+    WorkflowRequest,
+    workflow_template,
+)
+from aos_client.observability import ObservabilityConfig
 
 logger = logging.getLogger(__name__)
 
-app = AOSApp(name="business-infinity")
+app = AOSApp(
+    name="business-infinity",
+    observability=ObservabilityConfig(
+        structured_logging=True,
+        correlation_tracking=True,
+        health_checks=["aos", "service-bus"],
+    ),
+)
 
 # ── C-Suite Agent Selection ──────────────────────────────────────────────────
 
@@ -49,6 +67,30 @@ async def select_c_suite_agents(client: AOSClient) -> List[AgentDescriptor]:
     return selected
 
 
+# ── Workflow Template (Enhancement #11) ──────────────────────────────────────
+
+
+@workflow_template
+async def c_suite_orchestration(
+    request: WorkflowRequest,
+    agent_filter: Callable[[AgentDescriptor], bool],
+    purpose: str,
+    purpose_scope: str,
+) -> Dict[str, Any]:
+    """Reusable template for C-suite orchestrations."""
+    agents = await select_c_suite_agents(request.client)
+    agent_ids = [a.agent_id for a in agents if agent_filter(a)]
+    if not agent_ids:
+        raise ValueError("No matching agents available in the catalog")
+    status = await request.client.start_orchestration(
+        agent_ids=agent_ids,
+        purpose=purpose,
+        purpose_scope=purpose_scope,
+        context=request.body,
+    )
+    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
+
+
 # ── Purpose-Driven Orchestrations ────────────────────────────────────────────
 
 
@@ -64,21 +106,12 @@ async def strategic_review(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"quarter": "Q1-2026", "focus_areas": ["revenue", "growth"]}
     """
-    agents = await select_c_suite_agents(request.client)
-    agent_ids = [a.agent_id for a in agents]
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: True,
         purpose="Drive strategic review and continuous organisational improvement",
         purpose_scope="C-suite strategic alignment and cross-functional coordination",
-        context={
-            "quarter": request.body.get("quarter", "current"),
-            "focus_areas": request.body.get("focus_areas", ["revenue", "growth", "efficiency"]),
-        },
-        workflow="collaborative",
     )
-    logger.info("Strategic review orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
 
 
 @app.workflow("market-analysis")
@@ -167,29 +200,12 @@ async def risk_assessment(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"risk_domain": "cybersecurity", "risk_tolerance": "moderate"}
     """
-    agents = await select_c_suite_agents(request.client)
-    # Risk governance: CSO + CTO + COO
-    agent_ids = [a.agent_id for a in agents if a.agent_id in ("cso", "cto", "coo")]
-
-    if not agent_ids:
-        # Fall back to all available C-suite
-        agent_ids = [a.agent_id for a in agents]
-
-    if not agent_ids:
-        raise ValueError("No C-suite agents available for risk assessment")
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: a.agent_id in ("cso", "cto", "coo"),
         purpose="Continuously monitor, assess, and mitigate enterprise risks",
         purpose_scope="Risk identification, assessment, mitigation, and governance across all domains",
-        context={
-            "risk_domain": request.body.get("risk_domain", "enterprise"),
-            "risk_tolerance": request.body.get("risk_tolerance", "moderate"),
-        },
-        workflow="collaborative",
     )
-    logger.info("Risk assessment orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
 
 
 @app.workflow("boardroom-session")
@@ -203,24 +219,12 @@ async def boardroom_session(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"agenda": ["Q1 review", "hiring plan"], "mode": "autonomous"}
     """
-    agents = await select_c_suite_agents(request.client)
-    agent_ids = [a.agent_id for a in agents]
-
-    if not agent_ids:
-        raise ValueError("No C-suite agents available for boardroom session")
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: True,
         purpose="Run autonomous boardroom with perpetual strategic governance and decision-making",
         purpose_scope="Full C-suite collaboration, strategic planning, operational reviews, and covenant compliance",
-        context={
-            "agenda": request.body.get("agenda", []),
-            "mode": request.body.get("mode", "autonomous"),
-        },
-        workflow="collaborative",
     )
-    logger.info("Boardroom session orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
 
 
 @app.workflow("covenant-compliance")
@@ -234,28 +238,12 @@ async def covenant_compliance(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"compliance_standard": "BIC", "scope": "global"}
     """
-    agents = await select_c_suite_agents(request.client)
-    # Compliance: CEO + COO + CSO
-    agent_ids = [a.agent_id for a in agents if a.agent_id in ("ceo", "coo", "cso")]
-
-    if not agent_ids:
-        agent_ids = [a.agent_id for a in agents]
-
-    if not agent_ids:
-        raise ValueError("No agents available for covenant compliance monitoring")
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: a.agent_id in ("ceo", "coo", "cso"),
         purpose="Ensure continuous covenant compliance and governance adherence",
         purpose_scope="Compliance monitoring, audit trail validation, and covenant enforcement",
-        context={
-            "compliance_standard": request.body.get("compliance_standard", "BIC"),
-            "scope": request.body.get("scope", "global"),
-        },
-        workflow="collaborative",
     )
-    logger.info("Covenant compliance orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
 
 
 @app.workflow("talent-management")
@@ -269,24 +257,12 @@ async def talent_management(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"focus": "retention", "departments": ["engineering", "marketing"]}
     """
-    agents = await select_c_suite_agents(request.client)
-    agent_ids = [a.agent_id for a in agents if a.agent_id in ("chro", "ceo", "coo")]
-
-    if not agent_ids:
-        raise ValueError("CHRO and/or CEO agents not available in the catalog")
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: a.agent_id in ("chro", "ceo", "coo"),
         purpose="Drive talent strategy, organizational development, and workforce optimization",
         purpose_scope="Talent acquisition, retention, development, culture, and HR governance",
-        context={
-            "focus": request.body.get("focus", "strategy"),
-            "departments": request.body.get("departments", []),
-        },
-        workflow="hierarchical",
     )
-    logger.info("Talent management orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
 
 
 @app.workflow("technology-review")
@@ -300,21 +276,120 @@ async def technology_review(request: WorkflowRequest) -> Dict[str, Any]:
 
         {"focus_areas": ["cloud", "ai", "security"], "review_scope": "quarterly"}
     """
-    agents = await select_c_suite_agents(request.client)
-    agent_ids = [a.agent_id for a in agents if a.agent_id in ("cto", "ceo", "cso")]
-
-    if not agent_ids:
-        raise ValueError("CTO and/or CEO agents not available in the catalog")
-
-    status = await request.client.start_orchestration(
-        agent_ids=agent_ids,
+    return await c_suite_orchestration(
+        request,
+        agent_filter=lambda a: a.agent_id in ("cto", "ceo", "cso"),
         purpose="Drive technology strategy, architecture excellence, and innovation",
         purpose_scope="Technology roadmap, architecture review, engineering practices, and innovation pipeline",
-        context={
-            "focus_areas": request.body.get("focus_areas", ["cloud", "ai", "security"]),
-            "review_scope": request.body.get("review_scope", "quarterly"),
-        },
-        workflow="collaborative",
     )
-    logger.info("Technology review orchestration started: %s", status.orchestration_id)
-    return {"orchestration_id": status.orchestration_id, "status": status.status.value}
+
+
+# ── Enterprise Capability Workflows (Enhancement #1–#12) ────────────────────
+
+
+@app.workflow("knowledge-search")
+async def knowledge_search(request: WorkflowRequest) -> Dict[str, Any]:
+    """Search the knowledge base.
+
+    Request body::
+
+        {"query": "sustainability policy", "doc_type": "policy", "limit": 5}
+    """
+    docs = await request.client.search_documents(
+        query=request.body.get("query", ""),
+        doc_type=request.body.get("doc_type"),
+        limit=request.body.get("limit", 10),
+    )
+    return {"documents": [d.model_dump(mode="json") for d in docs]}
+
+
+@app.workflow("risk-register")
+async def risk_register(request: WorkflowRequest) -> Dict[str, Any]:
+    """Register a new risk in the AOS risk registry.
+
+    Request body::
+
+        {"title": "Supply chain disruption", "description": "...",
+         "category": "operational", "owner": "coo"}
+    """
+    risk = await request.client.register_risk(request.body)
+    return risk.model_dump(mode="json")
+
+
+@app.workflow("risk-assess")
+async def risk_assess(request: WorkflowRequest) -> Dict[str, Any]:
+    """Assess an existing risk.
+
+    Request body::
+
+        {"risk_id": "risk-abc", "likelihood": 0.7, "impact": 0.9}
+    """
+    risk = await request.client.assess_risk(
+        risk_id=request.body["risk_id"],
+        likelihood=request.body["likelihood"],
+        impact=request.body["impact"],
+    )
+    return risk.model_dump(mode="json")
+
+
+@app.workflow("log-decision")
+async def log_decision_workflow(request: WorkflowRequest) -> Dict[str, Any]:
+    """Log a boardroom decision to the audit trail.
+
+    Request body::
+
+        {"title": "Expand to EU", "rationale": "Market opportunity",
+         "agent_id": "ceo"}
+    """
+    record = await request.client.log_decision(request.body)
+    return record.model_dump(mode="json")
+
+
+@app.workflow("covenant-create")
+async def covenant_create(request: WorkflowRequest) -> Dict[str, Any]:
+    """Create a business covenant.
+
+    Request body::
+
+        {"title": "Ethics Covenant", "parties": ["business-infinity"]}
+    """
+    covenant = await request.client.create_covenant(request.body)
+    return covenant.model_dump(mode="json")
+
+
+@app.workflow("ask-agent")
+async def ask_agent_workflow(request: WorkflowRequest) -> Dict[str, Any]:
+    """Ask a single agent a question directly.
+
+    Request body::
+
+        {"agent_id": "ceo", "message": "What is the Q2 strategy?"}
+    """
+    response = await request.client.ask_agent(
+        agent_id=request.body["agent_id"],
+        message=request.body["message"],
+        context=request.body.get("context"),
+    )
+    return response.model_dump(mode="json")
+
+
+# ── Orchestration Update Handler (Enhancement #5) ───────────────────────────
+
+
+@app.on_orchestration_update("strategic-review")
+async def handle_strategic_review_update(update) -> None:
+    """Handle intermediate updates from strategic review orchestrations."""
+    logger.info(
+        "Strategic review update from agent %s: %s",
+        getattr(update, "agent_id", "unknown"),
+        getattr(update, "output", ""),
+    )
+
+
+# ── MCP Tool Integration (Enhancement #7) ───────────────────────────────────
+
+
+@app.mcp_tool("erp-search")
+async def erp_search(request) -> Any:
+    """Search ERP via MCP server."""
+    return await request.client.call_mcp_tool("erpnext", "search", request.body)
