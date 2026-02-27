@@ -1,18 +1,21 @@
 """Boardroom conversation workflows for BusinessInfinity.
 
-Manages boardroom conversations, agent-to-agent (A2A) messages, and
-conversation event polling.  Conversations are persisted as knowledge-base
-documents so they survive AOS restarts.
+Boardroom conversations and A2A messaging are orchestrated via the AOS
+infrastructure service, which manages agent lifecycle, messaging, storage,
+and monitoring.  The client app supplies only business context; AOS handles
+the rest.
+
+Conversation listings and event polling still query the AOS knowledge base,
+which persists orchestration artefacts as searchable documents.
 """
 
 from __future__ import annotations
 
-import uuid
 from typing import Any, Dict, List, Optional
 
 from aos_client import WorkflowRequest
 
-from ._app import app, logger
+from ._app import app, logger, select_c_suite_agents
 
 # Document type used to persist boardroom conversations in the knowledge base.
 _CONVERSATION_DOC_TYPE = "boardroom-conversation"
@@ -54,9 +57,11 @@ async def list_conversations(request: WorkflowRequest) -> Dict[str, Any]:
 
 @app.workflow("create-conversation")
 async def create_conversation(request: WorkflowRequest) -> Dict[str, Any]:
-    """Create a new boardroom conversation.
+    """Create and start a new boardroom conversation via AOS orchestration.
 
-    Creates a conversation record in the knowledge base.
+    Starts an AOS orchestration involving the relevant C-suite agents for the
+    given conversation, with the champion leading the discussion.  AOS manages
+    the agent lifecycle, messaging, storage, and monitoring.
 
     Request body::
 
@@ -68,33 +73,39 @@ async def create_conversation(request: WorkflowRequest) -> Dict[str, Any]:
             "context": {}
         }
     """
-    from datetime import datetime as dt, timezone
-
     required = ["conversation_type", "champion", "title", "content"]
     for field in required:
         if field not in request.body:
             raise ValueError(f"Missing required field: {field}")
 
-    doc_body = {
-        "doc_type": _CONVERSATION_DOC_TYPE,
-        "title": request.body["title"],
-        "conversation_type": request.body["conversation_type"],
-        "champion": request.body["champion"],
-        "content": request.body["content"],
-        "context": request.body.get("context", {}),
-        "status": "open",
-        "signers": [],
-        "created_at": dt.now(timezone.utc).isoformat(),
-    }
-    doc = await request.client.create_document(doc_body)
-    conversation_id = (
-        doc.document_id if hasattr(doc, "document_id") else str(uuid.uuid4())
+    champion = request.body["champion"]
+    agents = await select_c_suite_agents(request.client)
+    agent_ids = [a.agent_id for a in agents]
+    # Ensure champion leads the orchestration
+    if champion not in agent_ids:
+        agent_ids.insert(0, champion)
+
+    status = await request.client.start_orchestration(
+        agent_ids=agent_ids,
+        purpose=f"Boardroom conversation: {request.body['title']}",
+        purpose_scope=request.body["conversation_type"],
+        context={
+            "champion": champion,
+            "title": request.body["title"],
+            "content": request.body["content"],
+            **request.body.get("context", {}),
+        },
+        workflow="collaborative",
     )
-    logger.info("Conversation %s created by champion %s", conversation_id, request.body["champion"])
+    logger.info(
+        "Boardroom conversation orchestration started: %s (champion: %s)",
+        status.orchestration_id,
+        champion,
+    )
     return {
-        "conversation_id": conversation_id,
-        "status": "created",
-        "message": "Conversation created successfully",
+        "conversation_id": status.orchestration_id,
+        "status": status.status.value,
+        "message": "Conversation orchestration started",
     }
 
 
@@ -144,10 +155,11 @@ async def sign_conversation(request: WorkflowRequest) -> Dict[str, Any]:
 
 @app.workflow("create-a2a-message")
 async def create_a2a_message(request: WorkflowRequest) -> Dict[str, Any]:
-    """Initiate an Agent-to-Agent (A2A) communication.
+    """Initiate an Agent-to-Agent (A2A) communication via AOS orchestration.
 
-    Delivers a message from one agent to another via ``ask_agent`` and
-    stores the exchange as a conversation document in the knowledge base.
+    Delegates agent messaging, storage, and monitoring to AOS.  The client app
+    supplies only the business context; AOS handles the agent interaction
+    lifecycle.
 
     Request body::
 
@@ -158,55 +170,36 @@ async def create_a2a_message(request: WorkflowRequest) -> Dict[str, Any]:
             "message": "What is the runway at current burn rate?"
         }
     """
-    from datetime import datetime as dt, timezone
-
     required = ["from_agent", "to_agent", "conversation_type", "message"]
     for field in required:
         if field not in request.body:
             raise ValueError(f"Missing required field: {field}")
 
-    # Deliver the message via the agent interaction SDK
-    response = await request.client.ask_agent(
-        agent_id=request.body["to_agent"],
-        message=request.body["message"],
+    status = await request.client.start_orchestration(
+        agent_ids=[request.body["from_agent"], request.body["to_agent"]],
+        # AOS purpose field is capped at 240 characters; longer messages are
+        # carried in full inside the structured context dict below.
+        purpose=request.body["message"][:240],
+        purpose_scope=request.body["conversation_type"],
         context={
             "from_agent": request.body["from_agent"],
-            "conversation_type": request.body["conversation_type"],
+            "to_agent": request.body["to_agent"],
+            "message": request.body["message"],
             **request.body.get("context", {}),
         },
-    )
-    response_text = (
-        response.model_dump(mode="json") if hasattr(response, "model_dump") else response
-    )
-
-    # Persist the exchange as a conversation document
-    doc_body = {
-        "doc_type": _CONVERSATION_DOC_TYPE,
-        "title": f"A2A: {request.body['from_agent']} → {request.body['to_agent']}",
-        "conversation_type": request.body["conversation_type"],
-        "from_agent": request.body["from_agent"],
-        "to_agent": request.body["to_agent"],
-        "message": request.body["message"],
-        "response": response_text,
-        "status": "completed",
-        "created_at": dt.now(timezone.utc).isoformat(),
-    }
-    doc = await request.client.create_document(doc_body)
-    conversation_id = (
-        doc.document_id if hasattr(doc, "document_id") else str(uuid.uuid4())
+        workflow="sequential",
     )
     logger.info(
-        "A2A message from %s to %s stored as conversation %s",
+        "A2A orchestration started between %s and %s: %s",
         request.body["from_agent"],
         request.body["to_agent"],
-        conversation_id,
+        status.orchestration_id,
     )
     return {
-        "conversation_id": conversation_id,
+        "conversation_id": status.orchestration_id,
         "from_agent": request.body["from_agent"],
         "to_agent": request.body["to_agent"],
-        "response": response_text,
-        "status": "created",
+        "status": status.status.value,
     }
 
 
