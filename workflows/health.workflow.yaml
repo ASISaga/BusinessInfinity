@@ -1,0 +1,82 @@
+# Health & Analytics Workflows
+# ------------------------------
+# Liveness health check and KPI analytics endpoint for load balancers,
+# monitoring dashboards, and operational teams.
+#
+# Mirrors: src/business_infinity/workflows/health.py
+
+version: "5.0.0"
+domain: health
+description: >
+  Health and analytics workflows providing service liveness checks and
+  business KPI summaries for monitoring and dashboards.
+
+workflows:
+
+  - id: system-health
+    name: System Health Check
+    description: >
+      Return a health summary for the BusinessInfinity instance.
+      Checks agent reachability via list_agents and reports basic liveness
+      so load balancers and monitoring tools can verify the service.
+      Returns "healthy" when agents are reachable, "degraded" otherwise.
+    type: query
+    agents: []
+    input: {}
+    output:
+      service:
+        type: string
+        description: Service name — always "BusinessInfinity".
+      status:
+        type: string
+        description: '"healthy" when all agents are reachable, "degraded" on error.'
+      version:
+        type: string
+        description: BusinessInfinity version string.
+        example: "5.0.0"
+      agents_active:
+        type: integer
+        description: Number of agents currently reachable in the catalog.
+      timestamp:
+        type: string
+        description: ISO-8601 timestamp of the health check.
+
+  - id: business-analytics
+    name: Business Analytics
+    description: >
+      Return business KPIs and agent performance metrics.
+      Queries the SDK KPI dashboard and metrics endpoint, then augments with
+      a C-suite agent summary so stakeholders have a single analytics view.
+    type: query
+    agents:
+      - ceo
+      - cfo
+      - cmo
+      - coo
+      - cto
+      - cso
+      - chro
+    input:
+      include_kpis:
+        type: boolean
+        default: true
+        description: Include KPI dashboard and metrics in the response.
+      include_agent_summary:
+        type: boolean
+        default: true
+        description: Include a C-suite agent count and ID summary.
+    output:
+      kpi_dashboard:
+        type: object
+        required: false
+        description: KPI dashboard object from the AOS SDK (when include_kpis is true).
+      metrics:
+        type: array
+        required: false
+        description: Metrics list from the AOS SDK (when include_kpis is true).
+      agent_summary:
+        type: object
+        required: false
+        description: >
+          Summary containing total_agents count and c_suite_agents list
+          (when include_agent_summary is true).
