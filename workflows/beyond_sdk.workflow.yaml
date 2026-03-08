@@ -1,0 +1,385 @@
+# Beyond-SDK Enhancement Workflows
+# ----------------------------------
+# Implements the 10 capabilities not yet provided by the AOS Client SDK,
+# as documented in docs/AOS_NEXT_ENHANCEMENTS.md:
+#
+#   1. Field-level encryption            (utilities in _app.py)
+#   2. Rate limiting                     (utilities in _app.py)
+#   3. start-workflow-chain              dependency-aware workflow launch
+#   4. start/get/stop-orchestration-group  bulk orchestration management
+#   5. find-agents                       capability-based agent matching
+#   6. checkpoint/resume-orchestration   KB-backed checkpointing
+#   7. register-conditional-webhook      event-filter webhooks
+#   8. verify-audit-integrity            SHA-256 hash-chain tamper detection
+#   9. Middleware / plugin architecture  (utilities in _app.py)
+#  10. generate-api-docs                 workflow documentation generation
+#
+# Mirrors: src/business_infinity/workflows/beyond_sdk.py
+
+version: "5.0.0"
+domain: beyond_sdk
+description: >
+  Beyond-SDK workflows implementing capabilities not yet available in the
+  AOS Client SDK v5.0.0 — see docs/AOS_NEXT_ENHANCEMENTS.md for context.
+
+# Note: the `depends_on` field throughout this file is informational only.
+# It documents which upstream workflows should logically complete before this
+# workflow is invoked, matching the WORKFLOW_DEPENDENCIES map in _app.py.
+# Enforcement is the responsibility of the calling client or orchestration layer.
+
+# ── Enhancement #5: Agent Capability Matching ────────────────────────────────
+
+workflows:
+
+  - id: find-agents
+    name: Find Agents by Capability
+    description: >
+      Find and rank agents from the catalog by required and preferred capability
+      sets.  Because the AOS SDK list_agents() returns all agents without
+      capability filtering, this workflow applies scoring locally.
+    type: query
+    agents: []
+    input:
+      required_capabilities:
+        type: array
+        items: string
+        required: false
+        description: Capabilities that matching agents must have.
+        example: ["risk-analysis", "financial-governance"]
+      preferred_capabilities:
+        type: array
+        items: string
+        required: false
+        description: Capabilities that improve an agent's match score.
+        example: ["compliance"]
+      min_score:
+        type: number
+        default: 0.0
+        description: Minimum match score threshold (0.0–1.0).
+    output:
+      matches:
+        type: array
+        description: Agents sorted by match score (descending), each with agent object, score, and matched_capabilities.
+      total:
+        type: integer
+        description: Total number of matching agents.
+
+# ── Enhancement #4: Bulk Orchestration Management ────────────────────────────
+
+  - id: start-orchestration-group
+    name: Start Orchestration Group
+    description: >
+      Start multiple orchestrations simultaneously and register them under a
+      named group for collective status queries and lifecycle management.
+    type: action
+    agents: []
+    input:
+      group_name:
+        type: string
+        required: false
+        description: Human-readable name for the orchestration group.
+        example: "boardroom-q1-2026"
+      orchestrations:
+        type: array
+        required: true
+        description: List of orchestration specs to start.
+        items:
+          agent_ids:
+            type: array
+            items: string
+          purpose:
+            type: string
+          purpose_scope:
+            type: string
+          context:
+            type: object
+            required: false
+        example:
+          - agent_ids: ["ceo", "cfo"]
+            purpose: "Budget review"
+            purpose_scope: "Q2 financial governance"
+          - agent_ids: ["cso", "cto"]
+            purpose: "Risk review"
+            purpose_scope: "Technology risk assessment"
+    output:
+      group_id:
+        type: string
+        description: Unique identifier assigned to this orchestration group.
+      group_name:
+        type: string
+      orchestration_ids:
+        type: array
+        items: string
+        description: IDs of all orchestrations started within this group.
+      status:
+        type: string
+        description: Initial group status — always "running" on creation.
+
+  - id: get-group-status
+    name: Get Orchestration Group Status
+    description: >
+      Get the aggregate status and orchestration IDs for a named orchestration
+      group created by start-orchestration-group.
+    type: query
+    agents: []
+    depends_on:
+      - start-orchestration-group
+    input:
+      group_id:
+        type: string
+        required: true
+        description: Orchestration group ID returned by start-orchestration-group.
+        example: "<uuid>"
+    output:
+      group_id:
+        type: string
+      group_name:
+        type: string
+      orchestration_ids:
+        type: array
+        items: string
+      status:
+        type: string
+
+  - id: stop-orchestration-group
+    name: Stop Orchestration Group
+    description: >
+      Stop all orchestrations belonging to a named group and mark the group
+      as stopped.  Calls the SDK stop_orchestration for each member
+      orchestration when the SDK supports it.
+    type: action
+    agents: []
+    depends_on:
+      - start-orchestration-group
+    input:
+      group_id:
+        type: string
+        required: true
+        description: Orchestration group ID to stop.
+        example: "<uuid>"
+    output:
+      group_id:
+        type: string
+      status:
+        type: string
+        description: Always "stopped" on success.
+
+# ── Enhancement #6: Orchestration Checkpointing ──────────────────────────────
+
+  - id: checkpoint-orchestration
+    name: Checkpoint Orchestration
+    description: >
+      Save a checkpoint for a perpetual orchestration.  Checkpoint data is
+      persisted as a knowledge-base document so it survives AOS restarts and
+      can be used to resume the orchestration later.
+    type: action
+    agents: []
+    input:
+      orchestration_id:
+        type: string
+        required: true
+        description: ID of the orchestration to checkpoint.
+        example: "orch-abc123"
+      checkpoint_data:
+        type: object
+        required: false
+        description: Arbitrary state data to persist in the checkpoint.
+        example:
+          phase: "risk-review"
+          iteration: 12
+    output:
+      checkpoint_id:
+        type: string
+        description: ID of the created checkpoint document.
+      orchestration_id:
+        type: string
+      created_at:
+        type: string
+        description: ISO-8601 timestamp of checkpoint creation.
+
+  - id: resume-orchestration
+    name: Resume Orchestration from Checkpoint
+    description: >
+      Resume a perpetual orchestration from its latest knowledge-base
+      checkpoint.  Fetches the checkpoint document, then starts a new
+      orchestration seeded with the saved state.
+    type: action
+    agents: []
+    depends_on:
+      - checkpoint-orchestration
+    input:
+      orchestration_id:
+        type: string
+        required: true
+        description: ID of the orchestration to resume.
+        example: "orch-abc123"
+      agent_ids:
+        type: array
+        items: string
+        required: false
+        description: Agents to include in the resumed orchestration.
+        example: ["ceo", "cfo"]
+      purpose:
+        type: string
+        required: false
+        description: Purpose for the resumed orchestration.
+        example: "Continue strategic review"
+      purpose_scope:
+        type: string
+        required: false
+        description: Scope for the resumed orchestration.
+    output:
+      new_orchestration_id:
+        type: string
+        description: ID of the newly started orchestration.
+      resumed_from:
+        type: string
+        description: Checkpoint ID that was used for resumption.
+      checkpoint_data:
+        type: object
+        description: Checkpoint state data loaded from the knowledge base.
+
+# ── Enhancement #7: Conditional Webhook Filters ──────────────────────────────
+
+  - id: register-conditional-webhook
+    name: Register Conditional Webhook
+    description: >
+      Register a webhook with an optional event filter rule.
+      The filter is stored locally and evaluated before delivery to prevent
+      spurious notifications.  Extends the basic register-webhook capability.
+    type: action
+    agents: []
+    input:
+      url:
+        type: string
+        required: true
+        description: HTTPS URL of the webhook receiver.
+        example: "https://hooks.slack.com/services/..."
+      events:
+        type: array
+        items: string
+        required: true
+        description: AOS event types to subscribe to.
+        example: ["decision.created"]
+      filter:
+        type: object
+        required: false
+        description: >
+          Conditional filter rule with field, op, and value.
+          Only events matching the filter will be delivered.
+        example:
+          field: "priority"
+          op: "eq"
+          value: "critical"
+    output:
+      webhook_id:
+        type: string
+        description: Unique identifier of the registered webhook.
+      url:
+        type: string
+      events:
+        type: array
+      has_filter:
+        type: boolean
+        description: True when a filter rule was registered with this webhook.
+
+# ── Enhancement #8: Audit Tamper Detection ───────────────────────────────────
+
+  - id: verify-audit-integrity
+    name: Verify Audit Trail Integrity
+    description: >
+      Verify the integrity of the audit trail using a SHA-256 hash chain.
+      Fetches audit records via generate_compliance_report, chains their hashes,
+      and detects any tampering or missing entries.
+    type: action
+    agents: []
+    depends_on:
+      - log-decision
+    input:
+      start_time:
+        type: string
+        required: true
+        description: ISO-8601 start of the audit window to verify.
+        example: "2026-01-01T00:00:00"
+      end_time:
+        type: string
+        required: true
+        description: ISO-8601 end of the audit window to verify.
+        example: "2026-03-31T23:59:59"
+    output:
+      valid:
+        type: boolean
+        description: True when the hash chain is unbroken across all records.
+      record_count:
+        type: integer
+        description: Number of audit records verified.
+      chain_hash:
+        type: string
+        description: Final SHA-256 hash of the complete record chain.
+      message:
+        type: string
+        description: Human-readable integrity status message.
+
+# ── Enhancement #3: Workflow Dependency Chains ───────────────────────────────
+
+  - id: start-workflow-chain
+    name: Start Workflow Chain
+    description: >
+      Start a workflow while advertising its declared upstream dependencies.
+      Inspects WORKFLOW_DEPENDENCIES to surface dependencies so callers can
+      ensure upstream workflows have completed before this one proceeds.
+    type: action
+    agents: []
+    input:
+      workflow_name:
+        type: string
+        required: true
+        description: >
+          Name of the workflow to start.  Must be a registered workflow.
+          Workflows with declared dependencies:
+            compliance-report depends on covenant-compliance;
+            risk-summary depends on risk-assess;
+            risk-heatmap depends on risk-register and risk-assess;
+            verify-audit-integrity depends on log-decision.
+        example: "compliance-report"
+      context:
+        type: object
+        required: false
+        description: Context to pass to the target workflow.
+        example: {}
+    output:
+      workflow_name:
+        type: string
+      dependencies:
+        type: array
+        items: string
+        description: Declared upstream workflows that should have completed first.
+      context:
+        type: object
+      message:
+        type: string
+        description: Confirmation that the workflow chain was started.
+
+# ── Enhancement #10: API Documentation Generation ────────────────────────────
+
+  - id: generate-api-docs
+    name: Generate API Documentation
+    description: >
+      Generate structured API documentation for all 51 registered workflows.
+      Derives descriptions from each workflow's Python docstring, producing
+      output suitable for rendering as OpenAPI or Markdown documentation.
+    type: query
+    agents: []
+    input: {}
+    output:
+      workflows:
+        type: array
+        description: >
+          List of workflow descriptor objects, each containing name,
+          description, and module path.
+      total:
+        type: integer
+        description: Total number of documented workflows.
+      generated_at:
+        type: string
+        description: ISO-8601 timestamp of documentation generation.

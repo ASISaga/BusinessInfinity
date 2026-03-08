@@ -1,0 +1,186 @@
+# Founder Onboarding Workflows
+# ------------------------------
+# Handles the founder onboarding journey: website parsing, external-system
+# OAuth connection, founder voice-profile generation, and GDPR data
+# portability / right-to-erasure requests.
+#
+# Mirrors: src/business_infinity/workflows/onboarding.py
+
+version: "5.0.0"
+domain: onboarding
+description: >
+  Founder onboarding workflows covering company website parsing, external
+  system OAuth connections, voice-profile generation, and GDPR data rights.
+
+# Supported OAuth integration systems
+# oauth_integrations: informational list of external systems supported by the
+# onboarding-connect-system workflow.  Not enforced at the YAML schema level;
+# the authoritative list lives in _OAUTH_URLS in onboarding.py.
+oauth_integrations:
+  - salesforce
+  - hubspot
+  - netsuite
+  - workday
+  - quickbooks
+  - slack
+
+workflows:
+
+  - id: onboarding-parse-website
+    name: Parse Company Website
+    description: >
+      Parse a company website during onboarding to extract a structured
+      profile.  The CEO agent summarises the company based on its public URL;
+      the result is persisted as an onboarding-profile document in the
+      knowledge base.
+    type: action
+    agents:
+      - ceo
+    input:
+      url:
+        type: string
+        required: true
+        description: Public URL of the company website to parse.
+        example: "https://example.com"
+    output:
+      success:
+        type: boolean
+      data:
+        type: object
+        description: >
+          Parsed profile including source_url, description (CEO summary),
+          and parsed_at timestamp.
+
+  - id: onboarding-connect-system
+    name: Connect External System (OAuth)
+    description: >
+      Generate an OAuth authorisation URL to connect an external business
+      system (Salesforce, HubSpot, NetSuite, Workday, QuickBooks, or Slack).
+      Logs the user's consent decision in the audit trail before returning
+      the redirect URL.
+    type: action
+    agents: []
+    input:
+      system:
+        type: string
+        required: true
+        description: External system to connect.
+        enum:
+          - salesforce
+          - hubspot
+          - netsuite
+          - workday
+          - quickbooks
+          - slack
+        example: "salesforce"
+      user_id:
+        type: string
+        required: false
+        description: Identifier of the user granting consent.
+        default: "onboarding_user"
+        example: "founder-001"
+      customer_id:
+        type: string
+        required: false
+        description: Customer account identifier.
+        default: "onboarding_customer"
+        example: "cust-001"
+    output:
+      success:
+        type: boolean
+      auth_url:
+        type: string
+        description: OAuth authorisation URL to redirect the user to.
+      system:
+        type: string
+      scopes:
+        type: string
+        description: OAuth scopes granted — always "read-only".
+      consent_logged:
+        type: boolean
+        description: True when the consent decision has been written to the audit trail.
+
+  - id: onboarding-voice-profile
+    name: Generate Founder Voice Profile
+    description: >
+      Generate a founder voice profile by analysing their LinkedIn page and
+      public communication style.  The CMO agent identifies themes, tone,
+      style, and key phrases; the result is persisted in the knowledge base.
+    type: action
+    agents:
+      - cmo
+    input:
+      linkedin_url:
+        type: string
+        required: false
+        description: LinkedIn profile URL of the founder.
+        example: "https://linkedin.com/in/jsmith"
+      company_name:
+        type: string
+        required: false
+        description: Company name for the profile record.
+        example: "Acme"
+    output:
+      success:
+        type: boolean
+      data:
+        type: object
+        description: >
+          Voice profile including linkedin_url, company_name, profile (CMO
+          analysis), and generated_at timestamp.
+
+  - id: onboarding-export-data
+    name: Export Onboarding Data (GDPR)
+    description: >
+      Export all onboarding data for a customer for GDPR data-portability
+      compliance.  Retrieves onboarding-profile documents from the knowledge
+      base and returns them as a structured export bundle.
+    type: query
+    agents: []
+    input:
+      customer_id:
+        type: string
+        required: true
+        description: Customer account identifier whose data to export.
+        example: "cust-001"
+    output:
+      customer_id:
+        type: string
+      exported_at:
+        type: string
+        description: ISO-8601 timestamp of the export.
+      data:
+        type: object
+        description: Export bundle containing a documents array.
+
+  - id: onboarding-delete-data
+    name: Delete Onboarding Data (GDPR Right to Erasure)
+    description: >
+      Submit a data-deletion request for a customer under GDPR right to erasure.
+      Logs the deletion request in the audit trail so compliance teams can
+      action it; data is not immediately deleted.
+    type: action
+    agents: []
+    input:
+      customer_id:
+        type: string
+        required: true
+        description: Customer account identifier whose data to delete.
+        example: "cust-001"
+      user_id:
+        type: string
+        required: false
+        description: User identifier submitting the request; defaults to customer_id.
+        example: "founder-001"
+    output:
+      customer_id:
+        type: string
+      deletion_requested_at:
+        type: string
+        description: ISO-8601 timestamp when the deletion request was submitted.
+      status:
+        type: string
+        description: Always "pending" — data deletion is actioned by compliance teams.
+      message:
+        type: string
+        description: Confirmation message for the user.

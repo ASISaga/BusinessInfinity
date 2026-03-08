@@ -1,0 +1,252 @@
+# Boardroom Perpetual Orchestrations
+# ------------------------------------
+# Purpose-driven perpetual orchestrations that drive autonomous governance.
+# All orchestrations are continuous — agents work toward the stated purpose
+# indefinitely, running as boardroom-level decisions until explicitly stopped.
+#
+# Mirrors: src/business_infinity/workflows/orchestrations.py
+
+version: "5.0.0"
+domain: orchestrations
+description: >
+  Purpose-driven perpetual orchestrations for BusinessInfinity.
+  The boardroom-session is the primary orchestration; all others are
+  specialised sub-sessions that can run alongside or be initiated from it.
+
+workflows:
+
+  - id: boardroom-session
+    name: Boardroom Session
+    description: >
+      Start the primary perpetual autonomous boardroom session.
+      All C-suite agents collaborate continuously on strategic decisions,
+      operational reviews, and governance.  This is the central orchestration
+      of BusinessInfinity; all other orchestrations feed into or originate
+      from it.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - ceo
+      - cfo
+      - cmo
+      - coo
+      - cto
+      - cso
+      - chro
+    input:
+      agenda:
+        type: array
+        items: string
+        description: Boardroom agenda items for the session.
+        example: ["Q1 review", "hiring plan"]
+      mode:
+        type: string
+        default: autonomous
+        description: Orchestration mode (autonomous or supervised).
+    output:
+      orchestration_id:
+        type: string
+        description: Unique identifier of the started orchestration.
+      status:
+        type: string
+        description: Initial status of the orchestration.
+
+  - id: strategic-review
+    name: Strategic Review
+    description: >
+      Start a perpetual strategic review orchestration with all C-suite agents.
+      Continuously drives strategic alignment, improvement, and cross-functional
+      coordination across the organisation.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - ceo
+      - cfo
+      - cmo
+      - coo
+      - cto
+      - cso
+      - chro
+    input:
+      quarter:
+        type: string
+        description: Financial quarter under review.
+        example: "Q1-2026"
+      focus_areas:
+        type: array
+        items: string
+        description: Strategic focus areas for the review.
+        example: ["revenue", "growth"]
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: market-analysis
+    name: Market Analysis
+    description: >
+      Start a perpetual market analysis orchestration led by the CMO agent.
+      Continuously monitors markets, analyses competitors, and surfaces insights.
+      CEO provides strategic oversight; CSO contributes strategic analysis.
+    type: perpetual
+    workflow_mode: hierarchical
+    agents:
+      - cmo
+      - ceo
+      - cso
+    input:
+      market:
+        type: string
+        description: Target market or segment to analyse.
+        example: "EU SaaS"
+      competitors:
+        type: array
+        items: string
+        description: Competitor company names.
+        example: ["AcmeCorp", "Globex"]
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: budget-approval
+    name: Budget Approval & Governance
+    description: >
+      Start a perpetual budget governance orchestration with CEO and CFO.
+      Continuously oversees budget allocation, monitors spend, and governs
+      financial decisions across the organisation.
+    type: perpetual
+    workflow_mode: sequential
+    agents:
+      - ceo
+      - cfo
+    input:
+      department:
+        type: string
+        description: Department requesting the budget.
+        example: "Marketing"
+      amount:
+        type: number
+        description: Requested budget amount (in base currency).
+        example: 500000
+      justification:
+        type: string
+        description: Business justification for the budget request.
+        example: "Q2 campaign spend"
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: risk-assessment
+    name: Risk Assessment
+    description: >
+      Start a perpetual risk governance orchestration involving CSO, CTO, and COO.
+      Continuously monitors, assesses, and mitigates enterprise risks across all
+      business domains.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - cso
+      - cto
+      - coo
+    input:
+      risk_domain:
+        type: string
+        description: Business domain to assess risks for.
+        example: "cybersecurity"
+      risk_tolerance:
+        type: string
+        description: Risk tolerance level (low, moderate, high).
+        example: "moderate"
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: covenant-compliance
+    name: Covenant Compliance Monitoring
+    description: >
+      Start a perpetual covenant compliance monitoring orchestration with CEO,
+      COO, and CSO.  Continuously ensures all business operations comply with
+      established covenants and governance standards.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - ceo
+      - coo
+      - cso
+    input:
+      compliance_standard:
+        type: string
+        description: Compliance framework or standard identifier.
+        example: "BIC"
+      scope:
+        type: string
+        description: Geographic or organisational scope.
+        example: "global"
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: talent-management
+    name: Talent Management
+    description: >
+      Start a perpetual talent management orchestration led by CHRO with CEO
+      and COO.  Continuously manages talent strategy, organisational
+      development, and HR governance.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - chro
+      - ceo
+      - coo
+    input:
+      focus:
+        type: string
+        description: Talent management focus area.
+        example: "retention"
+      departments:
+        type: array
+        items: string
+        description: Departments to include in scope.
+        example: ["engineering", "marketing"]
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string
+
+  - id: technology-review
+    name: Technology Review
+    description: >
+      Start a perpetual technology review orchestration led by CTO with CEO and
+      CSO.  Continuously evaluates technology strategy, architecture decisions,
+      and engineering excellence.
+    type: perpetual
+    workflow_mode: default
+    agents:
+      - cto
+      - ceo
+      - cso
+    input:
+      focus_areas:
+        type: array
+        items: string
+        description: Technology areas to review.
+        example: ["cloud", "ai", "security"]
+      review_scope:
+        type: string
+        description: Review cadence or scope identifier.
+        example: "quarterly"
+    output:
+      orchestration_id:
+        type: string
+      status:
+        type: string

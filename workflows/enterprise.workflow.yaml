@@ -1,0 +1,354 @@
+# Enterprise SDK Capability Workflows
+# -------------------------------------
+# Knowledge management, risk registry, audit trail, covenant management,
+# direct agent interaction, analytics, MCP integration, and event handlers —
+# all backed by the AOS Client SDK v5.0.0.
+#
+# Mirrors: src/business_infinity/workflows/enterprise.py
+
+version: "5.0.0"
+domain: enterprise
+description: >
+  Enterprise capability workflows powered by the AOS Client SDK v5.0.0.
+  Covers knowledge base search, risk management, audit trail, covenants,
+  direct agent queries, analytics, alerting, and webhook registration.
+
+workflows:
+
+  - id: knowledge-search
+    name: Knowledge Base Search
+    description: >
+      Search the AOS knowledge base for documents using a free-text query.
+      Supports optional doc_type filtering and result-count limits.
+    type: query
+    agents: []
+    input:
+      query:
+        type: string
+        description: Free-text search query.
+        example: "sustainability policy"
+      doc_type:
+        type: string
+        required: false
+        description: Filter results to a specific document type.
+        example: "policy"
+      limit:
+        type: integer
+        default: 10
+        description: Maximum number of documents to return.
+    output:
+      documents:
+        type: array
+        description: List of matching knowledge-base documents.
+
+  - id: risk-register
+    name: Register Risk
+    description: >
+      Register a new risk entry in the AOS risk registry.
+      Captures title, description, category, and owner for tracking.
+    type: action
+    agents: []
+    input:
+      title:
+        type: string
+        required: true
+        description: Short descriptive title of the risk.
+        example: "Supply chain disruption"
+      description:
+        type: string
+        required: false
+        description: Detailed description of the risk.
+      category:
+        type: string
+        required: false
+        description: Risk category (e.g. operational, financial, compliance).
+        example: "operational"
+      owner:
+        type: string
+        required: false
+        description: Agent ID of the risk owner.
+        example: "coo"
+    output:
+      risk_id:
+        type: string
+        description: Unique identifier of the registered risk.
+      title:
+        type: string
+      category:
+        type: string
+      owner:
+        type: string
+
+  - id: risk-assess
+    name: Assess Risk
+    description: >
+      Assess an existing risk by recording its likelihood and impact scores.
+      Updates the risk record in the AOS risk registry.
+    type: action
+    agents: []
+    depends_on:
+      - risk-register
+    input:
+      risk_id:
+        type: string
+        required: true
+        description: ID of the risk to assess.
+        example: "risk-abc123"
+      likelihood:
+        type: number
+        required: true
+        description: Probability of the risk materialising (0.0–1.0).
+        example: 0.7
+      impact:
+        type: number
+        required: true
+        description: Severity of impact if the risk materialises (0.0–1.0).
+        example: 0.9
+    output:
+      risk_id:
+        type: string
+      likelihood:
+        type: number
+      impact:
+        type: number
+      risk_score:
+        type: number
+        description: Composite risk score derived from likelihood × impact.
+
+  - id: log-decision
+    name: Log Boardroom Decision
+    description: >
+      Log a boardroom decision to the AOS audit trail.
+      Each decision record is immutable and forms part of the tamper-evident
+      hash chain verified by verify-audit-integrity.
+    type: action
+    agents: []
+    input:
+      title:
+        type: string
+        required: true
+        description: Short title summarising the decision.
+        example: "Expand to EU"
+      rationale:
+        type: string
+        required: true
+        description: Business rationale behind the decision.
+        example: "Market opportunity identified in Q1 analysis"
+      agent_id:
+        type: string
+        required: true
+        description: Agent ID of the decision maker.
+        example: "ceo"
+    output:
+      decision_id:
+        type: string
+        description: Unique identifier of the logged decision record.
+      title:
+        type: string
+      agent_id:
+        type: string
+      timestamp:
+        type: string
+        description: ISO-8601 timestamp of the decision.
+
+  - id: covenant-create
+    name: Create Business Covenant
+    description: >
+      Create a new business covenant defining obligations, rights, and terms
+      between parties.  Covenants are enforced and monitored by the
+      covenant-compliance orchestration.
+    type: action
+    agents: []
+    input:
+      title:
+        type: string
+        required: true
+        description: Title of the covenant.
+        example: "Ethics Covenant"
+      parties:
+        type: array
+        items: string
+        required: true
+        description: List of party identifiers bound by the covenant.
+        example: ["business-infinity"]
+      terms:
+        type: object
+        required: false
+        description: Key-value terms and obligations of the covenant.
+    output:
+      covenant_id:
+        type: string
+        description: Unique identifier of the created covenant.
+      title:
+        type: string
+      parties:
+        type: array
+      status:
+        type: string
+
+  - id: ask-agent
+    name: Ask Agent
+    description: >
+      Ask a single C-suite agent a direct question and receive an answer.
+      The agent responds within the full boardroom context maintained by AOS.
+    type: query
+    # agents: accepts any agent ID from the catalog; ceo, cfo, cmo, coo, cto, cso, chro
+    # are the primary C-suite agents, but any registered agent can be queried.
+    agents: []
+    input:
+      agent_id:
+        type: string
+        required: true
+        description: Agent to query (e.g. ceo, cfo, cmo, coo, cto, cso, chro).
+        example: "ceo"
+      message:
+        type: string
+        required: true
+        description: The question or instruction to send to the agent.
+        example: "What is the Q2 strategy?"
+      context:
+        type: object
+        required: false
+        description: Additional structured context to pass to the agent.
+    output:
+      response:
+        type: object
+        description: Agent response object returned by the AOS SDK.
+
+  - id: risk-heatmap
+    name: Risk Heatmap
+    description: >
+      Retrieve a visual heatmap of risks categorised by likelihood and impact.
+      Optionally filter by risk category.
+    type: query
+    agents: []
+    depends_on:
+      - risk-register
+      - risk-assess
+    input:
+      category:
+        type: string
+        required: false
+        description: Filter heatmap to a specific risk category.
+        example: "operational"
+    output:
+      heatmap:
+        type: object
+        description: Heatmap data structure returned by the AOS SDK.
+
+  - id: risk-summary
+    name: Risk Summary
+    description: >
+      Get an aggregate summary of all registered risks, optionally filtered
+      by category.  Returns totals, averages, and top risks.
+    type: query
+    agents: []
+    depends_on:
+      - risk-assess
+    input:
+      category:
+        type: string
+        required: false
+        description: Filter the summary to a specific risk category.
+        example: "financial"
+    output:
+      summary:
+        type: object
+        description: Aggregate risk summary returned by the AOS SDK.
+
+  - id: compliance-report
+    name: Compliance Report
+    description: >
+      Generate a compliance report for a specified time window and report type.
+      Used for regulatory submissions and internal governance reviews.
+    type: action
+    agents: []
+    depends_on:
+      - covenant-compliance
+    input:
+      start_time:
+        type: string
+        required: true
+        description: ISO-8601 start of the reporting window.
+        example: "2026-01-01T00:00:00"
+      end_time:
+        type: string
+        required: true
+        description: ISO-8601 end of the reporting window.
+        example: "2026-03-31T23:59:59"
+      report_type:
+        type: string
+        default: decisions
+        description: Type of compliance data to include in the report.
+        example: "decisions"
+    output:
+      report_id:
+        type: string
+        description: Identifier of the generated compliance report.
+      report_type:
+        type: string
+      period:
+        type: object
+        description: Start and end timestamps of the report period.
+
+  - id: create-alert
+    name: Create Metric Alert
+    description: >
+      Create a threshold-based metric alert that notifies stakeholders when
+      a KPI crosses a defined boundary.
+    type: action
+    agents: []
+    input:
+      metric_name:
+        type: string
+        required: true
+        description: Name of the metric to monitor.
+        example: "risk_score"
+      threshold:
+        type: number
+        required: true
+        description: Alert threshold value.
+        example: 8.0
+      condition:
+        type: string
+        default: gt
+        description: Comparison operator — gt (greater-than), lt, eq.
+        example: "gt"
+    output:
+      alert_id:
+        type: string
+        description: Unique identifier of the created alert.
+      metric_name:
+        type: string
+      threshold:
+        type: number
+      condition:
+        type: string
+
+  - id: register-webhook
+    name: Register Webhook
+    description: >
+      Register an external webhook endpoint to receive real-time notifications
+      for specified AOS event types.
+    type: action
+    agents: []
+    input:
+      url:
+        type: string
+        required: true
+        description: HTTPS URL of the webhook receiver.
+        example: "https://hooks.slack.com/services/..."
+      events:
+        type: array
+        items: string
+        required: true
+        description: List of AOS event types to subscribe to.
+        example: ["decision.created", "covenant.violated"]
+    output:
+      webhook_id:
+        type: string
+        description: Unique identifier of the registered webhook.
+      url:
+        type: string
+      events:
+        type: array
